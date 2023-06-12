@@ -1,0 +1,4 @@
+# site-packages is not included by the conda .venv/python.exe
+# but it is included by the virtualenv .venv/Scripts/python.exe
+# so it is forced here to use both interpreters interchangeably.
+.venv\Lib\site-packages

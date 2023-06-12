@@ -1,0 +1,17 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff
+        entry: ruff check --force-exclude
+        language: python
+        require_serial: true
+        types_or: [python, pyi]
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: python
+        require_serial: true
+        types_or: [python, pyi]
