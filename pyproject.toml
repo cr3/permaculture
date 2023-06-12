@@ -1,16 +1,16 @@
 [tool.poetry]
-name = "changeme"
+name = "permaculture"
 version = "0.0.0"
-description = "changeme"
-authors = ["changeme"]
+description = "Permaculture design toolkit"
+authors = ["Marc Tardif"]
 readme = "README.rst"
-repository = "https://github.com/cr3/changeme"
+repository = "https://github.com/cr3/permaculture"
 packages = [
-    { include = "changeme" },
+    { include = "permaculture" },
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
@@ -99,7 +99,7 @@ addopts = [
     "--doctest-glob=*.rst",
 ]
 testpaths = [
-    "changeme",
+    "permaculture",
     "docs",
     "tests",
 ]
@@ -108,7 +108,7 @@ testpaths = [
 #   https://coverage.readthedocs.io/en/latest/config.html
 [tool.coverage.paths]
 source = [
-    "changeme",
+    "permaculture",
     "*/*/site-packages",
 ]
 
@@ -120,5 +120,5 @@ show_missing = true
 branch = true
 parallel = true
 source = [
-    "changeme",
+    "permaculture",
 ]

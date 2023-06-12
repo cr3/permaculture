@@ -8,9 +8,9 @@ import pkg_resources
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "changeme"
-copyright = "2023, changeme"  # noqa: A001
-author = "changeme"
+project = "permaculture"
+copyright = "2023, Marc Tardif"  # noqa: A001
+author = "Marc Tardif"
 version = release = pkg_resources.get_distribution(project).version
 
 # -- General configuration ---------------------------------------------------
