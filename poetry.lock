@@ -13,6 +13,25 @@ files = [
 ]
 
 [[package]]
+name = "attrs"
+version = "23.1.0"
+description = "Classes Without Boilerplate"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "attrs-23.1.0-py3-none-any.whl", hash = "sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04"},
+    {file = "attrs-23.1.0.tar.gz", hash = "sha256:6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc50e015"},
+]
+
+[package.extras]
+cov = ["attrs[tests]", "coverage[toml] (>=5.3)"]
+dev = ["attrs[docs,tests]", "pre-commit"]
+docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier", "zope-interface"]
+tests = ["attrs[tests-no-zope]", "zope-interface"]
+tests-no-zope = ["cloudpickle", "hypothesis", "mypy (>=1.1.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
+
+[[package]]
 name = "babel"
 version = "2.12.1"
 description = "Internationalization utilities"
@@ -78,7 +97,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 name = "certifi"
 version = "2023.5.7"
 description = "Python package for providing Mozilla's CA Bundle."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -102,7 +121,7 @@ files = [
 name = "charset-normalizer"
 version = "3.1.0"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
@@ -357,7 +376,7 @@ license = ["ukkonen"]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 files = [
@@ -605,6 +624,24 @@ files = [
 plugins = ["importlib-metadata"]
 
 [[package]]
+name = "pyhamcrest"
+version = "2.0.4"
+description = "Hamcrest framework for matcher objects"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pyhamcrest-2.0.4-py3-none-any.whl", hash = "sha256:60a41d4783b9d56c9ec8586635d2301db5072b3ea8a51c32dd03c408ae2b0f79"},
+    {file = "pyhamcrest-2.0.4.tar.gz", hash = "sha256:b5d9ce6b977696286cf232ce2adf8969b4d0b045975b0936ac9005e84e67e9c1"},
+]
+
+[package.extras]
+dev = ["black", "flake8", "pyhamcrest[docs,tests]", "pytest-mypy", "towncrier", "tox", "tox-asdf", "twine"]
+docs = ["alabaster (>=0.7,<1.0)", "sphinx (>=4.0,<5.0)"]
+tests = ["coverage[toml]", "dataclasses", "mypy (!=0.940)", "pytest (>=5.0)", "pytest-mypy-plugins", "pytest-sugar", "pytest-xdist", "types-dataclasses", "types-mock"]
+tests-numpy = ["numpy", "pyhamcrest[tests]"]
+
+[[package]]
 name = "pytest"
 version = "7.3.2"
 description = "pytest: simple powerful testing with Python"
@@ -681,7 +718,7 @@ files = [
 name = "requests"
 version = "2.31.0"
 description = "Python HTTP for Humans."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -964,7 +1001,7 @@ files = [
 name = "urllib3"
 version = "2.0.3"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1018,4 +1055,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "f465fc328b2d21161ed022dc826a62087c71543964c4a50b7c6690db103e3aba"
+content-hash = "e7c6761b6b66c878a513be30334f58719e8d10246237b3cfd9a8e8b97dc1a2c5"
