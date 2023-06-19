@@ -52,7 +52,9 @@ class Serializer:
         return getattr(self, "_default_content_type", None)
 
     # Default content type used when encoding and decoding data.
-    default_content_type = property(_get_default_content_type, _set_default_content_type)
+    default_content_type = property(
+        _get_default_content_type, _set_default_content_type
+    )
 
     def encode(self, data, content_type=None, optimize=False):
         """Encode data based on a content type.
@@ -75,7 +77,9 @@ class Serializer:
         try:
             serializer = self._serializers[content_type]
         except KeyError as error:
-            raise SerializerNotFound(f"Serializer {content_type!r} not found") from error
+            raise SerializerNotFound(
+                f"Serializer {content_type!r} not found"
+            ) from error
 
         payload = serializer.encode(data)
 
@@ -96,7 +100,9 @@ class Serializer:
         try:
             serializer = self._serializers[content_type]
         except KeyError as error:
-            raise SerializerNotFound(f"Serializer {content_type!r} not found") from error
+            raise SerializerNotFound(
+                f"Serializer {content_type!r} not found"
+            ) from error
 
         return serializer.decode(payload)
 

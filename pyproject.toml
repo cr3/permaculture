@@ -45,13 +45,13 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line-length = 120
+line-length = 79
 target-version = ["py39"]
 preview = true
 
 [tool.ruff]
 target-version = "py39"
-line-length = 120
+line-length = 79
 fix = true
 select = [
     # flake8-2020

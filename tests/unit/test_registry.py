@@ -21,7 +21,9 @@ def test_registry_load():
     ) as mock_entry_points:
         mock_entry_points.return_value = iter(
             [
-                EntryPoint("registry", "permaculture.registry", "permaculture.group"),
+                EntryPoint(
+                    "registry", "permaculture.registry", "permaculture.group"
+                ),
             ]
         )
         registry = registry_load("group")
@@ -37,7 +39,9 @@ def test_registry_load_ignore():
     ) as mock_entry_points:
         mock_entry_points.return_value = iter(
             [
-                EntryPoint("error", "permaculture.registry", "permaculture.group"),
+                EntryPoint(
+                    "error", "permaculture.registry", "permaculture.group"
+                ),
             ]
         )
         registry = registry_load("group")

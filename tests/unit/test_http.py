@@ -6,7 +6,11 @@ import pytest
 from attrs import Factory, define, field
 
 from permaculture.cache import MemoryCache
-from permaculture.http import HTTPCache, parse_http_expiry, parse_http_timestamp
+from permaculture.http import (
+    HTTPCache,
+    parse_http_expiry,
+    parse_http_timestamp,
+)
 
 
 @define(frozen=True)
@@ -28,7 +32,10 @@ class StubRequestsResponse:
     body: str = ""
     url: str = "http://www.test.com/"
     request: StubRequestsPreparedRequest = field(
-        default=Factory(lambda self: StubRequestsPreparedRequest(url=self.url), takes_self=True)
+        default=Factory(
+            lambda self: StubRequestsPreparedRequest(url=self.url),
+            takes_self=True,
+        )
     )
 
 
@@ -48,8 +55,16 @@ def test_parse_http_expiry_without_max_age():
 @pytest.mark.parametrize(
     "timestamp, expected",
     [
-        pytest.param("Sun, 01 Mar 2020 15:00:00 GMT", datetime(2020, 3, 1, 15, 0), id="RFC 1123"),
-        pytest.param("Sunday, 01-Mar-20 15:00:00 GMT", datetime(2020, 3, 1, 15, 0), id="RFC 850"),
+        pytest.param(
+            "Sun, 01 Mar 2020 15:00:00 GMT",
+            datetime(2020, 3, 1, 15, 0),
+            id="RFC 1123",
+        ),
+        pytest.param(
+            "Sunday, 01-Mar-20 15:00:00 GMT",
+            datetime(2020, 3, 1, 15, 0),
+            id="RFC 850",
+        ),
     ],
 )
 def test_parse_http_timestamp(timestamp, expected):
