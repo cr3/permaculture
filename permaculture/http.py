@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from attrs import define, field
 from requests.adapters import HTTPAdapter
 
-from permaculture.cache import Cache, MemoryCache
+from permaculture.storage import MemoryStorage, Storage
 
 RFC_1123_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 RFC_850_FORMAT = "%A, %d-%b-%y %H:%M:%S GMT"
@@ -39,7 +39,7 @@ CACHEABLE_METHODS = {"GET", "HEAD", "OPTIONS"}
 class HTTPCache:
     """Manages caching of responses according to RFC 2616."""
 
-    _cache: Cache = field(factory=MemoryCache)
+    _storage: Storage = field(factory=MemoryStorage)
 
     def store(self, response):
         """Store an HTTP response object in the cache."""
@@ -77,16 +77,17 @@ class HTTPCache:
         ):
             return False
 
-        self._cache.store(
-            response.url,
-            {"response": response, "creation": creation, "expiry": expiry},
-        )
+        self._storage[response.url] = {
+            "response": response,
+            "creation": creation,
+            "expiry": expiry,
+        }
 
         return True
 
     def handle_304(self, response):
         """Given a 304 response, retrieve the cached entry."""
-        cached_response = self._cache.retrieve(response.url)
+        cached_response = self._storage.get(response.url)
         if cached_response is None:
             return None
 
@@ -96,13 +97,13 @@ class HTTPCache:
         """Retrieve a cached HTTP response if possible."""
         url = request.url
 
-        cached_response = self._cache.retrieve(url)
+        cached_response = self._storage.get(url)
         if cached_response is None:
             return None
 
-        # If the method is not cacheable, discard the cache.
+        # If the method is not cacheable, remove from the cache.
         if request.method not in CACHEABLE_METHODS:
-            self._cache.discard(url)
+            del self._storage[url]
             return None
 
         # If we have no expiry time, add an 'If-Modified-Since' header.
@@ -112,9 +113,9 @@ class HTTPCache:
             request.headers["If-Modified-Since"] = header
             return None
 
-        # If we have an expiry time but it's later, discard the cache.
+        # If we have an expiry time but it's later, remove from the cache.
         if datetime.utcnow() > cached_response["expiry"]:
-            self._cache.discard(url)
+            del self._storage[url]
             return None
 
         return cached_response["response"]
