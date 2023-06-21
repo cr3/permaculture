@@ -10,6 +10,7 @@ repository = "https://github.com/cr3/permaculture"
 python = "^3.9"
 requests = "^2.31.0"
 attrs = "^23.1.0"
+yarl = "^1.9.2"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
@@ -39,6 +40,9 @@ sphinx-rtd-theme = "^1.2.0"
 "application/x-www-form-urlencoded" = "permaculture.serializer:www_form_serializer"
 "text/html" = "permaculture.serializer:text_html_serializer"
 "text/plain" = "permaculture.serializer:text_plain_serializer"
+
+[tool.poetry.scripts]
+usda-plants = "permaculture.usda:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
