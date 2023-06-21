@@ -96,6 +96,20 @@ def test_serialize_content_type():
     assert data is None
 
 
+def test_serializer_encode_error(serializer):
+    """A serializer should raise when encoding an unknown content type."""
+    content_type = "test"
+    with pytest.raises(SerializerNotFound):
+        serializer.encode("", content_type)
+
+
+def test_serializer_decode_error(serializer):
+    """A serializer should raise when decoding an unknown content type."""
+    content_type = "test"
+    with pytest.raises(SerializerNotFound):
+        serializer.decode(b"", content_type)
+
+
 def test_serializer_exception():
     """A serializer that raises an exception should be re-raised."""
 
