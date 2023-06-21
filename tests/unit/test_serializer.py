@@ -36,19 +36,19 @@ DICT_TEST = {
 )
 def serializer(request):
     """Produce pytest parameters for all serializers."""
-    return Serializer(request.param, {})
+    return Serializer.load(request.param, {})
 
 
 def test_init_not_found():
     """Initializing with an unknown content type should raise an exception."""
     content_type = "test"
     with pytest.raises(SerializerNotFound):
-        Serializer(content_type)
+        Serializer.load(content_type)
 
 
 def test_encode_optimized_bytes():
     """Encoding bytes with optimization should return an octet stream."""
-    serializer = Serializer()
+    serializer = Serializer.load()
     _, content_type, charset = serializer.encode(BYTES_TEST, optimize=True)
     assert content_type == "application/octet-stream"
     assert charset == "binary"
@@ -56,7 +56,7 @@ def test_encode_optimized_bytes():
 
 def test_encode_optimized_string():
     """Encoding a string with optimization should return plain text."""
-    serializer = Serializer()
+    serializer = Serializer.load()
     _, content_type, charset = serializer.encode(STRING_TEST, optimize=True)
     assert content_type == "text/plain"
     assert charset == "utf-8"
@@ -70,7 +70,7 @@ def test_encode_optimized_other():
         content_type,
         octet_stream_serializer,
     )
-    serializer = Serializer(content_type, registry)
+    serializer = Serializer.load(content_type, registry)
     assert content_type == serializer.encode(LIST_TEST, optimize=True)[1]
 
 
@@ -87,7 +87,7 @@ def test_serialize_content_type():
         text_plain_serializer,
         registry,
     )
-    serializer = Serializer("text/plain", registry)
+    serializer = Serializer.load("text/plain", registry)
     content_type = serializer.encode(
         None, content_type="application/octet-stream"
     )[1]
@@ -112,7 +112,7 @@ def test_serializer_exception():
         content_type,
         SerializerPlugin(test_serializer, test_serializer, "test"),
     )
-    serializer = Serializer(content_type, registry)
+    serializer = Serializer.load(content_type, registry)
     with pytest.raises(TestException):
         serializer.encode(None)
     with pytest.raises(TestException):

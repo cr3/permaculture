@@ -21,7 +21,7 @@ class FileStorage(Storage):
     """
 
     _basedir: Path = field(converter=Path)
-    serializer: Serializer = Serializer("application/x-pickle")
+    serializer: Serializer = Serializer.load("application/x-pickle")
 
     def _key_to_path(self, key):
         path = self._basedir / quote(key, "")
