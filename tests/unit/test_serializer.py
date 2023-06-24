@@ -65,17 +65,32 @@ def test_encode_optimized_string():
 def test_encode_optimized_other():
     """Encoding other data with optimization should use the default."""
     content_type = "test"
-    registry = registry_add("serializers", content_type, octet_stream_serializer)
+    registry = registry_add(
+        "serializers",
+        content_type,
+        octet_stream_serializer,
+    )
     serializer = Serializer(content_type, registry)
     assert content_type == serializer.encode(LIST_TEST, optimize=True)[1]
 
 
 def test_serialize_content_type():
     """Serializing a given content type should override the default."""
-    registry = registry_add("serializers", "application/octet-stream", octet_stream_serializer)
-    registry = registry_add("serializers", "text/plain", text_plain_serializer, registry)
+    registry = registry_add(
+        "serializers",
+        "application/octet-stream",
+        octet_stream_serializer,
+    )
+    registry = registry_add(
+        "serializers",
+        "text/plain",
+        text_plain_serializer,
+        registry,
+    )
     serializer = Serializer("text/plain", registry)
-    content_type = serializer.encode(None, content_type="application/octet-stream")[1]
+    content_type = serializer.encode(
+        None, content_type="application/octet-stream"
+    )[1]
     assert content_type == "application/octet-stream"
     data = serializer.decode(None, content_type="application/octet-stream")
     assert data is None
@@ -92,7 +107,11 @@ def test_serializer_exception():
         raise TestException
 
     content_type = "test"
-    registry = registry_add("serializers", content_type, SerializerPlugin(test_serializer, test_serializer, "test"))
+    registry = registry_add(
+        "serializers",
+        content_type,
+        SerializerPlugin(test_serializer, test_serializer, "test"),
+    )
     serializer = Serializer(content_type, registry)
     with pytest.raises(TestException):
         serializer.encode(None)

@@ -44,7 +44,10 @@ class HTTPCache:
     def store(self, response):
         """Store an HTTP response object in the cache."""
 
-        if response.status_code not in CACHEABLE_STATUS_CODES or response.request.method not in CACHEABLE_METHODS:
+        if (
+            response.status_code not in CACHEABLE_STATUS_CODES
+            or response.request.method not in CACHEABLE_METHODS
+        ):
             return False
 
         # Parse the date timestamp.
@@ -67,10 +70,17 @@ class HTTPCache:
 
         # If there's a query portion of the url and it's a GET, don't cache
         # this unless explicitly instructed to.
-        if expiry is None and response.request.method == "GET" and urlparse(response.url).query:
+        if (
+            expiry is None
+            and response.request.method == "GET"
+            and urlparse(response.url).query
+        ):
             return False
 
-        self._cache.store(response.url, {"response": response, "creation": creation, "expiry": expiry})
+        self._cache.store(
+            response.url,
+            {"response": response, "creation": creation, "expiry": expiry},
+        )
 
         return True
 
