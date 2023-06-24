@@ -13,6 +13,7 @@ class SerializerNotFound(Exception):
     """Raised when a serializer is not found for a content type."""
 
 
+@define(frozen=True)
 class Serializer:
     """A serializer to encode and decode data.
 
@@ -22,39 +23,27 @@ class Serializer:
     :raises SerializerNotFound: If the serializer is not found for the content
         type.
 
-    >>> serializer = Serializer()
+    >>> serializer = Serializer.load()
     >>> serializer.encode('foo') == (b'"foo"', 'application/json', 'utf-8')
     True
     >>> serializer.decode(b'{"key": "value"}') == {'key': 'value'}
     True
     """
 
-    def __init__(self, content_type="application/json", registry=None):
-        """Init."""
+    default_content_type: str
+    _serializers: dict[str, "SerializerPlugin"]
+
+    @classmethod
+    def load(cls, content_type="application/json", registry=None):
+        """Load serializers from registry."""
         if registry is None or "serializers" not in registry:
             registry = registry_load("serializers", registry)
 
-        self._serializers = registry.get("serializers", {})
-        self.default_content_type = content_type
-
-    def __repr__(self):
-        cls = self.__class__.__name__
-        content_type = self.default_content_type
-        return f"{cls}(content_type={content_type!r})"
-
-    def _set_default_content_type(self, content_type):
-        if content_type not in self._serializers:
+        serializers = registry.get("serializers", {})
+        if content_type not in serializers:
             raise SerializerNotFound(f"Serializer {content_type!r} not found")
 
-        self._default_content_type = content_type
-
-    def _get_default_content_type(self):
-        return getattr(self, "_default_content_type", None)
-
-    # Default content type used when encoding and decoding data.
-    default_content_type = property(
-        _get_default_content_type, _set_default_content_type
-    )
+        return cls(content_type, serializers)
 
     def encode(self, data, content_type=None, optimize=False):
         """Encode data based on a content type.
