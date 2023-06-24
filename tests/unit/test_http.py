@@ -1,6 +1,7 @@
 """Unit tests for the http module."""
 
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 
 import pytest
 from attrs import Factory, define, field
@@ -11,6 +12,7 @@ from permaculture.http import (
     HTTP_UNCACHEABLE_METHODS,
     HTTPCache,
     HTTPCacheAll,
+    HTTPClient,
     HTTPEntry,
     parse_http_expiry,
     parse_http_timestamp,
@@ -296,3 +298,28 @@ def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
 
     http_cache_all.store(resp)
     assert http_cache_all.handle_304(resp) is resp
+
+
+@pytest.mark.parametrize("method", HTTP_METHODS)
+def test_http_client_request(method):
+    """The HTTP client request should append the path to the base URL."""
+    session = Mock()
+    client = HTTPClient("http://www.test.com", session)
+    client.request(method, "/a")
+    session.request.assert_called_once_with(method, "http://www.test.com/a")
+
+
+def test_http_client_get():
+    """The HTTP client should map partial methods to request."""
+    session = Mock()
+    client = HTTPClient("http://www.test.com", session)
+    client.get("/a")
+    session.request.assert_called_once_with("GET", "http://www.test.com/a")
+
+
+def test_http_client_cache():
+    """The HTTP client should map partial methods to request."""
+    session = Mock()
+    client = HTTPClient("http://www.test.com", session)
+    client.get("/a")
+    session.request.assert_called_once_with("GET", "http://www.test.com/a")

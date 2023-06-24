@@ -1,11 +1,12 @@
 """HTTP module."""
 
 from datetime import datetime, timedelta
+from functools import partialmethod
 from typing import Optional
 from urllib.parse import urlparse
 
 from attrs import define, field
-from requests import Response
+from requests import Response, Session
 from requests.adapters import HTTPAdapter
 
 from permaculture.storage import MemoryStorage, Storage
@@ -165,10 +166,13 @@ class HTTPCacheAll:
 class HTTPCacheAdapter(HTTPAdapter):
     """An HTTP cache adapter for Python requests."""
 
-    def __init__(self, storage, **kwargs):
+    def __init__(self, cache=None, **kwargs):
         super().__init__(**kwargs)
 
-        self.cache = HTTPCache(storage)
+        if cache is None:
+            cache = HTTPCache()
+
+        self.cache = cache
 
     def send(self, request, *args, **kwargs):
         """Send a PreparedRequest object respecting RFC 2616 rules about HTTP caching."""
@@ -187,3 +191,33 @@ class HTTPCacheAdapter(HTTPAdapter):
             self.cache.store(resp)
 
         return resp
+
+
+@define(frozen=True)
+class HTTPClient:
+    """An HTTP client with base URL."""
+
+    base_url: str
+    session: Session = field(factory=Session)
+    adapter: HTTPAdapter = field(factory=HTTPCacheAdapter)
+
+    def __attrs_post_init__(self):
+        self.session.mount(self.base_url, self.adapter)
+
+    def request(self, method, path, **kwargs):
+        """Send an HTTP request.
+
+        :param method: Method for the request.
+        :param path: Path joined to the URL.
+        :param **kwargs: Optional keyword arguments passed to the session.
+        """
+        url = self.base_url + path
+        return self.session.request(method, url, **kwargs)
+
+    get = partialmethod(request, "GET")
+    head = partialmethod(request, "HEAD")
+    options = partialmethod(request, "OPTIONS")
+    put = partialmethod(request, "PUT")
+    delete = partialmethod(request, "DELETE")
+    connect = partialmethod(request, "CONNECT")
+    patch = partialmethod(request, "PATCH")

@@ -84,6 +84,14 @@ def test_null_storage_setitem(key):
     assert not storage.get(key, False)
 
 
+def test_null_storage_delitem(key):
+    """Deleting a key should always raise."""
+    storage = NullStorage()
+    storage[key] = True
+    with pytest.raises(KeyError):
+        del storage[key]
+
+
 def test_null_storage_iter(key):
     """Iterating over a null storage should return an empty list."""
     storage = NullStorage()
