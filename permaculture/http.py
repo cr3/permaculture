@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from attrs import define, field
 from requests import Response, Session
 from requests.adapters import HTTPAdapter
+from yarl import URL
 
 from permaculture.storage import MemoryStorage, Storage
 
@@ -38,6 +39,7 @@ HTTP_METHODS = {
     "GET",
     "HEAD",
     "OPTIONS",
+    "POST",
     "PUT",
     "DELETE",
     "CONNECT",
@@ -197,12 +199,12 @@ class HTTPCacheAdapter(HTTPAdapter):
 class HTTPClient:
     """An HTTP client with base URL."""
 
-    base_url: str
+    base_url: URL = field(converter=URL)
     session: Session = field(factory=Session)
     adapter: HTTPAdapter = field(factory=HTTPCacheAdapter)
 
     def __attrs_post_init__(self):
-        self.session.mount(self.base_url, self.adapter)
+        self.session.mount(str(self.base_url), self.adapter)
 
     def request(self, method, path, **kwargs):
         """Send an HTTP request.
@@ -211,12 +213,13 @@ class HTTPClient:
         :param path: Path joined to the URL.
         :param **kwargs: Optional keyword arguments passed to the session.
         """
-        url = self.base_url + path
-        return self.session.request(method, url, **kwargs)
+        url = self.base_url / path
+        return self.session.request(method, str(url), **kwargs)
 
     get = partialmethod(request, "GET")
     head = partialmethod(request, "HEAD")
     options = partialmethod(request, "OPTIONS")
+    post = partialmethod(request, "POST")
     put = partialmethod(request, "PUT")
     delete = partialmethod(request, "DELETE")
     connect = partialmethod(request, "CONNECT")

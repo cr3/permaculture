@@ -305,21 +305,13 @@ def test_http_client_request(method):
     """The HTTP client request should append the path to the base URL."""
     session = Mock()
     client = HTTPClient("http://www.test.com", session)
-    client.request(method, "/a")
+    client.request(method, "a")
     session.request.assert_called_once_with(method, "http://www.test.com/a")
 
 
 def test_http_client_get():
     """The HTTP client should map partial methods to request."""
     session = Mock()
-    client = HTTPClient("http://www.test.com", session)
-    client.get("/a")
-    session.request.assert_called_once_with("GET", "http://www.test.com/a")
-
-
-def test_http_client_cache():
-    """The HTTP client should map partial methods to request."""
-    session = Mock()
-    client = HTTPClient("http://www.test.com", session)
-    client.get("/a")
-    session.request.assert_called_once_with("GET", "http://www.test.com/a")
+    client = HTTPClient("http://www.test.com/a", session)
+    client.get("b")
+    session.request.assert_called_once_with("GET", "http://www.test.com/a/b")
