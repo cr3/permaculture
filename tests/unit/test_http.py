@@ -5,12 +5,12 @@ from datetime import datetime, timedelta
 import pytest
 from attrs import Factory, define, field
 
-from permaculture.cache import MemoryCache
 from permaculture.http import (
     HTTPCache,
     parse_http_expiry,
     parse_http_timestamp,
 )
+from permaculture.storage import MemoryStorage
 
 
 @define(frozen=True)
@@ -80,7 +80,7 @@ def test_parse_http_timestamp_invalid():
 @pytest.fixture
 def http_cache():
     """An HTTP cache with memory backend."""
-    return HTTPCache(MemoryCache())
+    return HTTPCache(MemoryStorage())
 
 
 def test_http_cache_200_responses(http_cache):
@@ -163,17 +163,14 @@ def test_expiry_of_expires(http_cache):
     earlier = timedelta(seconds=-60)
     much_earlier = timedelta(days=-1)
 
-    http_cache._cache.store(
-        resp.url,
-        {
-            "response": resp,
-            "creation": datetime.utcnow() + much_earlier,
-            "expiry": datetime.utcnow() + earlier,
-        },
-    )
+    http_cache._storage[resp.url] = {
+        "response": resp,
+        "creation": datetime.utcnow() + much_earlier,
+        "expiry": datetime.utcnow() + earlier,
+    }
 
     assert http_cache.retrieve(req) is None
-    assert len(http_cache._cache) == 0
+    assert len(http_cache._storage) == 0
 
 
 def test_http_cache_inside_max_age(http_cache):
@@ -262,4 +259,4 @@ def test_http_cache_invalidate_some_methods(method, http_cache):
     req = StubRequestsPreparedRequest(method=method)
     assert http_cache.retrieve(req) is None
 
-    assert len(http_cache._cache) == 0
+    assert len(http_cache._storage) == 0
