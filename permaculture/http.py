@@ -1,9 +1,11 @@
 """HTTP module."""
 
 from datetime import datetime, timedelta
+from typing import Optional
 from urllib.parse import urlparse
 
 from attrs import define, field
+from requests import Response
 from requests.adapters import HTTPAdapter
 
 from permaculture.storage import MemoryStorage, Storage
@@ -31,22 +33,42 @@ def parse_http_timestamp(header, default=None):
             return default
 
 
-CACHEABLE_STATUS_CODES = {200, 203, 300, 301, 410}
-CACHEABLE_METHODS = {"GET", "HEAD", "OPTIONS"}
+HTTP_METHODS = {
+    "GET",
+    "HEAD",
+    "OPTIONS",
+    "PUT",
+    "DELETE",
+    "CONNECT",
+    "PATCH",
+}
+HTTP_CACHEABLE_METHODS = {"GET", "HEAD", "OPTIONS"}
+HTTP_UNCACHEABLE_METHODS = HTTP_METHODS.difference(HTTP_CACHEABLE_METHODS)
+
+HTTP_CACHEABLE_STATUS_CODES = {200, 203, 300, 301, 410}
+
+
+@define(frozen=True)
+class HTTPEntry:
+    """HTTP entry to cache in storage."""
+
+    response: Response
+    creation: datetime
+    expiry: Optional[datetime] = None
 
 
 @define(frozen=True)
 class HTTPCache:
     """Manages caching of responses according to RFC 2616."""
 
-    _storage: Storage = field(factory=MemoryStorage)
+    storage: Storage = field(factory=MemoryStorage)
 
     def store(self, response):
         """Store an HTTP response object in the cache."""
 
         if (
-            response.status_code not in CACHEABLE_STATUS_CODES
-            or response.request.method not in CACHEABLE_METHODS
+            response.status_code not in HTTP_CACHEABLE_STATUS_CODES
+            or response.request.method not in HTTP_CACHEABLE_METHODS
         ):
             return False
 
@@ -55,9 +77,8 @@ class HTTPCache:
         creation = parse_http_timestamp(response.headers.get("Date", ""), now)
 
         # Parse the expiry timestamp.
-        cache_control = response.headers.get("Cache-Control")
-        if cache_control is not None:
-            expiry = parse_http_expiry(cache_control, now)
+        if cache_control := response.headers.get("Cache-Control"):
+            expiry = parse_http_expiry(cache_control, creation)
             if expiry is None:
                 return False
         else:
@@ -77,69 +98,88 @@ class HTTPCache:
         ):
             return False
 
-        self._storage[response.url] = {
-            "response": response,
-            "creation": creation,
-            "expiry": expiry,
-        }
+        self.storage[response.url] = HTTPEntry(response, creation, expiry)
 
         return True
 
     def handle_304(self, response):
         """Given a 304 response, retrieve the cached entry."""
-        cached_response = self._storage.get(response.url)
-        if cached_response is None:
-            return None
+        if entry := self.storage.get(response.url):
+            return entry.response
 
-        return cached_response["response"]
+        return None
 
     def retrieve(self, request):
         """Retrieve a cached HTTP response if possible."""
         url = request.url
 
-        cached_response = self._storage.get(url)
-        if cached_response is None:
+        entry = self.storage.get(url)
+        if entry is None:
             return None
 
         # If the method is not cacheable, remove from the cache.
-        if request.method not in CACHEABLE_METHODS:
-            del self._storage[url]
+        if request.method not in HTTP_CACHEABLE_METHODS:
+            del self.storage[url]
             return None
 
         # If we have no expiry time, add an 'If-Modified-Since' header.
-        if cached_response["expiry"] is None:
-            creation = cached_response["creation"]
-            header = creation.strftime(RFC_1123_FORMAT)
-            request.headers["If-Modified-Since"] = header
+        if entry.expiry is None:
+            modified_since = entry.creation.strftime(RFC_1123_FORMAT)
+            request.headers["If-Modified-Since"] = modified_since
             return None
 
         # If we have an expiry time but it's later, remove from the cache.
-        if datetime.utcnow() > cached_response["expiry"]:
-            del self._storage[url]
+        if datetime.utcnow() > entry.expiry:
+            del self.storage[url]
             return None
 
-        return cached_response["response"]
+        return entry.response
+
+
+@define(frozen=True)
+class HTTPCacheAll:
+    """Manages caching of all responses."""
+
+    storage: Storage = field(factory=MemoryStorage)
+
+    def store(self, response):
+        """Store an HTTP response object in the cache."""
+
+        # Parse the date timestamp.
+        now = datetime.utcnow()
+        creation = parse_http_timestamp(response.headers.get("Date", ""), now)
+        self.storage[response.url] = HTTPEntry(response, creation)
+
+        return True
+
+    def retrieve(self, request):
+        """Retrieve a cached HTTP response if possible."""
+        if entry := self.storage.get(request.url):
+            return entry.response
+
+        return None
+
+    handle_304 = retrieve
 
 
 class HTTPCacheAdapter(HTTPAdapter):
     """An HTTP cache adapter for Python requests."""
 
-    def __init__(self, cache, **kwargs):
+    def __init__(self, storage, **kwargs):
         super().__init__(**kwargs)
 
-        self.cache = HTTPCache(cache)
+        self.cache = HTTPCache(storage)
 
-    def send(self, request, **kwargs):
+    def send(self, request, *args, **kwargs):
         """Send a PreparedRequest object respecting RFC 2616 rules about HTTP caching."""
-        cached_response = self.cache.retrieve(request)
-        if cached_response is not None:
-            return cached_response
+        if entry := self.cache.retrieve(request):
+            return entry
 
-        return super().send(request, **kwargs)
+        return super().send(request, *args, **kwargs)
 
-    def build_response(self, request, response):
+    def build_response(self, req, response):
         """Build a Response object from a urllib3 response."""
-        resp = super().build_response(request, response)
+        resp = super().build_response(req, response)
 
         if resp.status_code == 304:
             resp = self.cache.handle_304(resp)
