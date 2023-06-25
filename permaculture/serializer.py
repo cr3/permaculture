@@ -4,7 +4,7 @@ import pickle
 from typing import Any, Callable
 from urllib.parse import parse_qsl, urlencode
 
-from attrs import define
+from attrs import define, field
 
 from permaculture.registry import registry_load
 
@@ -31,7 +31,7 @@ class Serializer:
     """
 
     default_content_type: str
-    _serializers: dict[str, "SerializerPlugin"]
+    _serializers: dict[str, "SerializerPlugin"] = field(repr=False)
 
     @classmethod
     def load(cls, content_type="application/json", registry=None):
@@ -106,7 +106,7 @@ class SerializerPlugin:
 
 
 json_serializer = SerializerPlugin(
-    lambda data: json.dumps(data).encode("utf-8"),
+    lambda data: json.dumps(data, sort_keys=True).encode("utf-8"),
     lambda payload: json.loads(payload.decode("utf-8")),
     "utf-8",
 )

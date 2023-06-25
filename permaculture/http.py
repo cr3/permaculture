@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 from functools import partialmethod
+from hashlib import md5
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -10,6 +11,7 @@ from requests import Response, Session
 from requests.adapters import HTTPAdapter
 from yarl import URL
 
+from permaculture.serializer import json_serializer
 from permaculture.storage import MemoryStorage, Storage
 
 RFC_1123_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
@@ -145,19 +147,43 @@ class HTTPCacheAll:
 
     storage: Storage = field(factory=MemoryStorage)
 
+    def _hash_request(self, request):
+        if (
+            request.method == "POST"
+            and request.headers.get("content-type") == "application/json"
+        ):
+            body = json_serializer.decode(request.body)
+        else:
+            body = request.body
+
+        data = json_serializer.encode(
+            {
+                "method": request.method,
+                "url": request.url,
+                "body": body,
+                "headers": {**request.headers},
+            }
+        )
+        return md5(data).hexdigest()  # noqa: S324
+
     def store(self, response):
         """Store an HTTP response object in the cache."""
+
+        key = self._hash_request(response.request)
+        if key in self.storage:
+            return False
 
         # Parse the date timestamp.
         now = datetime.utcnow()
         creation = parse_http_timestamp(response.headers.get("Date", ""), now)
-        self.storage[response.url] = HTTPEntry(response, creation)
+        self.storage[key] = HTTPEntry(response, creation)
 
         return True
 
     def retrieve(self, request):
         """Retrieve a cached HTTP response if possible."""
-        if entry := self.storage.get(request.url):
+        key = self._hash_request(request)
+        if entry := self.storage.get(key):
             return entry.response
 
         return None
