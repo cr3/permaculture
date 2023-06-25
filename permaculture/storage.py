@@ -27,6 +27,9 @@ class FileStorage(Storage):
         path = self._basedir / quote(key, "")
         return path
 
+    def _path_to_key(self, path):
+        return unquote(path.name)
+
     def __getitem__(self, key):
         """Read from file."""
         path = self._key_to_path(key)
@@ -40,6 +43,7 @@ class FileStorage(Storage):
         """Write to file."""
         path = self._key_to_path(key)
         payload, *_ = self.serializer.encode(value)
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(payload)
 
     def __delitem__(self, key):
@@ -50,7 +54,7 @@ class FileStorage(Storage):
             raise KeyError(key) from error
 
     def __iter__(self):
-        return (unquote(i.name) for i in self._basedir.iterdir())
+        return (self._path_to_key(p) for p in self._basedir.iterdir())
 
     def __len__(self):
         return sum(1 for _ in self)

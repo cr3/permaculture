@@ -70,6 +70,16 @@ def test_real_storage_length(key, real_storage):
     assert len(real_storage) == 1
 
 
+def test_file_storage_setitem(key, tmpdir):
+    """Setting a key should create the parent directory."""
+    parent = tmpdir / "parent"
+    assert not parent.exists()
+
+    storage = FileStorage(parent)
+    storage[key] = True
+    assert parent.exists()
+
+
 def test_null_storage_getitem(key):
     """Getting an existing key should always return the default."""
     storage = NullStorage()
