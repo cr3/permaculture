@@ -4,6 +4,7 @@ import sys
 from argparse import ArgumentParser, FileType
 
 from attrs import define
+from appdirs import user_cache_dir
 
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPClient
 from permaculture.storage import FileStorage, MemoryStorage
@@ -80,7 +81,8 @@ def main(argv=None):
     )
     parser.add_argument(
         "--cache-dir",
-        help="cache HTTP requests to directory, defaults to memory",
+        default=user_cache_dir("permaculture"),
+        help="cache HTTP requests to directory, defaults to %(default)r",
     )
     parser.add_argument(
         "--output",
@@ -102,6 +104,6 @@ def main(argv=None):
     if args.command == "download":
         output = plants.download(args.content_type)
     else:
-        raise Exception(f"Unsupported command: {args.command}")
+        parser.error(f"Unsupported command: {args.command}")
 
     args.output.write(output)
