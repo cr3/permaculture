@@ -3,8 +3,8 @@
 import sys
 from argparse import ArgumentParser, FileType
 
-from attrs import define
 from appdirs import user_cache_dir
+from attrs import define
 
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPClient
 from permaculture.storage import FileStorage, MemoryStorage

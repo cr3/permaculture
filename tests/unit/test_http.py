@@ -259,45 +259,117 @@ def test_http_cache_invalidate_some_methods(method, http_cache):
 
 
 @pytest.mark.parametrize("method", HTTP_METHODS)
-@pytest.mark.parametrize(
-    "url",
-    [
-        "http://www.test.com",
-        "http://www.test.com?a=b",
-    ],
-)
-def test_http_cache_all_methods(method, url, http_cache_all):
+def test_http_cache_all_methods(method, http_cache_all):
     """The HTTP cache all should cache all methods."""
     req = StubRequestsPreparedRequest(method)
     resp = StubRequestsResponse(
         request=req,
-        url=url,
+        url="http://www.test.com",
     )
 
     assert http_cache_all.store(resp)
 
 
+@pytest.mark.parametrize(
+    "url1, url2",
+    [
+        ("http://www.test.com", "http://www.test.com?a=b"),
+    ],
+)
+def test_http_cache_all_different_query(url1, url2, http_cache_all):
+    """The HTTP cache all should cache different queries separately."""
+    resp1 = StubRequestsResponse(url=url1)
+    assert http_cache_all.store(resp1)
+
+    resp2 = StubRequestsResponse(url=url2)
+    assert http_cache_all.store(resp2)
+
+
+@pytest.mark.parametrize(
+    "headers1, headers2",
+    [
+        ({"test": "a"}, {"test": "b"}),
+    ],
+)
+def test_http_cache_all_different_headers(headers1, headers2, http_cache_all):
+    """The HTTP cache all should cache different headers separately."""
+    req1 = StubRequestsPreparedRequest(headers=headers1)
+    resp1 = StubRequestsResponse(request=req1)
+    assert http_cache_all.store(resp1)
+
+    req2 = StubRequestsPreparedRequest(headers=headers2)
+    resp2 = StubRequestsResponse(request=req2)
+    assert http_cache_all.store(resp2)
+
+
+@pytest.mark.parametrize(
+    "body1, body2",
+    [
+        ({"test": "a"}, {"test": "b"}),
+    ],
+)
+def test_http_cache_all_different_body(body1, body2, http_cache_all):
+    """The HTTP cache all should cache different bodies separately."""
+    req1 = StubRequestsPreparedRequest(body=body1)
+    resp1 = StubRequestsResponse(request=req1)
+    assert http_cache_all.store(resp1)
+
+    req2 = StubRequestsPreparedRequest(body=body2)
+    resp2 = StubRequestsResponse(request=req2)
+    assert http_cache_all.store(resp2)
+
+
+@pytest.mark.parametrize(
+    "body1, body2",
+    [
+        (
+            b'{"a": "1", "b": "2"}',
+            b'{"b": "2", "a": "1"}',
+        ),
+    ],
+)
+def test_http_cache_all_same_json_body(body1, body2, http_cache_all):
+    """The HTTP cache all should cache same json bodies similarly."""
+    req1 = StubRequestsPreparedRequest(
+        method="POST",
+        body=body1,
+        headers={"content-type": "application/json"},
+    )
+    resp1 = StubRequestsResponse(request=req1)
+    assert http_cache_all.store(resp1)
+
+    req2 = StubRequestsPreparedRequest(
+        method="POST",
+        body=body2,
+        headers={"content-type": "application/json"},
+    )
+    resp2 = StubRequestsResponse(request=req2)
+    assert not http_cache_all.store(resp2)
+
+
 def test_http_cache_all_retrieve_new_responses(http_cache_all):
     """The HTTP cache retrieve new responses as None."""
-    resp = StubRequestsResponse(200)
+    req = StubRequestsPreparedRequest()
 
-    assert not http_cache_all.retrieve(resp)
+    assert not http_cache_all.retrieve(req)
 
 
 def test_http_cache_all_can_retrieve_all_responses(http_cache_all):
     """The HTTP cache can retrieve all responses."""
-    resp = StubRequestsResponse(200)
+    req = StubRequestsPreparedRequest()
+    resp = StubRequestsResponse(200, request=req)
 
     http_cache_all.store(resp)
-    assert http_cache_all.retrieve(resp) is resp
+    assert http_cache_all.retrieve(req) is resp
 
 
 def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
     """The HTTP cache can retrieve responses on 304."""
-    resp = StubRequestsResponse(200)
+    req = StubRequestsPreparedRequest()
+    resp = StubRequestsResponse(200, request=req)
 
     http_cache_all.store(resp)
-    assert http_cache_all.handle_304(resp) is resp
+    assert http_cache_all.handle_304(req) is resp
 
 
 @pytest.mark.parametrize("method", HTTP_METHODS)
