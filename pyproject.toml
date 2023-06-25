@@ -11,6 +11,7 @@ python = "^3.11"
 requests = "^2.31.0"
 attrs = "^23.1.0"
 yarl = "^1.9.2"
+appdirs = "^1.4.4"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
