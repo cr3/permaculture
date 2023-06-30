@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
-from attrs import Factory, define, field
 
 from permaculture.http import (
     HTTP_CACHEABLE_METHODS,
@@ -18,32 +17,7 @@ from permaculture.http import (
     parse_http_timestamp,
 )
 
-
-@define(frozen=True)
-class StubRequestsPreparedRequest:
-    """Stub Requests PreparedRequest object."""
-
-    method: str = "GET"
-    headers: dict = {}
-    body: str = ""
-    url: str = "http://www.test.com/"
-
-
-@define(frozen=True)
-class StubRequestsResponse:
-    """Stub Requests Response object."""
-
-    status_code: int = 200
-    headers: dict = {}
-    body: str = ""
-    url: str = "http://www.test.com/"
-    request: StubRequestsPreparedRequest = field(
-        default=Factory(
-            lambda self: StubRequestsPreparedRequest(url=self.url),
-            takes_self=True,
-        )
-    )
-
+from .stubs import StubRequestsPreparedRequest, StubRequestsResponse
 
 http_cache = pytest.fixture(lambda: HTTPCache())
 """An HTTP cache with memory backend."""
@@ -225,7 +199,10 @@ def test_http_cache_with_query_string(http_cache):
 
 
 def test_http_cache_with_query_inside_max_age(http_cache):
-    """The HTTP cache should store with a query string and inside Cache-Control max-age."""
+    """
+    The HTTP cache should store with a query string and inside
+    Cache-Control max-age.
+    """
     resp = StubRequestsResponse(
         headers={"Cache-Control": "max-age=3600"},
         url="http://www.test.com/?a=b",
