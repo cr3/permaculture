@@ -39,6 +39,7 @@ sphinx-rtd-theme = "^1.2.0"
 "application/octet-stream" = "permaculture.serializer:octet_stream_serializer"
 "application/x-pickle" = "permaculture.serializer:pickle_serializer"
 "application/x-www-form-urlencoded" = "permaculture.serializer:www_form_serializer"
+"text/csv" = "permaculture.serializer:text_csv_serializer"
 "text/html" = "permaculture.serializer:text_html_serializer"
 "text/plain" = "permaculture.serializer:text_plain_serializer"
 

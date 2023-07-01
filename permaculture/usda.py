@@ -8,6 +8,7 @@ from appdirs import user_cache_dir
 from attrs import define
 
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPClient
+from permaculture.serializer import SerializerAction
 from permaculture.storage import FileStorage, MemoryStorage
 
 
@@ -26,7 +27,7 @@ class UsdaPlants:
         client = HTTPClient(url, adapter=adapter)
         return cls(client)
 
-    def characteristics_search(self, content_type="text/csv") -> bytes:
+    def characteristics_search(self) -> bytes:
         """Search characteristics."""
         payload = {
             "Text": None,
@@ -56,30 +57,37 @@ class UsdaPlants:
             "TaxonSearchCriteria": None,
             "MasterId": -1,
         }
-        response = self.client.post(
-            "CharacteristicsSearch",
-            json=payload,
-            headers={
-                "Accept": content_type,
-            },
-        )
-
-        content = response.content.decode("utf-8")
-        if content_type == "text/csv":
-            # Strip first line that is not actually CSV.
-            content = "\n".join(content.splitlines()[1:])
-
-        return content
+        response = self.client.post("CharacteristicsSearch", json=payload)
+        return response.json()
 
     def plant_profile(self, symbol):
         """Plant profile for a symbol."""
         response = self.client.get("PlantProfile", params={"symbol": symbol})
-        return response.content.decode("utf-8")
+        return response.json()
 
     def plant_characteristics(self, Id):
         """Plant characteristics for an identifier."""
         response = self.client.get(f"PlantCharacteristics/{Id}")
-        return response.content.decode("utf-8")
+        return response.json()
+
+
+def all_characteristics(plants):
+    search = plants.characteristics_search()
+    return [
+        {
+            **{f"General/{k}": v for k, v in r.items()},
+            **{
+                "/".join(
+                    [
+                        c["PlantCharacteristicCategory"],
+                        c["PlantCharacteristicName"],
+                    ]
+                ): c["PlantCharacteristicValue"]
+                for c in plants.plant_characteristics(r["Id"])
+            },
+        }
+        for r in search["PlantResults"]
+    ]
 
 
 def main(argv=None):
@@ -88,27 +96,25 @@ def main(argv=None):
     parser.add_argument(
         "--api-url",
         default="https://plantsservices.sc.egov.usda.gov/api",
-        help="URL to the USDA plants services API, defaults to %(default)r",
+        help="URL to the USDA plants services API (default %(default)s)",
     )
     parser.add_argument(
         "--cache-dir",
         default=user_cache_dir("permaculture"),
-        help="cache HTTP requests to directory, defaults to %(default)r",
+        help="cache HTTP requests to directory (default %(default)s)",
     )
     parser.add_argument(
         "--output",
-        type=FileType("w"),
-        default=sys.stdout,
-        help="output file, defaults to stdout",
+        type=FileType("wb"),
+        default=sys.stdout.buffer,
+        help="output file (default stdout)",
+    )
+    parser.add_argument(
+        "--serializer",
+        action=SerializerAction,
     )
     subparsers = parser.add_subparsers(title="commands", dest="command")
-    characteristics_search = subparsers.add_parser("characteristics-search")
-    characteristics_search.add_argument(
-        "--content-type",
-        choices=["text/csv", "application/json"],
-        default="text/csv",
-        help="download content type, defaults to %(default)r",
-    )
+    subparsers.add_parser("characteristics-search")
     plant_profile = subparsers.add_parser("plant-profile")
     plant_profile.add_argument(
         "symbol",
@@ -120,18 +126,22 @@ def main(argv=None):
         type=int,
         help="plant identifier, e.g. 15309",
     )
+    subparsers.add_parser("all-characteristics")
 
     args = parser.parse_args(argv)
 
     plants = UsdaPlants.from_url(args.api_url, args.cache_dir)
     if args.command == "characteristics-search":
-        output = plants.characteristics_search(args.content_type)
+        data = plants.characteristics_search()
     elif args.command == "plant-profile":
-        output = plants.plant_profile(args.symbol)
+        data = plants.plant_profile(args.symbol)
     elif args.command == "plant-characteristics":
-        output = plants.plant_characteristics(args.id)
+        data = plants.plant_characteristics(args.id)
+    elif args.command == "all-characteristics":
+        data = all_characteristics(plants)
     else:
         parser.error(f"Unsupported command: {args.command}")
 
+    output, *_ = args.serializer.encode(data)
     with contextlib.suppress(BrokenPipeError):
         args.output.write(output)

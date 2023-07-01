@@ -1,12 +1,18 @@
 """Unit tests for the serializer module."""
+
+from argparse import ArgumentParser
+
 import pytest
+from hamcrest import assert_that, has_properties
 
 from permaculture.registry import registry_add
 from permaculture.serializer import (
     Serializer,
+    SerializerAction,
     SerializerNotFound,
     SerializerPlugin,
     octet_stream_serializer,
+    text_csv_serializer,
     text_plain_serializer,
     www_form_serializer,
 )
@@ -39,8 +45,36 @@ def serializer(request):
     return Serializer.load(request.param, {})
 
 
-def test_init_not_found():
-    """Initializing with an unknown content type should raise an exception."""
+def test_action_default():
+    """A SerializerAction should default to application/json."""
+    parser = ArgumentParser()
+    parser.add_argument("--serializer", action=SerializerAction)
+    result = parser.parse_args([])
+
+    assert_that(
+        result,
+        has_properties(
+            serializer=has_properties(default_content_type="application/json")
+        ),
+    )
+
+
+def test_action_custom():
+    """A SerializerAction should use the content-type given as argument."""
+    parser = ArgumentParser()
+    parser.add_argument("--serializer", action=SerializerAction)
+    result = parser.parse_args(["--serializer", "text/plain"])
+
+    assert_that(
+        result,
+        has_properties(
+            serializer=has_properties(default_content_type="text/plain")
+        ),
+    )
+
+
+def test_load_not_found():
+    """Loading with an unknown content type should raise an exception."""
     content_type = "test"
     with pytest.raises(SerializerNotFound):
         Serializer.load(content_type)
@@ -138,6 +172,13 @@ def test_octet_stream_serializer():
     payload = octet_stream_serializer.encode(BYTES_TEST)
     assert isinstance(payload, bytes)
     assert octet_stream_serializer.decode(payload) == BYTES_TEST
+
+
+def test_text_csv_serializer():
+    """The text/csv content type should encode a list of lists."""
+    payload = text_csv_serializer.encode([LIST_TEST])
+    assert isinstance(payload, bytes)
+    assert text_csv_serializer.decode(payload) == [LIST_TEST]
 
 
 def test_text_plain_serializer():
