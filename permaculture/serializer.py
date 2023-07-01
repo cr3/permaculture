@@ -1,16 +1,44 @@
 """Serializers for web related formats."""
+import csv
 import json
 import pickle
+from io import StringIO
 from typing import Any, Callable
 from urllib.parse import parse_qsl, urlencode
 
 from attrs import define, field
 
+from permaculture.action import SingleAction
 from permaculture.registry import registry_load
 
 
 class SerializerNotFound(Exception):
     """Raised when a serializer is not found for a content type."""
+
+
+class SerializerAction(SingleAction):
+    """Argument action for a serializer."""
+
+    metavar = "CONTENT-TYPE"
+    help_format = "serializer content-type (default application/json)".format
+
+    def __init__(self, option_strings, registry=None, **kwargs):
+        """Initializer serializer defaults."""
+        kwargs.setdefault("default", self.get_serializer())
+        kwargs.setdefault("metavar", self.metavar)
+        kwargs.setdefault("help", self.help_format())
+        super().__init__(option_strings, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        """Set the values to a serializer."""
+        serializer = self.get_serializer(values)
+
+        super().__call__(parser, namespace, serializer, option_string)
+
+    @classmethod
+    def get_serializer(cls, content_type="application/json"):
+        """Get a serializer with a default content-type."""
+        return Serializer.load(content_type)
 
 
 @define(frozen=True)
@@ -130,6 +158,27 @@ octet_stream_serializer = SerializerPlugin(
 
 This serializer doesn't do anything.
 """
+
+
+def _text_csv_serializer_encode(data, encoding="utf-8"):
+    f = StringIO()
+    writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+    writer.writerows(data)
+    return f.getvalue().encode(encoding)
+
+
+def _text_csv_serializer_decode(payload, encoding="utf-8"):
+    f = StringIO(payload.decode(encoding))
+    reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
+    return list(reader)
+
+
+text_csv_serializer = SerializerPlugin(
+    _text_csv_serializer_encode,
+    _text_csv_serializer_decode,
+    "utf-8",
+)
+"""Serializer for text/csv."""
 
 text_html_serializer = SerializerPlugin(
     lambda data: data.encode("utf-8"),

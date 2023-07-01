@@ -1,5 +1,7 @@
 """Unit testing stubs."""
 
+from typing import Callable
+
 from attrs import Factory, define, field
 
 
@@ -19,8 +21,7 @@ class StubRequestsResponse:
 
     status_code: int = 200
     headers: dict = {}
-    body: str = ""
-    content: bytes = b""
+    json: Callable[[], dict] = lambda: {}
     url: str = "http://www.test.com/"
     request: StubRequestsPreparedRequest = field(
         default=Factory(
