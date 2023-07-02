@@ -1,12 +1,12 @@
-"""Unit test for the usda_plants module."""
+"""Unit test for the plants module."""
 
 from unittest.mock import ANY, Mock, patch
 
 import pytest
 
-from permaculture.usda_plants import UsdaPlants, main
+from permaculture.usda.plants import UsdaPlants, main
 
-from .stubs import StubRequestsResponse
+from ..stubs import StubRequestsResponse
 
 
 def test_characteristics_search():

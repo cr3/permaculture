@@ -207,12 +207,16 @@ class HTTPCacheAdapter(HTTPAdapter):
         Send a PreparedRequest object respecting RFC 2616 rules about
         HTTP caching.
         """
-        if entry := self.cache.retrieve(request):
+        if response := self.cache.retrieve(request):
+            response.headers["X-Cache-Hit"] = "true"
             logger.debug(
                 "cache hit: %(method)s %(url)s",
-                {"method": request.method, "url": request.url},
+                {
+                    "method": request.method,
+                    "url": request.url,
+                },
             )
-            return entry
+            return response
 
         return super().send(request, *args, **kwargs)
 
@@ -228,12 +232,41 @@ class HTTPCacheAdapter(HTTPAdapter):
         return resp
 
 
+class HTTPLogAdapter(HTTPCacheAdapter):
+    """An HTTP log adapter for Python requests."""
+
+    def __init__(self, keys=None, cache=None, **kwargs):
+        super().__init__(cache, **kwargs)
+
+        if keys is None:
+            keys = []
+
+        self.keys = keys
+
+    def build_response(self, req, response):
+        """Log headers from the Response object."""
+        resp = super().build_response(req, response)
+
+        if resp.headers.get("X-Cache-Hit") != "true":
+            headers = {k: v for k, v in resp.headers.items() if k in self.keys}
+            logger.debug(
+                "%(method)s %(url)s %(headers)s",
+                {
+                    "method": req.method,
+                    "url": req.url,
+                    "headers": headers,
+                },
+            )
+
+        return resp
+
+
 @define(frozen=True)
 class HTTPClient:
     """An HTTP client with base URL."""
 
     base_url: URL = field(converter=URL)
-    headers: dict = field(factory=dict)
+    headers: dict[str, str] = field(factory=dict)
     session: Session = field(factory=Session)
     adapter: HTTPAdapter = field(factory=HTTPCacheAdapter)
 
