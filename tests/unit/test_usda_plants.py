@@ -1,10 +1,10 @@
-"""Unit test for the usda module."""
+"""Unit test for the usda_plants module."""
 
 from unittest.mock import ANY, Mock, patch
 
 import pytest
 
-from permaculture.usda import UsdaPlants, main
+from permaculture.usda_plants import UsdaPlants, main
 
 from .stubs import StubRequestsResponse
 
@@ -16,7 +16,6 @@ def test_characteristics_search():
     client.post.assert_called_once_with(
         "CharacteristicsSearch",
         json=ANY,
-        headers=ANY,
     )
 
 

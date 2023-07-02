@@ -2,8 +2,9 @@
 import csv
 import json
 import pickle
+from collections.abc import Callable
 from io import StringIO
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import parse_qsl, urlencode
 
 from attrs import define, field

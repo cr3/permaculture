@@ -1,9 +1,9 @@
 """HTTP module."""
 
+import logging
 from datetime import datetime, timedelta
 from functools import partialmethod
 from hashlib import md5
-from typing import Optional
 from urllib.parse import urlparse
 
 from attrs import define, field
@@ -13,6 +13,9 @@ from yarl import URL
 
 from permaculture.serializer import json_serializer
 from permaculture.storage import MemoryStorage, Storage
+
+logger = logging.getLogger(__name__)
+
 
 RFC_1123_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 RFC_850_FORMAT = "%A, %d-%b-%y %H:%M:%S GMT"
@@ -59,7 +62,7 @@ class HTTPEntry:
 
     response: Response
     creation: datetime
-    expiry: Optional[datetime] = None
+    expiry: datetime | None = None
 
 
 @define(frozen=True)
@@ -148,10 +151,8 @@ class HTTPCacheAll:
     storage: Storage = field(factory=MemoryStorage)
 
     def _hash_request(self, request):
-        if (
-            request.method == "POST"
-            and request.headers.get("content-type") == "application/json"
-        ):
+        content_type = request.headers.get("content-type")
+        if request.method == "POST" and content_type == "application/json":
             body = json_serializer.decode(request.body)
         else:
             body = request.body
@@ -161,7 +162,6 @@ class HTTPCacheAll:
                 "method": request.method,
                 "url": request.url,
                 "body": body,
-                "headers": {**request.headers},
             }
         )
         return md5(data).hexdigest()  # noqa: S324
@@ -203,8 +203,15 @@ class HTTPCacheAdapter(HTTPAdapter):
         self.cache = cache
 
     def send(self, request, *args, **kwargs):
-        """Send a PreparedRequest object respecting RFC 2616 rules about HTTP caching."""
+        """
+        Send a PreparedRequest object respecting RFC 2616 rules about
+        HTTP caching.
+        """
         if entry := self.cache.retrieve(request):
+            logger.debug(
+                "cache hit: %(method)s %(url)s",
+                {"method": request.method, "url": request.url},
+            )
             return entry
 
         return super().send(request, *args, **kwargs)
@@ -226,6 +233,7 @@ class HTTPClient:
     """An HTTP client with base URL."""
 
     base_url: URL = field(converter=URL)
+    headers: dict = field(factory=dict)
     session: Session = field(factory=Session)
     adapter: HTTPAdapter = field(factory=HTTPCacheAdapter)
 
@@ -240,7 +248,15 @@ class HTTPClient:
         :param **kwargs: Optional keyword arguments passed to the session.
         """
         url = self.base_url / path
-        return self.session.request(method, str(url), **kwargs)
+        if self.headers or "headers" in kwargs:
+            kwargs["headers"] = {**self.headers, **kwargs.get("headers", {})}
+        response = self.session.request(
+            method,
+            str(url),
+            **kwargs,
+        )
+        response.raise_for_status()
+        return response
 
     get = partialmethod(request, "GET")
     head = partialmethod(request, "HEAD")
