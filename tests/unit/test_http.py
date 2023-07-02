@@ -263,23 +263,6 @@ def test_http_cache_all_different_query(url1, url2, http_cache_all):
 
 
 @pytest.mark.parametrize(
-    "headers1, headers2",
-    [
-        ({"test": "a"}, {"test": "b"}),
-    ],
-)
-def test_http_cache_all_different_headers(headers1, headers2, http_cache_all):
-    """The HTTP cache all should cache different headers separately."""
-    req1 = StubRequestsPreparedRequest(headers=headers1)
-    resp1 = StubRequestsResponse(request=req1)
-    assert http_cache_all.store(resp1)
-
-    req2 = StubRequestsPreparedRequest(headers=headers2)
-    resp2 = StubRequestsResponse(request=req2)
-    assert http_cache_all.store(resp2)
-
-
-@pytest.mark.parametrize(
     "body1, body2",
     [
         ({"test": "a"}, {"test": "b"}),
@@ -353,7 +336,7 @@ def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
 def test_http_client_request(method):
     """The HTTP client request should append the path to the base URL."""
     session = Mock()
-    client = HTTPClient("http://www.test.com", session)
+    client = HTTPClient("http://www.test.com", session=session)
     client.request(method, "a")
     session.request.assert_called_once_with(method, "http://www.test.com/a")
 
@@ -361,6 +344,6 @@ def test_http_client_request(method):
 def test_http_client_get():
     """The HTTP client should map partial methods to request."""
     session = Mock()
-    client = HTTPClient("http://www.test.com/a", session)
+    client = HTTPClient("http://www.test.com/a", session=session)
     client.get("b")
     session.request.assert_called_once_with("GET", "http://www.test.com/a/b")

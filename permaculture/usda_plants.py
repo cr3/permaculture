@@ -8,6 +8,11 @@ from appdirs import user_cache_dir
 from attrs import define
 
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPClient
+from permaculture.logger import (
+    LoggerHandlerAction,
+    LoggerLevelAction,
+    setup_logger,
+)
 from permaculture.serializer import SerializerAction
 from permaculture.storage import FileStorage, MemoryStorage
 
@@ -113,6 +118,15 @@ def main(argv=None):
         "--serializer",
         action=SerializerAction,
     )
+    parser.add_argument(
+        "--log-file",
+        action=LoggerHandlerAction,
+    )
+    parser.add_argument(
+        "--log-level",
+        action=LoggerLevelAction,
+    )
+
     subparsers = parser.add_subparsers(title="commands", dest="command")
     subparsers.add_parser("characteristics-search")
     plant_profile = subparsers.add_parser("plant-profile")
@@ -130,17 +144,20 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
+    setup_logger(args.log_level, args.log_file)
+
     plants = UsdaPlants.from_url(args.api_url, args.cache_dir)
-    if args.command == "characteristics-search":
-        data = plants.characteristics_search()
-    elif args.command == "plant-profile":
-        data = plants.plant_profile(args.symbol)
-    elif args.command == "plant-characteristics":
-        data = plants.plant_characteristics(args.id)
-    elif args.command == "all-characteristics":
-        data = all_characteristics(plants)
-    else:
-        parser.error(f"Unsupported command: {args.command}")
+    match args.command:
+        case "characteristics-search":
+            data = plants.characteristics_search()
+        case "plant-profile":
+            data = plants.plant_profile(args.symbol)
+        case "plant-characteristics":
+            data = plants.plant_characteristics(args.id)
+        case "all-characteristics":
+            data = all_characteristics(plants)
+        case _:
+            parser.error(f"Unsupported command: {args.command}")
 
     output, *_ = args.serializer.encode(data)
     with contextlib.suppress(BrokenPipeError):

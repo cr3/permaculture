@@ -1,6 +1,6 @@
 """Unit testing stubs."""
 
-from typing import Callable
+from collections.abc import Callable
 
 from attrs import Factory, define, field
 
