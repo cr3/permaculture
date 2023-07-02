@@ -194,21 +194,24 @@ class HTTPCacheAll:
 class HTTPCacheAdapter(HTTPAdapter):
     """An HTTP cache adapter for Python requests."""
 
-    def __init__(self, cache=None, **kwargs):
+    def __init__(self, cache=None, keys=None, **kwargs):
         super().__init__(**kwargs)
 
         if cache is None:
             cache = HTTPCache()
+        if keys is None:
+            keys = []
 
         self.cache = cache
+        self.keys = keys
 
     def send(self, request, *args, **kwargs):
         """
         Send a PreparedRequest object respecting RFC 2616 rules about
         HTTP caching.
         """
-        if response := self.cache.retrieve(request):
-            response.headers["X-Cache-Hit"] = "true"
+        response = self.cache.retrieve(request)
+        if response is not None:
             logger.debug(
                 "cache hit: %(method)s %(url)s",
                 {
@@ -216,47 +219,29 @@ class HTTPCacheAdapter(HTTPAdapter):
                     "url": request.url,
                 },
             )
-            return response
+        else:
+            response = super().send(request, *args, **kwargs)
 
-        return super().send(request, *args, **kwargs)
+        return response
 
     def build_response(self, req, response):
         """Build a Response object from a urllib3 response."""
         resp = super().build_response(req, response)
 
+        headers = {k: v for k, v in resp.headers.items() if k in self.keys}
+        logger.debug(
+            "cache miss: %(method)s %(url)s %(headers)s",
+            {
+                "method": req.method,
+                "url": req.url,
+                "headers": headers,
+            },
+        )
+
         if resp.status_code == 304:
             resp = self.cache.handle_304(resp)
         else:
             self.cache.store(resp)
-
-        return resp
-
-
-class HTTPLogAdapter(HTTPCacheAdapter):
-    """An HTTP log adapter for Python requests."""
-
-    def __init__(self, keys=None, cache=None, **kwargs):
-        super().__init__(cache, **kwargs)
-
-        if keys is None:
-            keys = []
-
-        self.keys = keys
-
-    def build_response(self, req, response):
-        """Log headers from the Response object."""
-        resp = super().build_response(req, response)
-
-        if resp.headers.get("X-Cache-Hit") != "true":
-            headers = {k: v for k, v in resp.headers.items() if k in self.keys}
-            logger.debug(
-                "%(method)s %(url)s %(headers)s",
-                {
-                    "method": req.method,
-                    "url": req.url,
-                    "headers": headers,
-                },
-            )
 
         return resp
 
