@@ -1,4 +1,4 @@
-"""USDA plants services."""
+"""USDA Plants API."""
 
 import contextlib
 import sys
@@ -19,7 +19,7 @@ from permaculture.storage import FileStorage, MemoryStorage
 
 @define(frozen=True)
 class UsdaPlants:
-    """USDA plants service."""
+    """USDA Plants API."""
 
     client: HTTPClient
 
@@ -96,12 +96,12 @@ def all_characteristics(plants):
 
 
 def main(argv=None):
-    """Entry point to the USDA plants service."""
+    """Entry point to the USDA Plants API."""
     parser = ArgumentParser()
     parser.add_argument(
         "--api-url",
         default="https://plantsservices.sc.egov.usda.gov/api",
-        help="URL to the USDA plants services API (default %(default)s)",
+        help="URL to the USDA Plants API (default %(default)s)",
     )
     parser.add_argument(
         "--cache-dir",

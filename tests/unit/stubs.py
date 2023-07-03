@@ -23,6 +23,7 @@ class StubRequestsResponse:
     headers: dict = {}
     json: Callable[[], dict] = lambda: {}
     url: str = "http://www.test.com/"
+    reason: str = ""
     request: StubRequestsPreparedRequest = field(
         default=Factory(
             lambda self: StubRequestsPreparedRequest(url=self.url),

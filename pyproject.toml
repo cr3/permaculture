@@ -47,8 +47,8 @@ permaculture = "permaculture.testing.fixtures"
 "text/plain" = "permaculture.serializer:text_plain_serializer"
 
 [tool.poetry.scripts]
-usda-food = "permaculture.usda_food:main"
-usda-plants = "permaculture.usda_plants:main"
+usda-fdc = "permaculture.usda.fdc:main"
+usda-plants = "permaculture.usda.plants:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

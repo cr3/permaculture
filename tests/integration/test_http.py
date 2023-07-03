@@ -13,14 +13,16 @@ def session():
     return session
 
 
-def test_we_respect_304(session):
+def test_respect_304(session):
+    """The cache adapter should return the same response on 304."""
     r1 = session.get("http://httpbin.org/cache")
     r2 = session.get("http://httpbin.org/cache")
 
     assert r1 is r2
 
 
-def test_we_respect_cache_control(session):
+def test_respect_cache_control_max_age(session):
+    """The cache adapter should return the same response within max-age."""
     r1 = session.get(
         "http://httpbin.org/response-headers",
         params={"Cache-Control": "max-age=3600"},
@@ -33,20 +35,8 @@ def test_we_respect_cache_control(session):
     assert r1 is r2
 
 
-def test_we_respect_expires(session):
-    r1 = session.get(
-        "http://httpbin.org/response-headers",
-        params={"Expires": "Sun, 06 Nov 2034 08:49:37 GMT"},
-    )
-    r2 = session.get(
-        "http://httpbin.org/response-headers",
-        params={"Expires": "Sun, 06 Nov 2034 08:49:37 GMT"},
-    )
-
-    assert r1 is r2
-
-
-def test_we_respect_cache_control_2(session):
+def test_respect_cache_control_no_cache(session):
+    """The cache adapter should return the same response when no-cache."""
     r1 = session.get(
         "http://httpbin.org/response-headers",
         params={"Cache-Control": "no-cache"},
@@ -57,3 +47,17 @@ def test_we_respect_cache_control_2(session):
     )
 
     assert r1 is not r2
+
+
+def test_respect_expires(session):
+    """The cache adapter should return the same response within expires."""
+    r1 = session.get(
+        "http://httpbin.org/response-headers",
+        params={"Expires": "Sun, 01 Mar 2050 12:00:00 GMT"},
+    )
+    r2 = session.get(
+        "http://httpbin.org/response-headers",
+        params={"Expires": "Sun, 01 Mar 2050 12:00:00 GMT"},
+    )
+
+    assert r1 is r2

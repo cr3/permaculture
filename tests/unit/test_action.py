@@ -6,7 +6,7 @@ from enum import Enum
 import pytest
 from hamcrest import assert_that, has_properties
 
-from permaculture.action import EnumAction, SingleAction
+from permaculture.action import SingleAction, enum_action
 
 StubEnum = Enum("StubEnum", ["a", "b"])
 
@@ -14,7 +14,7 @@ StubEnum = Enum("StubEnum", ["a", "b"])
 def test_enum_action():
     """An EnumAction should return an enum instance."""
     parser = ArgumentParser()
-    parser.add_argument("--enum", action=EnumAction, type=StubEnum)
+    parser.add_argument("--enum", action=enum_action(StubEnum))
 
     result = parser.parse_args(["--enum", "a"])
 
@@ -26,8 +26,7 @@ def test_enum_action_default():
     parser = ArgumentParser()
     parser.add_argument(
         "--enum",
-        action=EnumAction,
-        type=StubEnum,
+        action=enum_action(StubEnum),
         default=StubEnum.a,
     )
 
@@ -39,12 +38,7 @@ def test_enum_action_default():
 def test_enum_action_list():
     """An EnumAction should return a list of values."""
     parser = ArgumentParser()
-    parser.add_argument(
-        "--enum",
-        action=EnumAction,
-        type=StubEnum,
-        nargs="*",
-    )
+    parser.add_argument("--enum", action=enum_action(StubEnum), nargs="*")
 
     result = parser.parse_args(["--enum", "a", "b"])
 
