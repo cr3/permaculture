@@ -135,7 +135,7 @@ class SerializerPlugin:
 
 
 json_serializer = SerializerPlugin(
-    lambda data: json.dumps(data, sort_keys=True).encode("utf-8"),
+    lambda data: json.dumps(data, sort_keys=True, indent=2).encode("utf-8"),
     lambda payload: json.loads(payload.decode("utf-8")),
     "utf-8",
 )

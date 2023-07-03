@@ -13,9 +13,9 @@ from requests import HTTPError
 
 from permaculture.action import enum_action
 from permaculture.http import (
+    HTTPCacheAdapter,
     HTTPCacheAll,
     HTTPClient,
-    HTTPLogAdapter,
 )
 from permaculture.logger import (
     LoggerHandlerAction,
@@ -53,9 +53,9 @@ class UsdaFdc:
         headers = {"X-Api-Key": api_key}
         storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
         cache = HTTPCacheAll(storage)
-        adapter = HTTPLogAdapter(
-            ["X-Ratelimit-Limit", "X-Ratelimit-Remaining"],
+        adapter = HTTPCacheAdapter(
             cache,
+            ["X-Ratelimit-Limit", "X-Ratelimit-Remaining"],
         )
         client = HTTPClient(url, headers=headers, adapter=adapter)
         return cls(client)
@@ -142,39 +142,39 @@ def main(argv=None):
     )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
-    food = subparsers.add_parser("food")
-    food.add_argument(
+    food_parser = subparsers.add_parser("food")
+    food_parser.add_argument(
         "fdc_id",
         type=int,
         help="Food Data Central identifier, e.g. 2341752",
     )
-    food.add_argument(
+    food_parser.add_argument(
         "--format",
         action=enum_action(UsdaFdcFormat),
         default=UsdaFdcFormat.full,
         help="output format (default full)",
     )
-    foods = subparsers.add_parser("foods")
-    foods.add_argument(
+    foods_parser = subparsers.add_parser("foods")
+    foods_parser.add_argument(
         "fdc_ids",
         type=int,
         nargs="*",
         help="Food Data Central identifiers",
     )
-    foods.add_argument(
+    foods_parser.add_argument(
         "--format",
         action=enum_action(UsdaFdcFormat),
         default=UsdaFdcFormat.full,
         help="output format (default full)",
     )
-    all_foods = subparsers.add_parser("all-foods")
-    all_foods.add_argument(
+    all_foods_parser = subparsers.add_parser("all-foods")
+    all_foods_parser.add_argument(
         "--sort-by",
         action=enum_action(UsdaFdcSortBy),
         default=UsdaFdcSortBy.fdc_id,
         help="sort value (default fdc_id)",
     )
-    all_foods.add_argument(
+    all_foods_parser.add_argument(
         "--sort-order",
         action=enum_action(UsdaFdcSortOrder),
         default=UsdaFdcSortOrder.asc,

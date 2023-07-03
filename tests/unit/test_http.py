@@ -10,10 +10,10 @@ from permaculture.http import (
     HTTP_METHODS,
     HTTP_UNCACHEABLE_METHODS,
     HTTPCache,
+    HTTPCacheAdapter,
     HTTPCacheAll,
     HTTPClient,
     HTTPEntry,
-    HTTPLogAdapter,
     parse_http_expiry,
     parse_http_timestamp,
 )
@@ -333,16 +333,16 @@ def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
     assert http_cache_all.handle_304(req) is resp
 
 
-def test_http_log_adapter(logger_handler):
-    """The HTTP log adapter should log the expected response headers."""
+def test_http_cache_adapter_keys(logger_handler):
+    """The HTTP cache adapter should log the expected header keys."""
     resp = StubRequestsResponse(headers={"X-Test": "test"})
     req = StubRequestsPreparedRequest("GET", url="http://www.test.com/")
 
-    adapter = HTTPLogAdapter(["X-Test"])
+    adapter = HTTPCacheAdapter(keys=["X-Test"])
     adapter.build_response(req, resp)
     result = logger_handler.records[0].message
 
-    assert result == "GET http://www.test.com/ {'X-Test': 'test'}"
+    assert result == "cache miss: GET http://www.test.com/ {'X-Test': 'test'}"
 
 
 @pytest.mark.parametrize("method", HTTP_METHODS)

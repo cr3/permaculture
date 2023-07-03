@@ -129,13 +129,15 @@ def main(argv=None):
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
     subparsers.add_parser("characteristics-search")
-    plant_profile = subparsers.add_parser("plant-profile")
-    plant_profile.add_argument(
+    plant_profile_parser = subparsers.add_parser("plant-profile")
+    plant_profile_parser.add_argument(
         "symbol",
         help="plant symbol, e.g. ABBA",
     )
-    plant_characteristics = subparsers.add_parser("plant-characteristics")
-    plant_characteristics.add_argument(
+    plant_characteristics_parser = subparsers.add_parser(
+        "plant-characteristics",
+    )
+    plant_characteristics_parser.add_argument(
         "id",
         type=int,
         help="plant identifier, e.g. 15309",
