@@ -12,6 +12,8 @@ requests = "^2.31.0"
 attrs = "^23.1.0"
 yarl = "^1.9.2"
 appdirs = "^1.4.4"
+beautifulsoup4 = "^4.12.2"
+pandas = "^2.0.3"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
@@ -49,6 +51,7 @@ permaculture = "permaculture.testing.fixtures"
 [tool.poetry.scripts]
 usda-fdc = "permaculture.usda.fdc:main"
 usda-plants = "permaculture.usda.plants:main"
+wikipedia-companion = "permaculture.wikipedia.companion:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

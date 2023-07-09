@@ -194,16 +194,16 @@ class HTTPCacheAll:
 class HTTPCacheAdapter(HTTPAdapter):
     """An HTTP cache adapter for Python requests."""
 
-    def __init__(self, cache=None, keys=None, **kwargs):
+    def __init__(self, cache=None, log_keys=None, **kwargs):
         super().__init__(**kwargs)
 
         if cache is None:
             cache = HTTPCache()
-        if keys is None:
-            keys = []
+        if log_keys is None:
+            log_keys = []
 
         self.cache = cache
-        self.keys = keys
+        self.log_keys = log_keys
 
     def send(self, request, *args, **kwargs):
         """
@@ -228,13 +228,15 @@ class HTTPCacheAdapter(HTTPAdapter):
         """Build a Response object from a urllib3 response."""
         resp = super().build_response(req, response)
 
-        headers = {k: v for k, v in resp.headers.items() if k in self.keys}
+        log_headers = {
+            k: v for k, v in resp.headers.items() if k in self.log_keys
+        }
         logger.debug(
             "cache miss: %(method)s %(url)s %(headers)s",
             {
                 "method": req.method,
                 "url": req.url,
-                "headers": headers,
+                "headers": log_headers,
             },
         )
 

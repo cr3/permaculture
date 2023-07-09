@@ -1,4 +1,4 @@
-"""Unit test for the plants module."""
+"""Unit tests for the USDA plants module."""
 
 from unittest.mock import ANY, Mock, patch
 
