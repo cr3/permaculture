@@ -333,12 +333,12 @@ def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
     assert http_cache_all.handle_304(req) is resp
 
 
-def test_http_cache_adapter_keys(logger_handler):
+def test_http_cache_adapter_log_keys(logger_handler):
     """The HTTP cache adapter should log the expected header keys."""
     resp = StubRequestsResponse(headers={"X-Test": "test"})
     req = StubRequestsPreparedRequest("GET", url="http://www.test.com/")
 
-    adapter = HTTPCacheAdapter(keys=["X-Test"])
+    adapter = HTTPCacheAdapter(log_keys=["X-Test"])
     adapter.build_response(req, resp)
     result = logger_handler.records[0].message
 

@@ -1,4 +1,4 @@
-"""Unit test for the fdc module."""
+"""Unit tests for the USDA fdc module."""
 
 from unittest.mock import Mock, patch
 
