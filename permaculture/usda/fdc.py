@@ -43,7 +43,7 @@ UsdaFdcSortOrder = StrEnum("UsdaFdcSortOrder", ["asc", "desc"])
 
 @define(frozen=True)
 class UsdaFdc:
-    """USDA Food Data Centra API."""
+    """USDA Food Data Central API."""
 
     client: HTTPClient
 

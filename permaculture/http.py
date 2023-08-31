@@ -12,7 +12,7 @@ from requests.adapters import HTTPAdapter
 from yarl import URL
 
 from permaculture.serializer import json_serializer
-from permaculture.storage import MemoryStorage, Storage
+from permaculture.storage import FileStorage, MemoryStorage, Storage
 
 logger = logging.getLogger(__name__)
 
@@ -259,6 +259,13 @@ class HTTPClient:
 
     def __attrs_post_init__(self):
         self.session.mount(str(self.base_url), self.adapter)
+
+    @classmethod
+    def with_cache_all(cls, url: URL, cache_dir=None):
+        storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
+        cache = HTTPCacheAll(storage)
+        adapter = HTTPCacheAdapter(cache)
+        return cls(url, adapter=adapter)
 
     def request(self, method, path, **kwargs):
         """Send an HTTP request.
