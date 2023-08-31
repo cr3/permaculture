@@ -8,12 +8,13 @@ repository = "https://github.com/cr3/permaculture"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-requests = "^2.31.0"
-attrs = "^23.1.0"
-yarl = "^1.9.2"
 appdirs = "^1.4.4"
+attrs = "^23.1.0"
 beautifulsoup4 = "^4.12.2"
+nltk = "^3.8.1"
 pandas = "^2.0.3"
+requests = "^2.31.0"
+yarl = "^1.9.2"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
@@ -51,7 +52,9 @@ permaculture = "permaculture.testing.fixtures"
 [tool.poetry.scripts]
 usda-fdc = "permaculture.usda.fdc:main"
 usda-plants = "permaculture.usda.plants:main"
+de-resources = "permaculture.de.resources:main"
 wikipedia-companion = "permaculture.wikipedia.companion:main"
+permaculture-query = "permaculture.query:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
