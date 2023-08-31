@@ -7,14 +7,13 @@ from argparse import ArgumentParser, FileType
 from appdirs import user_cache_dir
 from attrs import define
 
-from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPClient
+from permaculture.http import HTTPClient
 from permaculture.logger import (
     LoggerHandlerAction,
     LoggerLevelAction,
     setup_logger,
 )
 from permaculture.serializer import SerializerAction
-from permaculture.storage import FileStorage, MemoryStorage
 
 
 @define(frozen=True)
@@ -26,10 +25,7 @@ class UsdaPlants:
     @classmethod
     def from_url(cls, url, cache_dir=None):
         """Instantiate USDA Plants from URL."""
-        storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
-        cache = HTTPCacheAll(storage)
-        adapter = HTTPCacheAdapter(cache)
-        client = HTTPClient(url, adapter=adapter)
+        client = HTTPClient.with_cache_all(url, cache_dir)
         return cls(client)
 
     def characteristics_search(self) -> bytes:

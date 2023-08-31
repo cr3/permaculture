@@ -14,14 +14,14 @@ from permaculture.usda.fdc import (
 from ..stubs import StubRequestsResponse
 
 
-def test_food():
+def test_usda_fdc_food():
     """Food should GET with the given fdc identifier."""
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
     UsdaFdc(client).food(10)
     client.get.assert_called_once_with("v1/food/10", params={"format": "full"})
 
 
-def test_foods():
+def test_usda_fdc_foods():
     """Foods should POST with the given fdc identifiers."""
     client = Mock(post=Mock(return_value=StubRequestsResponse()))
     UsdaFdc(client).foods([1, 2, 3])
@@ -34,7 +34,7 @@ def test_foods():
     )
 
 
-def test_foods_list():
+def test_usd_fdc_foods_list():
     """Foods list should POST with the given parameters."""
     client = Mock(post=Mock(return_value=StubRequestsResponse()))
     UsdaFdc(client).foods_list(
