@@ -1,8 +1,10 @@
 """Wikipedia companion plants."""
 
 import contextlib
+import re
 import sys
 from argparse import ArgumentParser, FileType
+from functools import partial
 
 import pandas as pd
 from appdirs import user_cache_dir
@@ -25,11 +27,15 @@ def get_companion_plants(wikipedia):
     dfs = [
         df[category].assign(Category=category)
         for df in multi_dfs
-        for category in [
-            df.columns[0][0],
-        ]
+        for category in [df.columns[0][0]]
     ]
-    return pd.concat(dfs, ignore_index=True)
+    df = pd.concat(dfs, ignore_index=True)
+    df["Helps"] = (
+        df["Helps"]
+        .apply(partial(re.sub, r"\[.+?\]", ""))
+        .apply(partial(re.sub, r"\W+$", ""))
+    )
+    return df
 
 
 def main(argv=None):
