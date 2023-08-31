@@ -14,24 +14,28 @@ def test_get_companion_plants():
     wikipedia = Mock(get_text=Mock(return_value=dedent("""\
         <table>
           <tr>
-            <th>Vegetables</th>
+            <th colspan=2>Vegetables</th>
           </tr>
           <tr>
             <th>Common name</th>
+            <th>Helps</th>
           </tr>
           <tr>
             <td>a</td>
+            <td>x [1]</td>
           </tr>
         </table>
         <table>
           <tr>
-            <th>Fruits</th>
+            <th colspan=2>Fruits</th>
           </tr>
           <tr>
             <th>Common name</th>
+            <th>Helps</th>
           </tr>
           <tr>
             <td>b</td>
+            <td>y </td>
           </tr>
         </table>
         """)))
@@ -41,6 +45,7 @@ def test_get_companion_plants():
         pd.DataFrame(
             {
                 "Common name": ["a", "b"],
+                "Helps": ["x", "y"],
                 "Category": ["Vegetables", "Fruits"],
             },
         ),
