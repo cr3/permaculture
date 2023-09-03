@@ -1,19 +1,9 @@
 """USDA Plants API."""
 
-import contextlib
-import sys
-from argparse import ArgumentParser, FileType
-
-from appdirs import user_cache_dir
 from attrs import define
 
 from permaculture.http import HTTPClient
-from permaculture.logger import (
-    LoggerHandlerAction,
-    LoggerLevelAction,
-    setup_logger,
-)
-from permaculture.serializer import SerializerAction
+from permaculture.iterator import IteratorElement
 
 
 @define(frozen=True)
@@ -91,72 +81,16 @@ def all_characteristics(plants):
     ]
 
 
-def main(argv=None):
-    """Entry point to the USDA Plants API."""
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--api-url",
-        default="https://plantsservices.sc.egov.usda.gov/api",
-        help="URL to the USDA Plants API (default %(default)s)",
+def iterator(cache_dir=None):
+    plants = UsdaPlants.from_url(
+        "https://plantsservices.sc.egov.usda.gov/api",
+        cache_dir,
     )
-    parser.add_argument(
-        "--cache-dir",
-        default=user_cache_dir("permaculture"),
-        help="cache HTTP requests to directory (default %(default)s)",
-    )
-    parser.add_argument(
-        "--output",
-        type=FileType("wb"),
-        default=sys.stdout.buffer,
-        help="output file (default stdout)",
-    )
-    parser.add_argument(
-        "--serializer",
-        action=SerializerAction,
-    )
-    parser.add_argument(
-        "--log-file",
-        action=LoggerHandlerAction,
-    )
-    parser.add_argument(
-        "--log-level",
-        action=LoggerLevelAction,
-    )
-
-    subparsers = parser.add_subparsers(title="commands", dest="command")
-    subparsers.add_parser("characteristics-search")
-    plant_profile_parser = subparsers.add_parser("plant-profile")
-    plant_profile_parser.add_argument(
-        "symbol",
-        help="plant symbol, e.g. ABBA",
-    )
-    plant_characteristics_parser = subparsers.add_parser(
-        "plant-characteristics",
-    )
-    plant_characteristics_parser.add_argument(
-        "id",
-        type=int,
-        help="plant identifier, e.g. 15309",
-    )
-    subparsers.add_parser("all-characteristics")
-
-    args = parser.parse_args(argv)
-
-    setup_logger(args.log_level, args.log_file)
-
-    plants = UsdaPlants.from_url(args.api_url, args.cache_dir)
-    match args.command:
-        case "characteristics-search":
-            data = plants.characteristics_search()
-        case "plant-profile":
-            data = plants.plant_profile(args.symbol)
-        case "plant-characteristics":
-            data = plants.plant_characteristics(args.id)
-        case "all-characteristics":
-            data = all_characteristics(plants)
-        case _:
-            parser.error(f"Unsupported command: {args.command}")
-
-    output, *_ = args.serializer.encode(data)
-    with contextlib.suppress(BrokenPipeError):
-        args.output.write(output)
+    return [
+        IteratorElement(
+            c["General/ScientificName"],
+            list(filter(None, [c["General/CommonName"]])),
+            c,
+        )
+        for c in all_characteristics(plants)
+    ]

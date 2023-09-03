@@ -6,8 +6,10 @@ import pytest
 
 from permaculture.de.resources import (
     DesignEcologique,
-    main,
+    all_perenial_plants,
+    iterator,
 )
+from permaculture.iterator import IteratorElement
 
 from ..stubs import StubRequestsResponse
 
@@ -28,10 +30,44 @@ def test_de_resources_perenial_plants_error():
         DesignEcologique(client).perenial_plants()
 
 
-@patch("sys.stdout")
-def test_main_help(stdout):
-    """The main function should output usage when asked for --help."""
-    with pytest.raises(SystemExit):
-        main(["--help"])
+def test_de_resources_all_perenial_plants():
+    """All perenial plants should return a dictionary of characteristics."""
+    data = "TAXONOMIE\nGenre,Espèce \na,b\n"
+    export = Mock(return_value=data)
+    perenial_plants = Mock(return_value=Mock(export=export))
+    de = Mock(perenial_plants=perenial_plants)
 
-    stdout.write.call_args[0][0].startswith("usage")
+    plants = all_perenial_plants(de)
+    assert plants == [
+        {
+            "Genre": "a",
+            "Espèce": "b",
+        }
+    ]
+
+
+@patch("permaculture.de.resources.all_perenial_plants")
+def test_de_resources_iterator(mock_all_perenial_plants):
+    """Iterating over plants should return a list of elements."""
+    mock_all_perenial_plants.return_value = [
+        {
+            "Genre": "a",
+            "Espèce": "b",
+            "Nom Anglais": "c",
+            "Nom français": "d",
+        }
+    ]
+
+    elements = iterator()
+    assert elements == [
+        IteratorElement(
+            scientific_name="a b",
+            common_names=["c", "d"],
+            characteristics={
+                "Genre": "a",
+                "Espèce": "b",
+                "Nom Anglais": "c",
+                "Nom français": "d",
+            },
+        )
+    ]
