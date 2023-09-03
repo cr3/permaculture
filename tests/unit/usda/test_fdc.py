@@ -1,14 +1,11 @@
 """Unit tests for the USDA fdc module."""
 
-from unittest.mock import Mock, patch
-
-import pytest
+from unittest.mock import Mock
 
 from permaculture.usda.fdc import (
     UsdaFdc,
     UsdaFdcSortBy,
     UsdaFdcSortOrder,
-    main,
 )
 
 from ..stubs import StubRequestsResponse
@@ -52,12 +49,3 @@ def test_usd_fdc_foods_list():
             "sort_order": "desc",
         },
     )
-
-
-@patch("sys.stdout")
-def test_main_help(stdout):
-    """The main function should output usage when asked for --help."""
-    with pytest.raises(SystemExit):
-        main(["--help"])
-
-    stdout.write.call_args[0][0].startswith("usage")

@@ -2,9 +2,8 @@
 
 from unittest.mock import ANY, Mock, patch
 
-import pytest
-
-from permaculture.usda.plants import UsdaPlants, main
+from permaculture.iterator import IteratorElement
+from permaculture.usda.plants import UsdaPlants, all_characteristics, iterator
 
 from ..stubs import StubRequestsResponse
 
@@ -36,10 +35,52 @@ def test_usda_plants_plant_characteristics():
     client.get.assert_called_once_with("PlantCharacteristics/1234")
 
 
-@patch("sys.stdout")
-def test_main_help(stdout):
-    """The main function should output usage when asked for --help."""
-    with pytest.raises(SystemExit):
-        main(["--help"])
+def test_usda_plants_all_characteristics():
+    """All characteristics should return the general characteristics."""
+    plants = Mock(
+        plant_characteristics=Mock(return_value={}),
+        characteristics_search=Mock(
+            return_value={
+                "PlantResults": [
+                    {
+                        "Id": "1",
+                        "ScientificName": "a",
+                        "CommonName": "b",
+                    }
+                ],
+            }
+        ),
+    )
+    characteristics = all_characteristics(plants=plants)
+    assert characteristics == [
+        {
+            "General/Id": "1",
+            "General/ScientificName": "a",
+            "General/CommonName": "b",
+        }
+    ]
 
-    stdout.write.call_args[0][0].startswith("usage")
+
+@patch("permaculture.usda.plants.all_characteristics")
+def test_usda_plants_iterator(mock_all_characteristics):
+    """Iterating over plants should return a list of elements."""
+    mock_all_characteristics.return_value = [
+        {
+            "General/Id": "1",
+            "General/ScientificName": "a",
+            "General/CommonName": "b",
+        }
+    ]
+
+    elements = iterator()
+    assert elements == [
+        IteratorElement(
+            scientific_name="a",
+            common_names=["b"],
+            characteristics={
+                "General/Id": "1",
+                "General/ScientificName": "a",
+                "General/CommonName": "b",
+            },
+        )
+    ]

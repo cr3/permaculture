@@ -1,27 +1,20 @@
-"""Design Ecologique resources web interface."""
+"""Design Ecologique web interface."""
 
-import contextlib
-import sys
-from argparse import ArgumentParser, FileType
+from csv import reader
+from io import StringIO
 
-from appdirs import user_cache_dir
 from attrs import define
 from bs4 import BeautifulSoup
 from yarl import URL
 
 from permaculture.google.spreadsheets import GoogleSpreadsheet
 from permaculture.http import HTTPClient
-from permaculture.logger import (
-    LoggerHandlerAction,
-    LoggerLevelAction,
-    setup_logger,
-)
-from permaculture.serializer import SerializerAction
+from permaculture.iterator import IteratorElement
 
 
 @define(frozen=True)
 class DesignEcologique:
-    """Design Ecologique API."""
+    """Design Ecologique web interface."""
 
     client: HTTPClient
 
@@ -42,45 +35,24 @@ class DesignEcologique:
         return GoogleSpreadsheet.from_url(url)
 
 
-def main(argv=None):
-    """Entry point to the USDA Food Data Central API."""
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--url",
-        default="https://designecologique.ca",
-        help="URL to the Design Ecologique website (default %(default)s)",
-    )
-    parser.add_argument(
-        "--cache-dir",
-        default=user_cache_dir("permaculture"),
-        help="cache HTTP requests to directory (default %(default)s)",
-    )
-    parser.add_argument(
-        "--output",
-        type=FileType("wb"),
-        default=sys.stdout.buffer,
-        help="output file (default stdout)",
-    )
-    parser.add_argument(
-        "--serializer",
-        action=SerializerAction,
-    )
-    parser.add_argument(
-        "--log-file",
-        action=LoggerHandlerAction,
-    )
-    parser.add_argument(
-        "--log-level",
-        action=LoggerLevelAction,
-    )
+def all_perenial_plants(de):
+    data = de.perenial_plants().export(0)
+    csv = reader(StringIO(data))
+    next(csv)  # Skip groups
+    header = [h.strip() for h in next(csv)]
+    return [dict(zip(header, plant, strict=True)) for plant in csv]
 
-    args = parser.parse_args(argv)
 
-    setup_logger(args.log_level, args.log_file)
-
-    de = DesignEcologique.from_url(args.url, args.cache_dir)
-    data = de.perenial_plants().export(1)
-
-    output, *_ = args.serializer.encode(data)
-    with contextlib.suppress(BrokenPipeError):
-        args.output.write(output)
+def iterator(cache_dir=None):
+    de = DesignEcologique.from_url(
+        "https://designecologique.ca",
+        cache_dir,
+    )
+    return [
+        IteratorElement(
+            f"{p['Genre']} {p['Espèce']}",
+            list(filter(None, [p["Nom Anglais"], p["Nom français"]])),
+            p,
+        )
+        for p in all_perenial_plants(de)
+    ]

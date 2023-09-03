@@ -26,4 +26,4 @@ class GoogleSpreadsheet:
             f"spreadsheets/d/{self.doc_id}/export",
             params={"gid": gid, "format": fmt},
         )
-        return response.text
+        return response.content.decode("utf8")
