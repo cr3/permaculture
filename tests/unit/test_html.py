@@ -92,7 +92,7 @@ from permaculture.html import (
 )
 def test_parse_table(text, expected):
     """Parsing an HTML table should return a dictionary of values."""
-    table = BeautifulSoup(text)
+    table = BeautifulSoup(text, "html.parser")
     result = parse_table(table)
     assert result == expected
 

@@ -81,7 +81,7 @@ def all_characteristics(plants):
     ]
 
 
-def iterator(cache_dir=None):
+def iterator(cache_dir):
     plants = UsdaPlants.from_url(
         "https://plantsservices.sc.egov.usda.gov/api",
         cache_dir,
@@ -89,7 +89,7 @@ def iterator(cache_dir=None):
     return [
         IteratorElement(
             c["General/ScientificName"],
-            list(filter(None, [c["General/CommonName"]])),
+            [c["General/CommonName"]],
             c,
         )
         for c in all_characteristics(plants)

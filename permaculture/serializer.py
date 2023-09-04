@@ -8,6 +8,8 @@ from typing import Any
 from urllib.parse import parse_qsl, urlencode
 
 from attrs import define, field
+from yaml import safe_dump as yaml_dump
+from yaml import safe_load as yaml_load
 
 from permaculture.action import SingleAction
 from permaculture.registry import registry_load
@@ -21,13 +23,14 @@ class SerializerAction(SingleAction):
     """Argument action for a serializer."""
 
     metavar = "CONTENT-TYPE"
-    help_format = "serializer content-type (default application/json)".format
 
     def __init__(self, option_strings, registry=None, **kwargs):
         """Initializer serializer defaults."""
         kwargs.setdefault("default", self.get_serializer())
         kwargs.setdefault("metavar", self.metavar)
-        kwargs.setdefault("help", self.help_format())
+        kwargs.setdefault(
+            "help", "serializer content-type (default application/x-yaml)"
+        )
         super().__init__(option_strings, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -37,7 +40,7 @@ class SerializerAction(SingleAction):
         super().__call__(parser, namespace, serializer, option_string)
 
     @classmethod
-    def get_serializer(cls, content_type="application/json"):
+    def get_serializer(cls, content_type="application/x-yaml"):
         """Get a serializer with a default content-type."""
         return Serializer.load(content_type)
 
@@ -135,7 +138,9 @@ class SerializerPlugin:
 
 
 json_serializer = SerializerPlugin(
-    lambda data: json.dumps(data, sort_keys=True, indent=2).encode("utf-8"),
+    lambda data: json.dumps(
+        data, sort_keys=True, indent=2, ensure_ascii=False
+    ).encode("utf-8"),
     lambda payload: json.loads(payload.decode("utf-8")),
     "utf-8",
 )
@@ -197,3 +202,10 @@ www_form_serializer = SerializerPlugin(
     "utf-8",
 )
 """Serializer for application/x-www-form-urlencoded."""
+
+yaml_serializer = SerializerPlugin(
+    lambda data: yaml_dump(data).encode("utf-8"),
+    lambda payload: yaml_load(payload.decode("utf-8")),
+    "utf-8",
+)
+"""Serializer for application/x-yaml."""

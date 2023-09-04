@@ -35,15 +35,59 @@ class DesignEcologique:
         return GoogleSpreadsheet.from_url(url)
 
 
+def apply_legend(row):
+    legend = {
+        "Texture du sol": {
+            "░": "Léger",
+            "▒": "Moyen",
+            "▓": "Lourd",
+            "O": "Aquatique",
+        },
+        "Lumière": {
+            "○": "Plein soleil",
+            "◐": "Mi-Ombre",
+            "●": "Ombre",
+        },
+        "Forme": {
+            "A": "Arbre",
+            "Ar": "Arbuste",
+            "H": "Herbacée",
+            "G": "Grimpante",
+        },
+        "Racine": {
+            "B": "Bulbe",
+            "C": "Charnu",
+            "D": "Drageonnante",
+            "F": "Faciculé",
+            "L": "Latérales",
+            "P": "Pivotante",
+            "R": "Rhizome",
+            "S": "Superficiel",
+            "T": "Tubercule",
+        },
+        "Vie sauvage": {
+            "N": "Nourriture",
+            "A": "Abris",
+            "NA": "Nourriture et Abris",
+        },
+    }
+    for k, v in legend.items():
+        if k in row:
+            row[k] = " ".join(v.get(x, x) for x in row[k].split())
+
+    return row
+
+
 def all_perenial_plants(de):
     data = de.perenial_plants().export(0)
     csv = reader(StringIO(data))
     next(csv)  # Skip groups
     header = [h.strip() for h in next(csv)]
-    return [dict(zip(header, plant, strict=True)) for plant in csv]
+    rows = (dict(zip(header, plant, strict=True)) for plant in csv)
+    return [apply_legend(row) for row in rows]
 
 
-def iterator(cache_dir=None):
+def iterator(cache_dir):
     de = DesignEcologique.from_url(
         "https://designecologique.ca",
         cache_dir,
@@ -51,7 +95,7 @@ def iterator(cache_dir=None):
     return [
         IteratorElement(
             f"{p['Genre']} {p['Espèce']}",
-            list(filter(None, [p["Nom Anglais"], p["Nom français"]])),
+            [p["Nom Anglais"], p["Nom français"]],
             p,
         )
         for p in all_perenial_plants(de)

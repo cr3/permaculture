@@ -3,7 +3,7 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import pkg_resources
+from importlib.metadata import distribution
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -11,7 +11,7 @@ import pkg_resources
 project = "permaculture"
 copyright = "2023, Marc Tardif"  # noqa: A001
 author = "Marc Tardif"
-version = release = pkg_resources.get_distribution(project).version
+version = release = distribution(project).version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

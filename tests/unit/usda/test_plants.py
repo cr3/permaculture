@@ -35,7 +35,7 @@ def test_usda_plants_plant_characteristics():
     client.get.assert_called_once_with("PlantCharacteristics/1234")
 
 
-def test_usda_plants_all_characteristics():
+def test_all_characteristics():
     """All characteristics should return the general characteristics."""
     plants = Mock(
         plant_characteristics=Mock(return_value={}),
@@ -62,7 +62,7 @@ def test_usda_plants_all_characteristics():
 
 
 @patch("permaculture.usda.plants.all_characteristics")
-def test_usda_plants_iterator(mock_all_characteristics):
+def test_iterator(mock_all_characteristics):
     """Iterating over plants should return a list of elements."""
     mock_all_characteristics.return_value = [
         {
@@ -72,7 +72,7 @@ def test_usda_plants_iterator(mock_all_characteristics):
         }
     ]
 
-    elements = iterator()
+    elements = iterator(None)
     assert elements == [
         IteratorElement(
             scientific_name="a",
