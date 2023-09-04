@@ -21,6 +21,6 @@ def test_google_spreadsheet_export():
     client = Mock(post=Mock(return_value=StubRequestsResponse()))
     GoogleSpreadsheet(client, "test_id").export("test_gid", "test_format")
     client.get.assert_called_once_with(
-        "spreadsheets/d/test_id/export",
+        "/spreadsheets/d/test_id/export",
         params={"gid": "test_gid", "format": "test_format"},
     )

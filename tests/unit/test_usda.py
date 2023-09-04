@@ -13,7 +13,7 @@ def test_usda_plants_characteristics_search():
     client = Mock(post=Mock(return_value=StubRequestsResponse()))
     UsdaPlants(client).characteristics_search()
     client.post.assert_called_once_with(
-        "CharacteristicsSearch",
+        "/api/CharacteristicsSearch",
         json=ANY,
     )
 
@@ -23,7 +23,7 @@ def test_usda_plants_plant_profile():
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
     UsdaPlants(client).plant_profile("test")
     client.get.assert_called_once_with(
-        "PlantProfile",
+        "/api/PlantProfile",
         params={"symbol": "test"},
     )
 
@@ -32,7 +32,7 @@ def test_usda_plants_plant_characteristics():
     """PlantCharacteristics should GET with the id in the URL."""
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
     UsdaPlants(client).plant_characteristics(1234)
-    client.get.assert_called_once_with("PlantCharacteristics/1234")
+    client.get.assert_called_once_with("/api/PlantCharacteristics/1234")
 
 
 def test_all_characteristics():

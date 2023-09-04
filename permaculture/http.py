@@ -6,7 +6,7 @@ from functools import partialmethod
 from hashlib import md5
 from urllib.parse import urlparse
 
-from attrs import define, field
+from attrs import define, evolve, field
 from requests import Response, Session
 from requests.adapters import HTTPAdapter
 from yarl import URL
@@ -250,15 +250,15 @@ class HTTPCacheAdapter(HTTPAdapter):
 
 @define(frozen=True)
 class HTTPClient:
-    """An HTTP client with base URL."""
+    """An HTTP client with origin."""
 
-    base_url: URL = field(converter=URL)
+    origin: URL = field(converter=URL)
     headers: dict[str, str] = field(factory=dict)
     session: Session = field(factory=Session)
     adapter: HTTPAdapter = field(factory=HTTPCacheAdapter)
 
     def __attrs_post_init__(self):
-        self.session.mount(str(self.base_url), self.adapter)
+        self.session.mount(str(self.origin), self.adapter)
 
     @classmethod
     def with_cache_all(cls, url: URL, cache_dir=None):
@@ -274,15 +274,21 @@ class HTTPClient:
         :param path: Path joined to the URL.
         :param \\**kwargs: Optional keyword arguments passed to the session.
         """
-        url = self.base_url / path
+        url = str(self.origin) + path
         if self.headers or "headers" in kwargs:
             kwargs["headers"] = {**self.headers, **kwargs.get("headers", {})}
-        response = self.session.request(
-            method,
-            str(url),
-            **kwargs,
-        )
+
+        # This is necessary for redirects to also use the cache adapter.
+        kwargs.setdefault("allow_redirects", False)
+
+        response = self.session.request(method, url, **kwargs)
         response.raise_for_status()
+
+        if response.is_redirect is True:
+            url = URL(response.headers["Location"])
+            client = evolve(self, origin=url.origin())
+            return client.request(method, url.path, **kwargs)
+
         return response
 
     get = partialmethod(request, "GET")

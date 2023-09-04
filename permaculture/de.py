@@ -3,7 +3,7 @@
 from csv import reader
 from io import StringIO
 
-from attrs import define
+from attrs import define, field
 from bs4 import BeautifulSoup
 from yarl import URL
 
@@ -16,23 +16,24 @@ from permaculture.iterator import IteratorElement
 class DesignEcologique:
     """Design Ecologique web interface."""
 
-    client: HTTPClient
+    client: HTTPClient = field()
+    _cache_dir = field(default=None)
 
     @classmethod
-    def from_url(cls, url, cache_dir=None):
+    def from_url(cls, url: URL, cache_dir=None):
         """Instantiate Design Ecologique from URL."""
         client = HTTPClient.with_cache_all(url, cache_dir)
-        return cls(client)
+        return cls(client, cache_dir)
 
     def perenial_plants(self):
-        response = self.client.get("liste-de-plantes-vivaces")
+        response = self.client.get("/liste-de-plantes-vivaces/")
         soup = BeautifulSoup(response.text, "html.parser")
         element = soup.select_one("a[href*=spreadsheets]")
         if not element:
             raise KeyError("Link to Google spreadsheets not found")
 
         url = URL(element["href"])
-        return GoogleSpreadsheet.from_url(url)
+        return GoogleSpreadsheet.from_url(url, self._cache_dir)
 
 
 def apply_legend(row):

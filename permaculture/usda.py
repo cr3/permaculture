@@ -1,6 +1,7 @@
 """USDA Plants API."""
 
 from attrs import define
+from yarl import URL
 
 from permaculture.http import HTTPClient
 from permaculture.iterator import IteratorElement
@@ -13,7 +14,7 @@ class UsdaPlants:
     client: HTTPClient
 
     @classmethod
-    def from_url(cls, url, cache_dir=None):
+    def from_url(cls, url: URL, cache_dir=None):
         """Instantiate USDA Plants from URL."""
         client = HTTPClient.with_cache_all(url, cache_dir)
         return cls(client)
@@ -48,17 +49,19 @@ class UsdaPlants:
             "TaxonSearchCriteria": None,
             "MasterId": -1,
         }
-        response = self.client.post("CharacteristicsSearch", json=payload)
+        response = self.client.post("/api/CharacteristicsSearch", json=payload)
         return response.json()
 
     def plant_profile(self, symbol):
         """Plant profile for a symbol."""
-        response = self.client.get("PlantProfile", params={"symbol": symbol})
+        response = self.client.get(
+            "/api/PlantProfile", params={"symbol": symbol}
+        )
         return response.json()
 
     def plant_characteristics(self, Id):
         """Plant characteristics for an identifier."""
-        response = self.client.get(f"PlantCharacteristics/{Id}")
+        response = self.client.get(f"/api/PlantCharacteristics/{Id}")
         return response.json()
 
 
@@ -83,7 +86,7 @@ def all_characteristics(plants):
 
 def iterator(cache_dir):
     plants = UsdaPlants.from_url(
-        "https://plantsservices.sc.egov.usda.gov/api",
+        "https://plantsservices.sc.egov.usda.gov",
         cache_dir,
     )
     return [

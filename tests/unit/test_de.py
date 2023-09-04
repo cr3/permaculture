@@ -20,7 +20,7 @@ def test_de_resources_perenial_plants():
     text = "<a href='https://docs.google.com/spreadsheets/d/test_id/edit'>"
     client = Mock(get=Mock(return_value=StubRequestsResponse(text=text)))
     plants = DesignEcologique(client).perenial_plants()
-    client.get.assert_called_once_with("liste-de-plantes-vivaces")
+    client.get.assert_called_once_with("/liste-de-plantes-vivaces/")
     assert plants.doc_id == "test_id"
 
 
