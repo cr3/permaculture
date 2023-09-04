@@ -35,33 +35,72 @@ def test_de_resources_perenial_plants_error():
     "row, expected",
     [
         pytest.param(
-            {"Texture du sol": "░ ▒ ▓"},
-            {"Texture du sol": "Léger Moyen Lourd"},
-            id="Texture du sol",
+            {"Couleur de floraison": "Rg Rs B J O P V Br Bl"},
+            {
+                "Couleur de floraison": [
+                    "Rouge",
+                    "Rose",
+                    "Blanc",
+                    "Jaune",
+                    "Orangé",
+                    "Pourpre",
+                    "Verte",
+                    "Brun",
+                    "Bleu",
+                ]
+            },
+            id="Couleur de floraison",
+        ),
+        pytest.param(
+            {"Couleur de feuillage": "V Po Pa P F T J"},
+            {
+                "Couleur de feuillage": [
+                    "Vert",
+                    "Pourpre",
+                    "Panaché",
+                    "Pale",
+                    "Foncé",
+                    "Tacheté",
+                    "Jaune",
+                ]
+            },
+            id="Couleur de feuillage",
+        ),
+        pytest.param(
+            {"Eau": "▁ ▅ █"},
+            {"Eau": ["Peu", "Moyen", "Beaucoup"]},
+            id="Eau",
         ),
         pytest.param(
             {"Lumière": "○ ◐ ●"},
-            {"Lumière": "Plein soleil Mi-Ombre Ombre"},
+            {"Lumière": ["Plein soleil", "Mi-Ombre", "Ombre"]},
             id="Lumière",
-        ),
-        pytest.param(
-            {"Forme": "A Ar H G"},
-            {"Forme": "Arbre Arbuste Herbacée Grimpante"},
-            id="Forme",
         ),
         pytest.param(
             {"Racine": "B C D F L P R S T"},
             {
-                "Racine": (
-                    "Bulbe Charnu Drageonnante Faciculé Latérales Pivotante"
-                    " Rhizome Superficiel Tubercule"
-                )
+                "Racine": [
+                    "Bulbe",
+                    "Charnu",
+                    "Drageonnante",
+                    "Faciculé",
+                    "Latérales",
+                    "Pivotante",
+                    "Rhizome",
+                    "Superficiel",
+                    "Tubercule",
+                ]
             },
             id="Racine",
         ),
         pytest.param(
+            {"Texture du sol": "░ ▒ ▓"},
+            {"Texture du sol": ["Léger", "Moyen", "Lourd"]},
+            id="Texture du sol",
+        ),
+        pytest.param(
             {"Vie sauvage": "N A NA"},
-            {"Vie sauvage": "Nourriture Abris Nourriture et Abris"},
+            {"Vie sauvage": ["Nourriture", "Abris", "Nourriture et Abris"]},
             id="Vie sauvage",
         ),
     ],
