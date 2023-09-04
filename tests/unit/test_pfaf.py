@@ -23,17 +23,17 @@ def test_pfaf_main_database():
     [
         pytest.param(
             {"Soil": "LMH"},
-            {"Soil": "Light(sandy) Medium(loam) Heavy"},
+            {"Soil": ["Light(sandy)", "Medium(loam)", "Heavy"]},
             id="Soil",
         ),
         pytest.param(
             {"Shade": "FSN"},
-            {"Shade": "Full Semi None"},
+            {"Shade": ["Full", "Semi", "None"]},
             id="Shade",
         ),
         pytest.param(
             {"pH": "ANB"},
-            {"pH": "Acid Neutral Base/Alkaline"},
+            {"pH": ["Acid", "Neutral", "Base/Alkaline"]},
             id="pH",
         ),
     ],

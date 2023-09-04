@@ -55,11 +55,9 @@ class Iterator:
 
     def lookup(self, name):
         characteristics = {}
-        for iterate in self._iterators.values():
-            iterate(self.cache_dir)
-            for element in iterate(self.cache_dir):
-                if re.match(name, element.scientific_name, re.I):
-                    characteristics.update(element.characteristics)
+        for element in self.iterate():
+            if re.match(name, element.scientific_name, re.I):
+                characteristics.update(element.characteristics)
 
         if not characteristics:
             raise IteratorElementNotFound(name)

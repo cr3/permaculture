@@ -7,9 +7,8 @@ from io import StringIO
 from typing import Any
 from urllib.parse import parse_qsl, urlencode
 
+import yaml
 from attrs import define, field
-from yaml import safe_dump as yaml_dump
-from yaml import safe_load as yaml_load
 
 from permaculture.action import SingleAction
 from permaculture.registry import registry_load
@@ -204,8 +203,8 @@ www_form_serializer = SerializerPlugin(
 """Serializer for application/x-www-form-urlencoded."""
 
 yaml_serializer = SerializerPlugin(
-    lambda data: yaml_dump(data).encode("utf-8"),
-    lambda payload: yaml_load(payload.decode("utf-8")),
+    lambda data: yaml.safe_dump(data, allow_unicode=True).encode("utf-8"),
+    lambda payload: yaml.safe_load(payload.decode("utf-8")),
     "utf-8",
 )
 """Serializer for application/x-yaml."""

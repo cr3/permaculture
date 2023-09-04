@@ -1,5 +1,6 @@
 """Design Ecologique web interface."""
 
+import re
 from csv import reader
 from io import StringIO
 
@@ -38,22 +39,41 @@ class DesignEcologique:
 
 def apply_legend(row):
     legend = {
-        "Texture du sol": {
-            "░": "Léger",
-            "▒": "Moyen",
-            "▓": "Lourd",
-            "O": "Aquatique",
+        "Couleur de floraison": {
+            "Rg": "Rouge",
+            "Rs": "Rose",
+            "B": "Blanc",
+            "J": "Jaune",
+            "O": "Orangé",
+            "P": "Pourpre",
+            "V": "Verte",
+            "Br": "Brun",
+            "Bl": "Bleu",
         },
-        "Lumière": {
-            "○": "Plein soleil",
-            "◐": "Mi-Ombre",
-            "●": "Ombre",
+        "Couleur de feuillage": {
+            "V": "Vert",
+            "Po": "Pourpre",
+            "Pa": "Panaché",
+            "P": "Pale",
+            "F": "Foncé",
+            "T": "Tacheté",
+            "J": "Jaune",
+        },
+        "Eau": {
+            "▁": "Peu",
+            "▅": "Moyen",
+            "█": "Beaucoup",
         },
         "Forme": {
             "A": "Arbre",
             "Ar": "Arbuste",
             "H": "Herbacée",
             "G": "Grimpante",
+        },
+        "Lumière": {
+            "○": "Plein soleil",
+            "◐": "Mi-Ombre",
+            "●": "Ombre",
         },
         "Racine": {
             "B": "Bulbe",
@@ -66,6 +86,12 @@ def apply_legend(row):
             "S": "Superficiel",
             "T": "Tubercule",
         },
+        "Texture du sol": {
+            "░": "Léger",
+            "▒": "Moyen",
+            "▓": "Lourd",
+            "O": "Aquatique",
+        },
         "Vie sauvage": {
             "N": "Nourriture",
             "A": "Abris",
@@ -74,7 +100,7 @@ def apply_legend(row):
     }
     for k, v in legend.items():
         if k in row:
-            row[k] = " ".join(v.get(x, x) for x in row[k].split())
+            row[k] = [v.get(x, x) for x in re.split(r",?\s+", row[k])]
 
     return row
 

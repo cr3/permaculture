@@ -42,7 +42,7 @@ def apply_legend(row):
     }
     for k, v in legend.items():
         if k in row:
-            row[k] = " ".join(v.get(x, x) for x in row[k])
+            row[k] = [v.get(x, x) for x in row[k]]
 
     return row
 
