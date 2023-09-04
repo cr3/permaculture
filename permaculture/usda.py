@@ -5,6 +5,7 @@ from yarl import URL
 
 from permaculture.http import HTTPClient
 from permaculture.iterator import IteratorElement
+from permaculture.storage import FileStorage, MemoryStorage
 
 
 @define(frozen=True)
@@ -65,23 +66,28 @@ class UsdaPlants:
         return response.json()
 
 
-def all_characteristics(plants):
-    search = plants.characteristics_search()
-    return [
-        {
-            **{f"General/{k}": v for k, v in r.items()},
-            **{
-                "/".join(
-                    [
-                        c["PlantCharacteristicCategory"],
-                        c["PlantCharacteristicName"],
-                    ]
-                ): c["PlantCharacteristicValue"]
-                for c in plants.plant_characteristics(r["Id"])
-            },
-        }
-        for r in search["PlantResults"]
-    ]
+def all_characteristics(plants, cache_dir=None):
+    storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
+    key = "usda-plants-all-characteristics"
+    if key not in storage:
+        search = plants.characteristics_search()
+        storage[key] = [
+            {
+                **{f"General/{k}": v for k, v in r.items()},
+                **{
+                    "/".join(
+                        [
+                            c["PlantCharacteristicCategory"],
+                            c["PlantCharacteristicName"],
+                        ]
+                    ): c["PlantCharacteristicValue"]
+                    for c in plants.plant_characteristics(r["Id"])
+                },
+            }
+            for r in search["PlantResults"]
+        ]
+
+    return storage[key]
 
 
 def iterator(cache_dir):
@@ -95,5 +101,5 @@ def iterator(cache_dir):
             [c["General/CommonName"]],
             c,
         )
-        for c in all_characteristics(plants)
+        for c in all_characteristics(plants, cache_dir)
     ]
