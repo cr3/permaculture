@@ -1,10 +1,10 @@
-"""Unit tests for the Design Ecologique resources module."""
+"""Unit tests for the Design Ecologique module."""
 
 from unittest.mock import Mock, patch
 
 import pytest
 
-from permaculture.de.resources import (
+from permaculture.de import (
     DesignEcologique,
     all_perenial_plants,
     apply_legend,
@@ -12,7 +12,7 @@ from permaculture.de.resources import (
 )
 from permaculture.iterator import IteratorElement
 
-from ..stubs import StubRequestsResponse
+from .stubs import StubRequestsResponse
 
 
 def test_de_resources_perenial_plants():
@@ -88,7 +88,7 @@ def test_all_perenial_plants():
     ]
 
 
-@patch("permaculture.de.resources.all_perenial_plants")
+@patch("permaculture.de.all_perenial_plants")
 def test_iterator(mock_all_perenial_plants):
     """Iterating over plants should return a list of elements."""
     mock_all_perenial_plants.return_value = [
