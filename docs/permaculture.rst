@@ -7,11 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   permaculture.de
-   permaculture.google
    permaculture.testing
-   permaculture.usda
-   permaculture.wikipedia
 
 Submodules
 ----------
@@ -28,6 +24,22 @@ permaculture.command module
 ---------------------------
 
 .. automodule:: permaculture.command
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.de module
+----------------------
+
+.. automodule:: permaculture.de
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.google module
+--------------------------
+
+.. automodule:: permaculture.google
    :members:
    :undoc-members:
    :show-inheritance:
@@ -100,6 +112,22 @@ permaculture.tokenizer module
 -----------------------------
 
 .. automodule:: permaculture.tokenizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.usda module
+------------------------
+
+.. automodule:: permaculture.usda
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.wikipedia module
+-----------------------------
+
+.. automodule:: permaculture.wikipedia
    :members:
    :undoc-members:
    :show-inheritance:
