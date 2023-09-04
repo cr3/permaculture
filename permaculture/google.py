@@ -23,7 +23,7 @@ class GoogleSpreadsheet:
 
     def export(self, gid=1, fmt="csv"):
         response = self.client.get(
-            f"spreadsheets/d/{self.doc_id}/export",
+            f"/spreadsheets/d/{self.doc_id}/export",
             params={"gid": gid, "format": fmt},
         )
         return response.content.decode("utf8")
