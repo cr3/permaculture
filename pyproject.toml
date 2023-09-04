@@ -45,7 +45,7 @@ permaculture = "permaculture.testing.fixtures"
 
 [tool.poetry.plugins."permaculture.iterators"]
 "usda" = "permaculture.usda:iterator"
-"de-resources" = "permaculture.de.resources:iterator"
+"de" = "permaculture.de:iterator"
 "pfaf" = "permaculture.pfaf:iterator"
 
 [tool.poetry.plugins."permaculture.serializers"]
