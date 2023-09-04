@@ -64,4 +64,4 @@ class Iterator:
         if not characteristics:
             raise IteratorElementNotFound(name)
 
-        return {k: list(v) for k, v in characteristics.items()}
+        return characteristics
