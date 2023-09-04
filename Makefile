@@ -47,6 +47,15 @@ build:
 	@echo Creating wheel file
 	@poetry build
 
+.PHONY: publish
+publish:
+	@echo Publishing: Dry run
+	@poetry config repositories.test-pypi https://test.pypi.org/legacy/
+	@poetry config pypi-token.test-pypi $(PYPI_TOKEN)
+	@poetry publish --repository test-pypi --dry-run
+	@echo Publishing
+	@poetry publish --repository test-pypi
+
 .PHONY: clean
 clean:
 	@echo Cleaning ignored files
