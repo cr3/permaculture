@@ -1,9 +1,0 @@
-{
-    "recommendations": [
-        "charliermarsh.ruff",
-        "ms-python.black-formatter",
-        "lextudio.restructuredtext",
-        "trond-snekvik.simple-rst",
-        "editorconfig.editorconfig"
-    ]
-}
