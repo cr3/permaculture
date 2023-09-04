@@ -1,12 +1,12 @@
-"""Unit tests for the Google spreadsheets module."""
+"""Unit tests for the Google module."""
 
 from unittest.mock import Mock
 
 from yarl import URL
 
-from permaculture.google.spreadsheets import GoogleSpreadsheet
+from permaculture.google import GoogleSpreadsheet
 
-from ..stubs import StubRequestsResponse
+from .stubs import StubRequestsResponse
 
 
 def test_google_spreadsheet_from_url():
