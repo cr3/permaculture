@@ -1,8 +1,10 @@
-La révolution d'un seul brin de paille par Masanobu Fukuoka est reconnu
-pour sa méthode d'agriculture du "non-agir". Il ne s'agit pas de ne
-rien faire mais plutôt de cultiver aussi simplement que possible dans
-l'environnement naturel, et ce, en coopérant avec lui - ça sonne comme
-la permaculture?
+La révolution d'un seul brin de paille
+======================================
+
+Ce livre par Masanobu Fukuoka est reconnu pour sa méthode d'agriculture
+du "non-agir". Il ne s'agit pas de ne rien faire mais plutôt de
+cultiver aussi simplement que possible dans l'environnement naturel,
+et ce, en coopérant avec lui - ça sonne comme la permaculture?
 
 Pour arriver à cette méthode, M. Fukuoaka se demande "Et si on ne faisant pas
 ceci? Et si on ne faisant pas cela?" Finalement, il est arrivé à ces quatre

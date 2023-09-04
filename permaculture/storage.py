@@ -20,19 +20,24 @@ class FileStorage(Storage):
     :param serializer: Serializer, defaults to `json_serializer`
     """
 
-    _basedir: Path = field(converter=Path)
-    serializer: Serializer = Serializer.load("application/x-pickle")
+    base_dir: Path = field(converter=Path)
+    serializer: Serializer = field(
+        default="application/x-pickle",
+        converter=lambda x: (
+            x if isinstance(x, Serializer) else Serializer.load(x)
+        ),
+    )
 
-    def _key_to_path(self, key):
-        path = self._basedir / quote(key, "")
+    def key_to_path(self, key):
+        path = self.base_dir / quote(key, "")
         return path
 
-    def _path_to_key(self, path):
+    def path_to_key(self, path):
         return unquote(path.name)
 
     def __getitem__(self, key):
         """Read from file."""
-        path = self._key_to_path(key)
+        path = self.key_to_path(key)
         if not path.exists():
             raise KeyError(key)
 
@@ -41,7 +46,7 @@ class FileStorage(Storage):
 
     def __setitem__(self, key, value):
         """Write to file."""
-        path = self._key_to_path(key)
+        path = self.key_to_path(key)
         payload, *_ = self.serializer.encode(value)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(payload)
@@ -49,12 +54,12 @@ class FileStorage(Storage):
     def __delitem__(self, key):
         """Unlink file."""
         try:
-            self._key_to_path(key).unlink()
+            self.key_to_path(key).unlink()
         except FileNotFoundError as error:
             raise KeyError(key) from error
 
     def __iter__(self):
-        return (self._path_to_key(p) for p in self._basedir.iterdir())
+        return (self.path_to_key(p) for p in self.base_dir.iterdir())
 
     def __len__(self):
         return sum(1 for _ in self)

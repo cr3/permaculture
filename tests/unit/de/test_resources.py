@@ -7,6 +7,7 @@ import pytest
 from permaculture.de.resources import (
     DesignEcologique,
     all_perenial_plants,
+    apply_legend,
     iterator,
 )
 from permaculture.iterator import IteratorElement
@@ -30,7 +31,48 @@ def test_de_resources_perenial_plants_error():
         DesignEcologique(client).perenial_plants()
 
 
-def test_de_resources_all_perenial_plants():
+@pytest.mark.parametrize(
+    "row, expected",
+    [
+        pytest.param(
+            {"Texture du sol": "░ ▒ ▓"},
+            {"Texture du sol": "Léger Moyen Lourd"},
+            id="Texture du sol",
+        ),
+        pytest.param(
+            {"Lumière": "○ ◐ ●"},
+            {"Lumière": "Plein soleil Mi-Ombre Ombre"},
+            id="Lumière",
+        ),
+        pytest.param(
+            {"Forme": "A Ar H G"},
+            {"Forme": "Arbre Arbuste Herbacée Grimpante"},
+            id="Forme",
+        ),
+        pytest.param(
+            {"Racine": "B C D F L P R S T"},
+            {
+                "Racine": (
+                    "Bulbe Charnu Drageonnante Faciculé Latérales Pivotante"
+                    " Rhizome Superficiel Tubercule"
+                )
+            },
+            id="Racine",
+        ),
+        pytest.param(
+            {"Vie sauvage": "N A NA"},
+            {"Vie sauvage": "Nourriture Abris Nourriture et Abris"},
+            id="Vie sauvage",
+        ),
+    ],
+)
+def test_apply_legend(row, expected):
+    """Applying the legend should translate a row into the expected result."""
+    result = apply_legend(row)
+    assert result == expected
+
+
+def test_all_perenial_plants():
     """All perenial plants should return a dictionary of characteristics."""
     data = "TAXONOMIE\nGenre,Espèce \na,b\n"
     export = Mock(return_value=data)
@@ -47,7 +89,7 @@ def test_de_resources_all_perenial_plants():
 
 
 @patch("permaculture.de.resources.all_perenial_plants")
-def test_de_resources_iterator(mock_all_perenial_plants):
+def test_iterator(mock_all_perenial_plants):
     """Iterating over plants should return a list of elements."""
     mock_all_perenial_plants.return_value = [
         {
@@ -58,7 +100,7 @@ def test_de_resources_iterator(mock_all_perenial_plants):
         }
     ]
 
-    elements = iterator()
+    elements = iterator(None)
     assert elements == [
         IteratorElement(
             scientific_name="a b",

@@ -38,6 +38,7 @@ DICT_TEST = {
     params=[
         "application/json",
         "application/x-pickle",
+        "application/x-yaml",
     ]
 )
 def serializer(request):
@@ -46,7 +47,7 @@ def serializer(request):
 
 
 def test_action_default():
-    """A SerializerAction should default to application/json."""
+    """A SerializerAction should default to application/x-yaml."""
     parser = ArgumentParser()
     parser.add_argument("--serializer", action=SerializerAction)
     result = parser.parse_args([])
@@ -54,7 +55,9 @@ def test_action_default():
     assert_that(
         result,
         has_properties(
-            serializer=has_properties(default_content_type="application/json")
+            serializer=has_properties(
+                default_content_type="application/x-yaml"
+            )
         ),
     )
 

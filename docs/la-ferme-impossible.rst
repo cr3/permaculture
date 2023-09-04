@@ -1,25 +1,29 @@
-Dans le livre La ferme impossible, Dominic Lamontagne partage les nombreux
-obstacles réglementaires soumis à une ferme artisanale au Québec
-qui compte 2 vaches, 200 poules et 500 poulets. Ce sont les piliers de
-l'agriculture régionale - le lait, les oeufs et le poulet - mais les
-mécanismes qui contingentent et régissent leur mise en marché sont
-parmi les plus contraignants du Québec. L'auteur démontre de manière
-convaincante à l'aide de "preuve mathématiques" que c'est impossible
-pour cette ferme spécifiquement d'être économiquement viable dans
-le contexte législatif actuel. Les raisons principales sont les prix
-prohibitifs des quotas, les minimums de quotas, les ententes de prix
-convenus entre l'UPA et les acheteurs et, si ce n'est pas assez, la
-cotisation obligatoire à l'UPA. Il existe cependant des brèches: le
-petit producteur qui détient 300 pondeuses ou moins peut encore classes
-lui-même ses oeufs sans enregistrer son poste de classement. Quoi qu'il
-en soit, Dominic nous met en garde que le climat de l'agriculture au
-Québec n'est pas favorable pour le producteur indépendant.
+La ferme impossible
+===================
+
+Dans ce livre, Dominic Lamontagne partage les nombreux obstacles
+réglementaires soumis à une ferme artisanale au Québec qui compte 2
+vaches, 200 poules et 500 poulets. Ce sont les piliers de l'agriculture
+régionale - le lait, les oeufs et le poulet - mais les mécanismes qui
+contingentent et régissent leur mise en marché sont parmi les plus
+contraignants du Québec. L'auteur démontre de manière convaincante
+à l'aide de "preuve mathématiques" que c'est impossible pour cette
+ferme spécifiquement d'être économiquement viable dans le contexte
+législatif actuel. Les raisons principales sont les prix prohibitifs des
+quotas, les minimums de quotas, les ententes de prix convenus entre l'UPA
+et les acheteurs et, si ce n'est pas assez, la cotisation obligatoire
+à l'UPA. Il existe cependant des brèches: le petit producteur qui
+détient 300 pondeuses ou moins peut encore classes lui-même ses oeufs
+sans enregistrer son poste de classement. Quoi qu'il en soit, Dominic
+nous met en garde que le climat de l'agriculture au Québec n'est pas
+favorable pour le producteur indépendant.
 
 En expliquant la genèse de la ferme impossible, Dominic décrit
 les nombreux intervenants qui constituent l'agriculture au Québec
 aujourd'hui. Ce n'est pas évident de connaître les principaux
 intervenants et de comprendre les relations entre eux alors voici un
 (pas très) bref survol:
+
 * L'Union des producteurs agricoles (UPA) - autrefois l'Union des
   cultivateurs catholiques (UCC) - est un syndicat dont la mission est
   de promouvoir les intérêts des agriculteurs au Québec. En fait,
@@ -80,6 +84,7 @@ intervenants et de comprendre les relations entre eux alors voici un
 Dominic poursuit avec quelques rapports qui portent une réflexion
 profonde sur l'avenir de l'agriculture et de l'agroalimentaire québecois
 ainsi que quelques politiques tout aussi infructueuses:
+
 * Le rapport Pronovost (2006) constitue LE guide de référence
   pour amorcer un virage pour "une agriculture moderne, novatrice et
   entrepreneuriale". Le rapport démontre aussi les centaines de millions de

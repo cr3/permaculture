@@ -272,7 +272,7 @@ class HTTPClient:
 
         :param method: Method for the request.
         :param path: Path joined to the URL.
-        :param **kwargs: Optional keyword arguments passed to the session.
+        :param \\**kwargs: Optional keyword arguments passed to the session.
         """
         url = self.base_url / path
         if self.headers or "headers" in kwargs:

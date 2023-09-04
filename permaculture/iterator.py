@@ -4,10 +4,10 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from attrs import define
-from unidecode import unidecode
+from attrs import define, field
 
 from permaculture.registry import registry_load
+from permaculture.tokenizer import tokenize
 
 
 class IteratorElementNotFound(Exception):
@@ -16,8 +16,8 @@ class IteratorElementNotFound(Exception):
 
 @define(frozen=True)
 class IteratorElement:
-    scientific_name: str
-    common_names: list[str]
+    scientific_name: str = field(converter=tokenize)
+    common_names: list[str] = field(converter=lambda x: list(filter(None, x)))
     characteristics: dict[str, Any]
 
 
@@ -48,7 +48,7 @@ class Iterator:
             element
             for element in self.iterate()
             if any(
-                re.search(name, unidecode(n), re.I)
+                re.search(name, tokenize(n), re.I)
                 for n in element.common_names
             )
         ]
@@ -64,4 +64,4 @@ class Iterator:
         if not characteristics:
             raise IteratorElementNotFound(name)
 
-        return characteristics
+        return {k: list(v) for k, v in characteristics.items()}

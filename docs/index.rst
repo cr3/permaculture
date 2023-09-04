@@ -11,6 +11,14 @@ Welcome!
    :caption: Contents:
 
 
+Books
+-----
+
+.. toctree::
+   :maxdepth: 2
+
+   la-ferme-impossible
+   la-revolution-dun-seul-brin-de-paille
 
 API Reference
 -------------
@@ -19,7 +27,7 @@ If you are looking for information on a specific function, class or
 method, this part of the documentation is for you.
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 3
 
    modules
 
@@ -30,6 +38,7 @@ Additional Notes
 .. toctree::
    :maxdepth: 2
 
+   pfaf
    contributing
    license
    changes

@@ -2,6 +2,7 @@
 
 import sys
 from argparse import ArgumentParser, FileType
+from collections import defaultdict
 
 from appdirs import user_cache_dir
 
@@ -12,6 +13,7 @@ from permaculture.logger import (
     setup_logger,
 )
 from permaculture.serializer import SerializerAction
+from permaculture.storage import FileStorage
 
 
 def main(argv=None):
@@ -42,15 +44,26 @@ def main(argv=None):
     )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
+    lookup = subparsers.add_parser("lookup")
+    lookup.add_argument(
+        "name",
+        help="lookup the characteristics given a latin name",
+    )
     search = subparsers.add_parser("search")
     search.add_argument(
         "name",
         help="search for latin names given a common name",
     )
-    lookup = subparsers.add_parser("lookup")
-    lookup.add_argument(
-        "name",
-        help="lookup the characteristics given a latin name",
+    store = subparsers.add_parser("store")
+    store.add_argument(
+        "key",
+        help="storage key",
+    )
+    store.add_argument(
+        "file",
+        type=FileType("rb"),
+        default=sys.stdin.buffer,
+        help="input file (default stdin)",
     )
 
     args = parser.parse_args(argv)
@@ -59,19 +72,19 @@ def main(argv=None):
     iterator = Iterator.load(args.cache_dir)
 
     match args.command:
-        case "search":
-            for element in iterator.search(args.name):
-                output, *_ = args.serializer.encode(
-                    (
-                        f"{element.scientific_name}:"
-                        f" {', '.join(element.common_names)}\n"
-                    ),
-                    "text/plain",
-                )
-                args.output.write(output)
         case "lookup":
             element = iterator.lookup(args.name)
             output, *_ = args.serializer.encode(element)
             args.output.write(output)
+        case "search":
+            data = defaultdict(set)
+            for element in iterator.search(args.name):
+                data[element.scientific_name].update(element.common_names)
+            data = {k: sorted(v) for k, v in data.items()}
+            output, *_ = args.serializer.encode(data)
+            args.output.write(output)
+        case "store":
+            storage = FileStorage(args.cache_dir, "application/octet-stream")
+            storage[args.key] = args.file.read()
         case _:
             parser.error(f"Unsupported command: {args.command}")
