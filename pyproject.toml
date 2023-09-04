@@ -44,7 +44,7 @@ sphinx-rtd-theme = "^1.2.0"
 permaculture = "permaculture.testing.fixtures"
 
 [tool.poetry.plugins."permaculture.iterators"]
-"usda-plants" = "permaculture.usda.plants:iterator"
+"usda" = "permaculture.usda:iterator"
 "de-resources" = "permaculture.de.resources:iterator"
 "pfaf" = "permaculture.pfaf:iterator"
 

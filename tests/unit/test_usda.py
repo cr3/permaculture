@@ -1,11 +1,11 @@
-"""Unit tests for the USDA plants module."""
+"""Unit tests for the USDA module."""
 
 from unittest.mock import ANY, Mock, patch
 
 from permaculture.iterator import IteratorElement
-from permaculture.usda.plants import UsdaPlants, all_characteristics, iterator
+from permaculture.usda import UsdaPlants, all_characteristics, iterator
 
-from ..stubs import StubRequestsResponse
+from .stubs import StubRequestsResponse
 
 
 def test_usda_plants_characteristics_search():
@@ -61,7 +61,7 @@ def test_all_characteristics():
     ]
 
 
-@patch("permaculture.usda.plants.all_characteristics")
+@patch("permaculture.usda.all_characteristics")
 def test_iterator(mock_all_characteristics):
     """Iterating over plants should return a list of elements."""
     mock_all_characteristics.return_value = [
