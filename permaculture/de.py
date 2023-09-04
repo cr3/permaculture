@@ -7,7 +7,7 @@ from attrs import define
 from bs4 import BeautifulSoup
 from yarl import URL
 
-from permaculture.google.spreadsheets import GoogleSpreadsheet
+from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPClient
 from permaculture.iterator import IteratorElement
 
