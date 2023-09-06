@@ -58,7 +58,11 @@ def apply_legend(row):
 
 
 def all_plants(pfaf):
-    ws = pfaf.main_database()
+    try:
+        ws = pfaf.main_database()
+    except FileNotFoundError:
+        return []
+
     rows = ws.get_rows()
     header = [h.value for h in next(rows)]
     rows = (

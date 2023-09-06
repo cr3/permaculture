@@ -1,5 +1,8 @@
 """USDA Plants database."""
 
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
 from attrs import define
 from yarl import URL
 
@@ -66,26 +69,35 @@ class UsdaPlants:
         return response.json()
 
 
+def plant_characteristics(plants, plant):
+    """Return the characteristics for a single plant."""
+    return {
+        **{f"General/{k}": v for k, v in plant.items()},
+        **{
+            "/".join(
+                [
+                    c["PlantCharacteristicCategory"],
+                    c["PlantCharacteristicName"],
+                ]
+            ): c["PlantCharacteristicValue"]
+            for c in plants.plant_characteristics(plant["Id"])
+        },
+    }
+
+
 def all_characteristics(plants, cache_dir=None):
+    """Return the characteristics for all plants."""
     storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
     key = "usda-plants-all-characteristics"
     if key not in storage:
         search = plants.characteristics_search()
-        storage[key] = [
-            {
-                **{f"General/{k}": v for k, v in r.items()},
-                **{
-                    "/".join(
-                        [
-                            c["PlantCharacteristicCategory"],
-                            c["PlantCharacteristicName"],
-                        ]
-                    ): c["PlantCharacteristicValue"]
-                    for c in plants.plant_characteristics(r["Id"])
-                },
-            }
-            for r in search["PlantResults"]
-        ]
+        with ThreadPoolExecutor() as executor:
+            storage[key] = list(
+                executor.map(
+                    partial(plant_characteristics, plants),
+                    search["PlantResults"],
+                )
+            )
 
     return storage[key]
 

@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from permaculture.iterator import IteratorElement
-from permaculture.pfaf import Pfaf, apply_legend, iterator
+from permaculture.pfaf import Pfaf, all_plants, apply_legend, iterator
 
 
 def test_pfaf_main_database():
@@ -16,6 +16,20 @@ def test_pfaf_main_database():
     pfaf = Pfaf(storage)
     ws = pfaf.main_database()
     assert ws.cell(0, 0).value == "Test"
+
+
+def test_pfaf_main_database_error(tmpdir):
+    """The main database should raise when file not found."""
+    pfaf = Pfaf.with_cache_dir(tmpdir)
+    with pytest.raises(FileNotFoundError):
+        pfaf.main_database()
+
+
+def test_all_plants_error(tmpdir):
+    """All plants should return no plant when file not found."""
+    pfaf = Pfaf.with_cache_dir(tmpdir)
+    plants = all_plants(pfaf)
+    assert plants == []
 
 
 @pytest.mark.parametrize(
