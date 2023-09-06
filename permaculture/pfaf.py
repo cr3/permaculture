@@ -1,10 +1,14 @@
-"""Plants for a future."""
+"""Plants for a future database."""
+
+import logging
 
 import xlrd
 from attrs import define
 
 from permaculture.iterator import IteratorElement
 from permaculture.storage import FileStorage
+
+logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -24,25 +28,31 @@ class Pfaf:
 
 def apply_legend(row):
     legend = {
-        "Soil": {
-            "L": "Light(sandy)",
-            "M": "Medium(loam)",
-            "H": "Heavy",
-        },
-        "Shade": {
-            "F": "Full",
-            "S": "Semi",
-            "N": "None",
+        "Deciduous/Evergreen": {
+            "D": "Deciduous",
+            "E": "Evergreen",
         },
         "pH": {
             "A": "Acid",
             "N": "Neutral",
             "B": "Base/Alkaline",
         },
+        "Shade": {
+            "F": "Full",
+            "S": "Semi",
+            "N": "None",
+        },
+        "Soil": {
+            "L": "Light(sandy)",
+            "M": "Medium(loam)",
+            "H": "Heavy",
+        },
     }
     for k, v in legend.items():
         if k in row:
             row[k] = [v.get(x, x) for x in row[k]]
+        else:
+            logger.warn("%(key)r not found in data", {"key": k})
 
     return row
 
@@ -61,6 +71,6 @@ def all_plants(pfaf):
 def iterator(cache_dir):
     pfaf = Pfaf.with_cache_dir(cache_dir)
     return [
-        IteratorElement(p["Latin name"], [p["Common name"]], p)
+        IteratorElement("PFAF", p["Latin name"], [p["Common name"]], p)
         for p in all_plants(pfaf)
     ]

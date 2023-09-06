@@ -35,6 +35,24 @@ def test_de_resources_perenial_plants_error():
     "row, expected",
     [
         pytest.param(
+            {"Comestible": "Fl Fr Fe N G R S JP T B"},
+            {
+                "Comestible": [
+                    "Fleur",
+                    "Fruit",
+                    "Feuille",
+                    "Noix",
+                    "Graine",
+                    "Racine",
+                    "Sève",
+                    "Jeune pousse",
+                    "Tige",
+                    "Bulbe",
+                ]
+            },
+            id="Comestible",
+        ),
+        pytest.param(
             {"Couleur de floraison": "Rg Rs B J O P V Br Bl"},
             {
                 "Couleur de floraison": [
@@ -72,9 +90,80 @@ def test_de_resources_perenial_plants_error():
             id="Eau",
         ),
         pytest.param(
+            {"Inconvénient": "E D A P Épi V B G Pe"},
+            {
+                "Inconvénient": [
+                    "Expansif",
+                    "Dispersif",
+                    "Allergène",
+                    "Poison",
+                    "Épineux",
+                    "Vigne vigoureuse",
+                    "Brûlure",
+                    "Grimpant invasif",
+                    "Persistant",
+                ]
+            },
+            id="Inconvénient",
+        ),
+        pytest.param(
+            {"Intérêt automnale hivernal": "A H"},
+            {"Intérêt automnale hivernal": ["Automne", "Hivernale"]},
+            id="Intérêt automnale hivernal",
+        ),
+        pytest.param(
             {"Lumière": "○ ◐ ●"},
             {"Lumière": ["Plein soleil", "Mi-Ombre", "Ombre"]},
             id="Lumière",
+        ),
+        pytest.param(
+            {"Multiplication": "B M D S G St P A É T"},
+            {
+                "Multiplication": [
+                    "Bouturage",
+                    "Marcottage",
+                    "Division",
+                    "Semi",
+                    "Greffe",
+                    "Stolon",
+                    "Printemps",
+                    "Automne",
+                    "Été",
+                    "Tubercule",
+                ]
+            },
+            id="Multiplication",
+        ),
+        pytest.param(
+            {"Période de floraison": "P É A"},
+            {"Période de floraison": ["Printemps", "Été", "Automne"]},
+            id="Période de floraison",
+        ),
+        pytest.param(
+            {"Période de taille": "AD AF P É A T N"},
+            {
+                "Période de taille": [
+                    "Avant le débourement",
+                    "Après la floraison",
+                    "Printemps",
+                    "Été",
+                    "Automne",
+                    "en tout temps",
+                    "Ne pas tailler",
+                ]
+            },
+            id="Période de taille",
+        ),
+        pytest.param(
+            {"Pollinisateurs": "S G V"},
+            {
+                "Pollinisateurs": [
+                    "Spécialistes",
+                    "Généralistes",
+                    "Vent",
+                ]
+            },
+            id="Pollinisateurs",
         ),
         pytest.param(
             {"Racine": "B C D F L P R S T"},
@@ -94,9 +183,25 @@ def test_de_resources_perenial_plants_error():
             id="Racine",
         ),
         pytest.param(
+            {"Rythme de croissance": "R M L"},
+            {"Rythme de croissance": ["Rapide", "Moyen", "Lent"]},
+            id="Rythme de croissance",
+        ),
+        pytest.param(
             {"Texture du sol": "░ ▒ ▓"},
             {"Texture du sol": ["Léger", "Moyen", "Lourd"]},
             id="Texture du sol",
+        ),
+        pytest.param(
+            {"Utilisation écologique": "BR P Z"},
+            {
+                "Utilisation écologique": [
+                    "Bande Riveraine",
+                    "Pentes",
+                    "Zone innondable",
+                ]
+            },
+            id="Utilisation écologique",
         ),
         pytest.param(
             {"Vie sauvage": "N A NA"},
@@ -142,6 +247,7 @@ def test_iterator(mock_all_perenial_plants):
     elements = iterator(None)
     assert elements == [
         IteratorElement(
+            database="DE",
             scientific_name="a b",
             common_names=["c", "d"],
             characteristics={

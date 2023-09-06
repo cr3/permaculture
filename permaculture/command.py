@@ -73,18 +73,21 @@ def main(argv=None):
 
     match args.command:
         case "lookup":
-            element = iterator.lookup(args.name)
-            output, *_ = args.serializer.encode(element)
-            args.output.write(output)
+            data = {
+                element.database: element.characteristics
+                for element in iterator.lookup(args.name)
+            }
         case "search":
             data = defaultdict(set)
             for element in iterator.search(args.name):
                 data[element.scientific_name].update(element.common_names)
             data = {k: sorted(v) for k, v in data.items()}
-            output, *_ = args.serializer.encode(data)
-            args.output.write(output)
         case "store":
             storage = FileStorage(args.cache_dir, "application/octet-stream")
             storage[args.key] = args.file.read()
+            return
         case _:
             parser.error(f"Unsupported command: {args.command}")
+
+    output, *_ = args.serializer.encode(data, "application/x-yaml")
+    args.output.write(output)

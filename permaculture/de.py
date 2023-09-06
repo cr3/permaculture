@@ -1,5 +1,6 @@
-"""Design Ecologique web interface."""
+"""Design Ecologique database."""
 
+import logging
 import re
 from csv import reader
 from io import StringIO
@@ -11,6 +12,8 @@ from yarl import URL
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPClient
 from permaculture.iterator import IteratorElement
+
+logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -39,6 +42,18 @@ class DesignEcologique:
 
 def apply_legend(row):
     legend = {
+        "Comestible": {
+            "Fl": "Fleur",
+            "Fr": "Fruit",
+            "Fe": "Feuille",
+            "N": "Noix",
+            "G": "Graine",
+            "R": "Racine",
+            "S": "Sève",
+            "JP": "Jeune pousse",
+            "T": "Tige",
+            "B": "Bulbe",
+        },
         "Couleur de floraison": {
             "Rg": "Rouge",
             "Rs": "Rose",
@@ -70,10 +85,56 @@ def apply_legend(row):
             "H": "Herbacée",
             "G": "Grimpante",
         },
+        "Inconvénient": {
+            "E": "Expansif",
+            "D": "Dispersif",
+            "A": "Allergène",
+            "P": "Poison",
+            "Épi": "Épineux",
+            "V": "Vigne vigoureuse",
+            "B": "Brûlure",
+            "G": "Grimpant invasif",
+            "Pe": "Persistant",
+        },
+        "Intérêt automnale hivernal": {
+            "A": "Automne",
+            "H": "Hivernale",
+        },
         "Lumière": {
             "○": "Plein soleil",
             "◐": "Mi-Ombre",
             "●": "Ombre",
+        },
+        "Multiplication": {
+            "B": "Bouturage",
+            "M": "Marcottage",
+            "D": "Division",
+            "S": "Semi",
+            "G": "Greffe",
+            "St": "Stolon",
+            "P": "Printemps",
+            "A": "Automne",
+            "É": "Été",
+            "T": "Tubercule",
+        },
+        "Période de floraison": {
+            "P": "Printemps",
+            "É": "Été",
+            "A": "Automne",
+        },
+        "Période de taille": {
+            "AD": "Avant le débourement",
+            "AF": "Après la floraison",
+            "P": "Printemps",
+            "É": "Été",
+            "A": "Automne",
+            "T": "en tout temps",
+            "N": "Ne pas tailler",
+        },
+        "Pollinisateurs": {
+            "S": "Spécialistes",
+            "G": "Généralistes",
+            "V": "Vent",
         },
         "Racine": {
             "B": "Bulbe",
@@ -86,11 +147,21 @@ def apply_legend(row):
             "S": "Superficiel",
             "T": "Tubercule",
         },
+        "Rythme de croissance": {
+            "R": "Rapide",
+            "M": "Moyen",
+            "L": "Lent",
+        },
         "Texture du sol": {
             "░": "Léger",
             "▒": "Moyen",
             "▓": "Lourd",
             "O": "Aquatique",
+        },
+        "Utilisation écologique": {
+            "BR": "Bande Riveraine",
+            "P": "Pentes",
+            "Z": "Zone innondable",
         },
         "Vie sauvage": {
             "N": "Nourriture",
@@ -100,7 +171,14 @@ def apply_legend(row):
     }
     for k, v in legend.items():
         if k in row:
-            row[k] = [v.get(x, x) for x in re.split(r",?\s+", row[k])]
+            old_value = row[k]
+            new_value = [v.get(x, x) for x in re.split(r",?\s+", old_value)]
+            if len(new_value) == 1 and new_value[0] == old_value:
+                new_value = [v.get(x, x) for x in old_value]
+
+            row[k] = new_value
+        else:
+            logger.warn("%(key)r not found in data", {"key": k})
 
     return row
 
@@ -121,6 +199,7 @@ def iterator(cache_dir):
     )
     return [
         IteratorElement(
+            "DE",
             f"{p['Genre']} {p['Espèce']}",
             [p["Nom Anglais"], p["Nom français"]],
             p,

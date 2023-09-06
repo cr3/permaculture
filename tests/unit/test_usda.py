@@ -75,6 +75,7 @@ def test_iterator(mock_all_characteristics):
     elements = iterator(None)
     assert elements == [
         IteratorElement(
+            database="USDA",
             scientific_name="a",
             common_names=["b"],
             characteristics={
