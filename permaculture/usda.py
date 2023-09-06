@@ -1,4 +1,4 @@
-"""USDA Plants API."""
+"""USDA Plants database."""
 
 from attrs import define
 from yarl import URL
@@ -97,6 +97,7 @@ def iterator(cache_dir):
     )
     return [
         IteratorElement(
+            "USDA",
             c["General/ScientificName"],
             [c["General/CommonName"]],
             c,

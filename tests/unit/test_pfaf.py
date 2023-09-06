@@ -22,9 +22,19 @@ def test_pfaf_main_database():
     "row, expected",
     [
         pytest.param(
-            {"Soil": "LMH"},
-            {"Soil": ["Light(sandy)", "Medium(loam)", "Heavy"]},
-            id="Soil",
+            {"Deciduous/Evergreen": "DE"},
+            {
+                "Deciduous/Evergreen": [
+                    "Deciduous",
+                    "Evergreen",
+                ]
+            },
+            id="Deciduous/Evergreen",
+        ),
+        pytest.param(
+            {"pH": "ANB"},
+            {"pH": ["Acid", "Neutral", "Base/Alkaline"]},
+            id="pH",
         ),
         pytest.param(
             {"Shade": "FSN"},
@@ -32,9 +42,9 @@ def test_pfaf_main_database():
             id="Shade",
         ),
         pytest.param(
-            {"pH": "ANB"},
-            {"pH": ["Acid", "Neutral", "Base/Alkaline"]},
-            id="pH",
+            {"Soil": "LMH"},
+            {"Soil": ["Light(sandy)", "Medium(loam)", "Heavy"]},
+            id="Soil",
         ),
     ],
 )
@@ -57,6 +67,7 @@ def test_iterator(mock_all_plants):
     elements = iterator("")
     assert elements == [
         IteratorElement(
+            database="PFAF",
             scientific_name="a",
             common_names=["b"],
             characteristics={
