@@ -315,6 +315,15 @@ def test_http_cache_all_retrieve_new_responses(http_cache_all):
     assert not http_cache_all.retrieve(req)
 
 
+def test_http_cache_all_retrieve_overwrite_responses(http_cache_all):
+    """The HTTP cache retrieve overwrite responses as None."""
+    req = StubRequestsPreparedRequest(headers={"X-Cache-All": "overwrite"})
+    resp = StubRequestsResponse(200, request=req)
+
+    http_cache_all.store(resp)
+    assert not http_cache_all.retrieve(req)
+
+
 def test_http_cache_all_can_retrieve_all_responses(http_cache_all):
     """The HTTP cache can retrieve all responses."""
     req = StubRequestsPreparedRequest()
@@ -351,9 +360,7 @@ def test_http_client_request(method):
     session = Mock()
     client = HTTPClient("http://www.test.com", session=session)
     client.request(method, "/a")
-    session.request.assert_called_once_with(
-        method, "http://www.test.com/a", allow_redirects=False
-    )
+    session.request.assert_called_once_with(method, "http://www.test.com/a")
 
 
 def test_http_client_get():
@@ -361,6 +368,4 @@ def test_http_client_get():
     session = Mock()
     client = HTTPClient("http://www.test.com", session=session)
     client.get("/a/b")
-    session.request.assert_called_once_with(
-        "GET", "http://www.test.com/a/b", allow_redirects=False
-    )
+    session.request.assert_called_once_with("GET", "http://www.test.com/a/b")

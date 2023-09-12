@@ -23,4 +23,5 @@ def test_google_spreadsheet_export():
     client.get.assert_called_once_with(
         "/spreadsheets/d/test_id/export",
         params={"gid": "test_gid", "format": "test_format"},
+        allow_redirects=False,
     )

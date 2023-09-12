@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from attrs import define
+from requests.status_codes import codes
 from yarl import URL
 
 from permaculture.http import HTTPClient
@@ -25,5 +26,12 @@ class GoogleSpreadsheet:
         response = self.client.get(
             f"/spreadsheets/d/{self.doc_id}/export",
             params={"gid": gid, "format": fmt},
+            allow_redirects=False,
         )
+        if response.status_code == codes.temporary_redirect:
+            adapter = self.client.session.adapters[str(self.client.origin)]
+            url = URL(response.headers["Location"])
+            client = HTTPClient.with_adapter(url.origin(), adapter)
+            response = client.get(url.path, params=url.query)
+
         return response.content.decode("utf8")

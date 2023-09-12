@@ -6,7 +6,7 @@ from functools import partialmethod
 from hashlib import md5
 from urllib.parse import urlparse
 
-from attrs import define, evolve, field
+from attrs import define, field
 from requests import Response, Session
 from requests.adapters import HTTPAdapter
 from yarl import URL
@@ -183,10 +183,14 @@ class HTTPCacheAll:
     def retrieve(self, request):
         """Retrieve a cached HTTP response if possible."""
         key = self._hash_request(request)
-        if entry := self.storage.get(key):
-            return entry.response
+        entry = self.storage.get(key)
+        if entry is None:
+            return None
 
-        return None
+        if "overwrite" in request.headers.get("X-Cache-All", ""):
+            return None
+
+        return entry.response
 
     handle_304 = retrieve
 
@@ -255,17 +259,19 @@ class HTTPClient:
     origin: URL = field(converter=URL)
     headers: dict[str, str] = field(factory=dict)
     session: Session = field(factory=Session)
-    adapter: HTTPAdapter = field(factory=HTTPCacheAdapter)
-
-    def __attrs_post_init__(self):
-        self.session.mount(str(self.origin), self.adapter)
 
     @classmethod
     def with_cache_all(cls, url: URL, cache_dir=None):
         storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
         cache = HTTPCacheAll(storage)
         adapter = HTTPCacheAdapter(cache)
-        return cls(url, adapter=adapter)
+        return cls.with_adapter(url, adapter)
+
+    @classmethod
+    def with_adapter(cls, url: URL, adapter: HTTPAdapter, **kwargs):
+        session = Session()
+        session.mount(str(URL(url).origin()), adapter)
+        return cls(url, session=session, **kwargs)
 
     def request(self, method, path, **kwargs):
         """Send an HTTP request.
@@ -278,16 +284,8 @@ class HTTPClient:
         if self.headers or "headers" in kwargs:
             kwargs["headers"] = {**self.headers, **kwargs.get("headers", {})}
 
-        # This is necessary for redirects to also use the cache adapter.
-        kwargs.setdefault("allow_redirects", False)
-
         response = self.session.request(method, url, **kwargs)
         response.raise_for_status()
-
-        if response.is_redirect is True:
-            url = URL(response.headers["Location"])
-            client = evolve(self, origin=url.origin())
-            return client.request(method, url.path, **kwargs)
 
         return response
 
