@@ -1,4 +1,6 @@
 """Storage providers."""
+
+import logging
 from collections.abc import MutableMapping
 from pathlib import Path
 from urllib.parse import quote, unquote
@@ -6,6 +8,8 @@ from urllib.parse import quote, unquote
 from attrs import define, field
 
 from permaculture.serializer import Serializer
+
+logger = logging.getLogger(__name__)
 
 Storage = MutableMapping
 
@@ -41,6 +45,7 @@ class FileStorage(Storage):
         if not path.exists():
             raise KeyError(key)
 
+        logger.debug("reading from %(path)s", {"path": path})
         payload = path.read_bytes()
         return self.serializer.decode(payload)
 
@@ -49,6 +54,7 @@ class FileStorage(Storage):
         path = self.key_to_path(key)
         payload, *_ = self.serializer.encode(value)
         path.parent.mkdir(parents=True, exist_ok=True)
+        logger.debug("writing to %(path)s", {"path": path})
         path.write_bytes(payload)
 
     def __delitem__(self, key):
