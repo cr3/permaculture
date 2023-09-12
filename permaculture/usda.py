@@ -6,8 +6,8 @@ from functools import partial
 from attrs import define
 from yarl import URL
 
+from permaculture.database import DatabaseElement, DatabasePlugin
 from permaculture.http import HTTPClient
-from permaculture.iterator import IteratorElement
 from permaculture.storage import FileStorage, MemoryStorage
 
 
@@ -102,17 +102,22 @@ def all_characteristics(plants, cache_dir=None):
     return storage[key]
 
 
-def iterator(cache_dir):
-    plants = UsdaPlants.from_url(
-        "https://plantsservices.sc.egov.usda.gov",
-        cache_dir,
-    )
-    return [
-        IteratorElement(
-            "USDA",
-            c["General/ScientificName"],
-            [c["General/CommonName"]],
-            c,
+class UsdaDatabase(DatabasePlugin):
+
+    def iterate(self, cache_dir):
+        plants = UsdaPlants.from_url(
+            "https://plantsservices.sc.egov.usda.gov",
+            cache_dir,
         )
-        for c in all_characteristics(plants, cache_dir)
-    ]
+        return [
+            DatabaseElement(
+                "USDA",
+                c["General/ScientificName"],
+                [c["General/CommonName"]],
+                c,
+            )
+            for c in all_characteristics(plants, cache_dir)
+        ]
+
+
+usda_database = UsdaDatabase()

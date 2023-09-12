@@ -2,8 +2,8 @@
 
 from unittest.mock import ANY, Mock, patch
 
-from permaculture.iterator import IteratorElement
-from permaculture.usda import UsdaPlants, all_characteristics, iterator
+from permaculture.database import DatabaseElement
+from permaculture.usda import UsdaPlants, all_characteristics, usda_database
 
 from .stubs import StubRequestsResponse
 
@@ -62,8 +62,8 @@ def test_all_characteristics():
 
 
 @patch("permaculture.usda.all_characteristics")
-def test_iterator(mock_all_characteristics):
-    """Iterating over plants should return a list of elements."""
+def test_usda_database_iterate(mock_all_characteristics):
+    """Iterating over the database should return a list of elements."""
     mock_all_characteristics.return_value = [
         {
             "General/Id": "1",
@@ -72,9 +72,9 @@ def test_iterator(mock_all_characteristics):
         }
     ]
 
-    elements = iterator(None)
+    elements = usda_database.iterate(None)
     assert elements == [
-        IteratorElement(
+        DatabaseElement(
             database="USDA",
             scientific_name="a",
             common_names=["b"],

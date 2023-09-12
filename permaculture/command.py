@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from appdirs import user_cache_dir
 
-from permaculture.iterator import Iterator
+from permaculture.database import Database
 from permaculture.logger import (
     LoggerHandlerAction,
     LoggerLevelAction,
@@ -69,17 +69,17 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     setup_logger(args.log_level, args.log_file)
-    iterator = Iterator.load(args.cache_dir)
+    database = Database.load(args.cache_dir)
 
     match args.command:
         case "lookup":
             data = {
                 element.database: element.characteristics
-                for element in iterator.lookup(args.name)
+                for element in database.lookup(args.name)
             }
         case "search":
             data = defaultdict(set)
-            for element in iterator.search(args.name):
+            for element in database.search(args.name):
                 data[element.scientific_name].update(element.common_names)
             data = {k: sorted(v) for k, v in data.items()}
         case "store":
