@@ -1,12 +1,14 @@
 """Wikipedia API."""
 
 import re
+from collections import defaultdict
 from functools import partial
+from itertools import count
 
 import pandas as pd
 from attrs import define
+from bs4 import BeautifulSoup
 
-from permaculture.html import parse_tables
 from permaculture.http import (
     HTTPCacheAdapter,
     HTTPCacheAll,
@@ -27,7 +29,7 @@ class Wikipedia:
         storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
         cache = HTTPCacheAll(storage)
         adapter = HTTPCacheAdapter(cache)
-        client = HTTPClient(url, adapter=adapter)
+        client = HTTPClient.with_adapter(url, adapter)
         return cls(client)
 
     def get(self, action="query", **kwargs):
@@ -42,6 +44,38 @@ class Wikipedia:
     def get_text(self, page):
         data = self.get("parse", prop="text", page=page)
         return data["parse"]["text"]["*"]
+
+
+def parse_table(table):
+    """Parse an HTML table into a dictionary of values."""
+    data = defaultdict(list)
+    headers = {}
+    for tr in table.find_all("tr"):
+        if ths := tr.find_all("th"):
+            # Repeat headers across colspan.
+            names = [
+                th.get_text().strip()
+                for th in ths
+                for _ in range(int(th.attrs.get("colspan", "1")))
+            ]
+            # Skip duplicate headers.
+            if names != [v[-1] for v in headers.values()]:
+                headers = {
+                    i: (*headers.get(i, ()), name)
+                    for i, name in zip(count(), names)  # noqa: B905
+                }
+
+        for i, td in enumerate(tr.find_all("td")):
+            key = headers.get(i, i)
+            data[key].append(td.get_text())
+
+    return data
+
+
+def parse_tables(text, **kwargs):
+    """Parse HTML text into a list of tables."""
+    soup = BeautifulSoup(text, "html.parser")
+    return [parse_table(table) for table in soup.find_all("table", **kwargs)]
 
 
 def get_companion_plants(wikipedia):

@@ -4,8 +4,15 @@ from textwrap import dedent
 from unittest.mock import Mock
 
 import pandas as pd
+import pytest
+from bs4 import BeautifulSoup
 
-from permaculture.wikipedia import Wikipedia, get_companion_plants
+from permaculture.wikipedia import (
+    Wikipedia,
+    get_companion_plants,
+    parse_table,
+    parse_tables,
+)
 
 from .stubs import StubRequestsResponse
 
@@ -47,6 +54,106 @@ def test_wikipedia_get_text():
         },
     )
     assert text == "text"
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        (
+            dedent("""\
+            <table>
+              <tr>
+                <td>0</td>
+                <td>1</td>
+              </tr>
+            </table>",
+        """),
+            {
+                0: ["0"],
+                1: ["1"],
+            },
+        ),
+        (
+            dedent("""\
+            <table>
+              <tr>
+                <th>a</th>
+              </tr>
+              <tr>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>1</td>
+              </tr>
+            </table>",
+        """),
+            {
+                ("a",): ["0", "1"],
+            },
+        ),
+        (
+            dedent("""\
+            <table>
+              <tr>
+                <th>a</th>
+              </tr>
+              <tr>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>a</th>
+              </tr>
+              <tr>
+                <td>1</td>
+              </tr>
+            </table>",
+        """),
+            {
+                ("a",): ["0", "1"],
+            },
+        ),
+        (
+            dedent("""\
+            <table>
+              <tr>
+                <th colspan=2>a</th>
+              </tr>
+              <tr>
+                <th>b</th>
+                <th>c</th>
+              </tr>
+              <tr>
+                <td>0</td>
+                <td>1</td>
+              </tr>
+            </table>",
+        """),
+            {
+                ("a", "b"): ["0"],
+                ("a", "c"): ["1"],
+            },
+        ),
+    ],
+)
+def test_parse_table(text, expected):
+    """Parsing an HTML table should return a dictionary of values."""
+    table = BeautifulSoup(text, "html.parser")
+    result = parse_table(table)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("", 0),
+        ("<table></table>", 1),
+        ("<table></table><table></table>", 2),
+    ],
+)
+def test_parse_tables(text, expected):
+    """Parsing HTML tables should return the same number of tables."""
+    tables = parse_tables(text)
+    assert len(tables) == expected
 
 
 def test_get_companion_plants():
