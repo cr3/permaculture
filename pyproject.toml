@@ -59,7 +59,6 @@ permaculture = "permaculture.testing.fixtures"
 "text/plain" = "permaculture.serializer:text_plain_serializer"
 
 [tool.poetry.scripts]
-wikipedia-companion = "permaculture.wikipedia.companion:main"
 permaculture = "permaculture.command:main"
 
 [build-system]
