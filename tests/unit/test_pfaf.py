@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from permaculture.iterator import IteratorElement
-from permaculture.pfaf import Pfaf, all_plants, apply_legend, iterator
+from permaculture.database import DatabaseElement
+from permaculture.pfaf import Pfaf, all_plants, apply_legend, pfaf_database
 
 
 def test_pfaf_main_database():
@@ -69,8 +69,8 @@ def test_apply_legend(row, expected):
 
 
 @patch("permaculture.pfaf.all_plants")
-def test_iterator(mock_all_plants):
-    """Iterating over plants should return a list of elements."""
+def test_pfaf_database_iterate(mock_all_plants):
+    """Iterating over the database should return a list of elements."""
     mock_all_plants.return_value = [
         {
             "Latin name": "a",
@@ -78,9 +78,9 @@ def test_iterator(mock_all_plants):
         }
     ]
 
-    elements = iterator("")
+    elements = pfaf_database.iterate("")
     assert elements == [
-        IteratorElement(
+        DatabaseElement(
             database="PFAF",
             scientific_name="a",
             common_names=["b"],

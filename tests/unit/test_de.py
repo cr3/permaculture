@@ -8,9 +8,9 @@ from permaculture.de import (
     DesignEcologique,
     all_perenial_plants,
     apply_legend,
-    iterator,
+    de_database,
 )
-from permaculture.iterator import IteratorElement
+from permaculture.database import DatabaseElement
 
 from .stubs import StubRequestsResponse
 
@@ -233,8 +233,8 @@ def test_all_perenial_plants():
 
 
 @patch("permaculture.de.all_perenial_plants")
-def test_iterator(mock_all_perenial_plants):
-    """Iterating over plants should return a list of elements."""
+def test_de_database_iterate(mock_all_perenial_plants):
+    """Iterating over the database should return a list of elements."""
     mock_all_perenial_plants.return_value = [
         {
             "Genre": "a",
@@ -244,9 +244,9 @@ def test_iterator(mock_all_perenial_plants):
         }
     ]
 
-    elements = iterator(None)
+    elements = de_database.iterate(None)
     assert elements == [
-        IteratorElement(
+        DatabaseElement(
             database="DE",
             scientific_name="a b",
             common_names=["c", "d"],

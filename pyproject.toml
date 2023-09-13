@@ -43,10 +43,10 @@ sphinx-rtd-theme = "^1.2.0"
 [tool.poetry.plugins."pytest11"]
 permaculture = "permaculture.testing.fixtures"
 
-[tool.poetry.plugins."permaculture.iterators"]
-"usda" = "permaculture.usda:iterator"
-"de" = "permaculture.de:iterator"
-"pfaf" = "permaculture.pfaf:iterator"
+[tool.poetry.plugins."permaculture.databases"]
+"usda" = "permaculture.usda:usda_database"
+"de" = "permaculture.de:de_database"
+"pfaf" = "permaculture.pfaf:pfaf_database"
 
 [tool.poetry.plugins."permaculture.serializers"]
 "application/json" = "permaculture.serializer:json_serializer"

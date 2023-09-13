@@ -9,9 +9,9 @@ from attrs import define, field
 from bs4 import BeautifulSoup
 from yarl import URL
 
+from permaculture.database import DatabaseElement, DatabasePlugin
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPClient
-from permaculture.iterator import IteratorElement
 
 logger = logging.getLogger(__name__)
 
@@ -192,17 +192,22 @@ def all_perenial_plants(de):
     return [apply_legend(row) for row in rows]
 
 
-def iterator(cache_dir):
-    de = DesignEcologique.from_url(
-        "https://designecologique.ca",
-        cache_dir,
-    )
-    return [
-        IteratorElement(
-            "DE",
-            f"{p['Genre']} {p['Espèce']}",
-            [p["Nom Anglais"], p["Nom français"]],
-            p,
+class DeDatabase(DatabasePlugin):
+
+    def iterate(self, cache_dir):
+        de = DesignEcologique.from_url(
+            "https://designecologique.ca",
+            cache_dir,
         )
-        for p in all_perenial_plants(de)
-    ]
+        return [
+            DatabaseElement(
+                "DE",
+                f"{p['Genre']} {p['Espèce']}",
+                [p["Nom Anglais"], p["Nom français"]],
+                p,
+            )
+            for p in all_perenial_plants(de)
+        ]
+
+
+de_database = DeDatabase()
