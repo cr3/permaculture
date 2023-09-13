@@ -3,10 +3,10 @@ Permaculture Design Toolkit
 
 This is an experimental toolkit to assist in permaculture design.
 
-Examples
---------
+Usage
+-----
 
-Searching for the latin name for a plant:
+To ``search`` for the scientific name of a plant by common name:
 
 .. code-block:: text
 
@@ -18,7 +18,7 @@ Searching for the latin name for a plant:
     - Consoude russe
     - Rusian comfrey
 
-Looking up the characteristics of a plant:
+To ``lookup`` the characteristics of a plant by scientific name:
 
 .. code-block:: text
 
@@ -30,6 +30,19 @@ Looking up the characteristics of a plant:
     Comestible: '*'
     ...
 
+
+Configuration
+-------------
+
+The ``permaculture`` command can be configured with options on the
+command-line or the same options in an INI configuration file: either
+``.permaculture`` in your current working directory or ``~/.permaculture``
+in your home directory. To configure logging:
+
+.. code-block:: text
+
+    log-level = debug
+    log-file = permaculture.log
 
 Project Information
 -------------------

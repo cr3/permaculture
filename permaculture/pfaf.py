@@ -52,7 +52,7 @@ def apply_legend(row):
         if k in row:
             row[k] = [v.get(x, x) for x in row[k]]
         else:
-            logger.warn("%(key)r not found in data", {"key": k})
+            logger.warning("%(key)r not found in data", {"key": k})
 
     return row
 
@@ -73,7 +73,6 @@ def all_plants(pfaf):
 
 
 class PfafDatabase(DatabasePlugin):
-
     def iterate(self, cache_dir):
         pfaf = Pfaf.with_cache_dir(cache_dir)
         return [

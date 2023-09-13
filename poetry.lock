@@ -245,6 +245,21 @@ files = [
 ]
 
 [[package]]
+name = "configargparse"
+version = "1.7"
+description = "A drop-in replacement for argparse that allows options to also be set via config files and/or environment variables."
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "ConfigArgParse-1.7-py3-none-any.whl", hash = "sha256:d249da6591465c6c26df64a9f73d2536e743be2f244eb3ebe61114af2f94f86b"},
+    {file = "ConfigArgParse-1.7.tar.gz", hash = "sha256:e7067471884de5478c58a511e529f0f9bd1c66bfef1dea90935438d6c23306d1"},
+]
+
+[package.extras]
+test = ["PyYAML", "mock", "pytest"]
+yaml = ["PyYAML"]
+
+[[package]]
 name = "coverage"
 version = "7.3.0"
 description = "Code coverage measurement for Python"
@@ -1472,4 +1487,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "6150c7689cd6ceed304f0354f5a909fff97418a1946c140a9002d9ddba8713a2"
+content-hash = "475939c10083e291181130f34beb8df5de6f2c2e0d06644d6471e7efa8dbc8fb"
