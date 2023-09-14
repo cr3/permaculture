@@ -4,13 +4,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from permaculture.database import DatabaseElement
 from permaculture.de import (
     DesignEcologique,
     all_perenial_plants,
     apply_legend,
     de_database,
 )
-from permaculture.database import DatabaseElement
 
 from .stubs import StubRequestsResponse
 

@@ -103,7 +103,6 @@ def all_characteristics(plants, cache_dir=None):
 
 
 class UsdaDatabase(DatabasePlugin):
-
     def iterate(self, cache_dir):
         plants = UsdaPlants.from_url(
             "https://plantsservices.sc.egov.usda.gov",

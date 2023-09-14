@@ -1,7 +1,6 @@
 """Database utilities."""
 
 import re
-from collections.abc import Callable
 from typing import Any
 
 from attrs import define, field
@@ -23,7 +22,6 @@ class DatabaseElement:
 
 
 class DatabasePlugin:
-
     def lookup(self, scientific_name: str) -> DatabaseElement:
         return None
 

@@ -178,7 +178,7 @@ def apply_legend(row):
 
             row[k] = new_value
         else:
-            logger.warn("%(key)r not found in data", {"key": k})
+            logger.warning("%(key)r not found in data", {"key": k})
 
     return row
 
@@ -193,7 +193,6 @@ def all_perenial_plants(de):
 
 
 class DeDatabase(DatabasePlugin):
-
     def iterate(self, cache_dir):
         de = DesignEcologique.from_url(
             "https://designecologique.ca",
