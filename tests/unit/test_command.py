@@ -13,25 +13,25 @@ from permaculture.command import (
 )
 
 
-def test_make_args_parser_defaults():
+def test_make_args_parser_defaults(unique):
     """Making an args parser should have remaining args."""
     args_parser = make_args_parser()
-    args, _ = args_parser.parse_known_args(["lookup", "test"])
+    args, _ = args_parser.parse_known_args(["lookup", unique("text")])
     assert args.output == sys.stdout.buffer
 
 
-def test_make_args_parser_command():
+def test_make_args_parser_command(unique):
     """Making an args parser should have remaining args."""
     args_parser = make_args_parser()
-    args, _ = args_parser.parse_known_args(["lookup", "test"])
+    args, _ = args_parser.parse_known_args(["lookup", unique("text")])
     assert args.command == "lookup"
 
 
-def test_make_args_parser_remaining():
+def test_make_args_parser_remaining(unique):
     """Making an args parser should have remaining args."""
     args_parser = make_args_parser()
     _, remaining = args_parser.parse_known_args(
-        ["--log-level=debug", "lookup", "test"]
+        ["--log-level=debug", "lookup", unique("text")]
     )
     assert remaining == ["--log-level=debug"]
 
@@ -69,9 +69,9 @@ def test_main_help(stdout):
 
 
 @patch("sys.stderr")
-def test_main_error(stderr):
+def test_main_error(stderr, unique):
     """The main function should output an error with an invalid command."""
     with pytest.raises(SystemExit):
-        main(["test"])
+        main([unique("text")])
 
     assert "invalid choice" in stderr.write.call_args[0][0]

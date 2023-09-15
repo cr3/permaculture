@@ -9,19 +9,21 @@ from permaculture.google import GoogleSpreadsheet
 from .stubs import StubRequestsResponse
 
 
-def test_google_spreadsheet_from_url():
+def test_google_spreadsheet_from_url(unique):
     """Instantiating from URL should parse the doc ID."""
-    url = URL("https://docs.google.com/spreadsheets/d/test_id/edit")
+    doc_id = unique("text")
+    url = URL(f"https://docs.google.com/spreadsheets/d/{doc_id}/edit")
     gs = GoogleSpreadsheet.from_url(url)
-    assert gs.doc_id == "test_id"
+    assert gs.doc_id == doc_id
 
 
-def test_google_spreadsheet_export():
+def test_google_spreadsheet_export(unique):
     """Exporting should GET with gid and format params."""
+    doc_id, gid, fmt = unique("text"), unique("text"), unique("text")
     client = Mock(post=Mock(return_value=StubRequestsResponse()))
-    GoogleSpreadsheet(client, "test_id").export("test_gid", "test_format")
+    GoogleSpreadsheet(client, doc_id).export(gid, fmt)
     client.get.assert_called_once_with(
-        "/spreadsheets/d/test_id/export",
-        params={"gid": "test_gid", "format": "test_format"},
+        f"/spreadsheets/d/{doc_id}/export",
+        params={"gid": gid, "format": fmt},
         allow_redirects=False,
     )

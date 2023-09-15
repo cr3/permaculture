@@ -23,6 +23,7 @@ configargparse = "^1.7"
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
 pytest = "^7.2.2"
+pytest-unique = "^0.1.0"
 pyhamcrest = "^2.0.4"
 
 [tool.poetry.group.check]

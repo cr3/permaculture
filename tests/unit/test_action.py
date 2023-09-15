@@ -45,14 +45,15 @@ def test_enum_action_list():
     assert_that(result, has_properties(enum=[StubEnum.a, StubEnum.b]))
 
 
-def test_single_action():
+def test_single_action(unique):
     """A SingleAction should allow a single action."""
     parser = ArgumentParser()
     parser.add_argument("--action", action=SingleAction)
 
-    result = parser.parse_args(["--action", "test"])
+    action = unique("text")
+    result = parser.parse_args(["--action", action])
 
-    assert_that(result, has_properties(action="test"))
+    assert_that(result, has_properties(action=action))
 
 
 def test_single_action_value_error():

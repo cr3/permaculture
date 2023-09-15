@@ -60,9 +60,9 @@ def test_parse_http_timestamp(timestamp, expected):
     assert parse_http_timestamp(timestamp) == expected
 
 
-def test_parse_http_timestamp_invalid():
+def test_parse_http_timestamp_invalid(unique):
     """An invalid date timestamp should return None."""
-    assert parse_http_timestamp("test") is None
+    assert parse_http_timestamp(unique("text")) is None
 
 
 def test_http_cache_200_responses(http_cache):
