@@ -72,7 +72,7 @@ def test_usda_database_iterate(mock_all_characteristics):
         }
     ]
 
-    elements = usda_database.iterate(None)
+    elements = list(usda_database.iterate(None))
     assert elements == [
         DatabaseElement(
             database="USDA",

@@ -5,7 +5,7 @@ import logging
 import xlrd
 from attrs import define
 
-from permaculture.database import DatabaseElement, DatabasePlugin
+from permaculture.database import DatabaseElement, DatabaseIterablePlugin
 from permaculture.storage import FileStorage
 
 logger = logging.getLogger(__name__)
@@ -72,13 +72,13 @@ def all_plants(pfaf):
     return [apply_legend(row) for row in rows]
 
 
-class PfafDatabase(DatabasePlugin):
+class PfafDatabase(DatabaseIterablePlugin):
     def iterate(self, cache_dir):
         pfaf = Pfaf.with_cache_dir(cache_dir)
-        return [
-            DatabaseElement("PFAF", p["Latin name"], [p["Common name"]], p)
-            for p in all_plants(pfaf)
-        ]
+        for p in all_plants(pfaf):
+            yield DatabaseElement(
+                "PFAF", p["Latin name"], [p["Common name"]], p
+            )
 
 
 pfaf_database = PfafDatabase()

@@ -78,7 +78,7 @@ def test_pfaf_database_iterate(mock_all_plants):
         }
     ]
 
-    elements = pfaf_database.iterate("")
+    elements = list(pfaf_database.iterate(""))
     assert elements == [
         DatabaseElement(
             database="PFAF",
