@@ -245,7 +245,7 @@ def test_de_database_iterate(mock_all_perenial_plants):
         }
     ]
 
-    elements = de_database.iterate(None)
+    elements = list(de_database.iterate(None))
     assert elements == [
         DatabaseElement(
             database="DE",

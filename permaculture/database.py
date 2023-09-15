@@ -1,6 +1,8 @@
 """Database utilities."""
 
 import re
+from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from typing import Any
 
 from attrs import define, field
@@ -21,9 +23,33 @@ class DatabaseElement:
     characteristics: dict[str, Any] = field()
 
 
-class DatabasePlugin:
-    def lookup(self, scientific_name: str) -> DatabaseElement:
-        return None
+class DatabasePlugin(ABC):
+    @abstractmethod
+    def search(self, common_name: str) -> Iterator[DatabaseElement]:
+        """Search for the scientific name by common name."""
+
+    @abstractmethod
+    def lookup(self, scientific_name: str) -> Iterator[DatabaseElement]:
+        """Lookup characteristics by scientific name."""
+
+
+class DatabaseIterablePlugin(DatabasePlugin):
+    @abstractmethod
+    def iterate(self, cache_dir) -> Iterator[DatabaseElement]:
+        """Iterate over all plants."""
+
+    def search(self, cache_dir, common_name) -> Iterator[DatabaseElement]:
+        for element in self.iterate(cache_dir):
+            if any(
+                re.search(common_name, tokenize(n), re.I)
+                for n in element.common_names
+            ):
+                yield element
+
+    def lookup(self, cache_dir, scientific_name) -> Iterator[DatabaseElement]:
+        for element in self.iterate(cache_dir):
+            if re.match(scientific_name, element.scientific_name, re.I):
+                yield element
 
 
 @define(frozen=True)
@@ -41,24 +67,17 @@ class Database:
 
         return cls(cache_dir, databases)
 
-    def iterate(self):
-        for database in self._databases.values():
-            yield from database.iterate(self.cache_dir)
-
     def search(self, common_name):
-        for element in self.iterate():
-            if any(
-                re.search(common_name, tokenize(n), re.I)
-                for n in element.common_names
-            ):
-                yield element
+        """Search for the scientific name by common name in all databases."""
+        for database in self._databases.values():
+            yield from database.search(self.cache_dir, common_name)
 
     def lookup(self, scientific_name):
+        """Lookup characteristics by scientific name in all databases."""
         not_found = True
-        for element in self.iterate():
-            if re.match(scientific_name, element.scientific_name, re.I):
-                not_found = False
-                yield element
+        for database in self._databases.values():
+            not_found = False
+            yield from database.lookup(self.cache_dir, scientific_name)
 
         if not_found:
             raise DatabaseElementNotFound(scientific_name)

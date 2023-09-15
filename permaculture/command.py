@@ -121,7 +121,7 @@ def main(argv=None):
                 data[element.scientific_name].update(element.common_names)
             data = {k: sorted(v) for k, v in data.items()}
         case "store":
-            storage = FileStorage(args.cache_dir, "application/octet-stream")
+            storage = FileStorage(config.cache_dir, "application/octet-stream")
             storage[args.key] = args.file.read()
             return
         case _:
