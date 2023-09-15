@@ -1,6 +1,7 @@
 """Unit testing stubs."""
 
 from collections.abc import Callable
+from http.cookiejar import CookieJar
 
 from attrs import Factory, define, field
 
@@ -14,6 +15,9 @@ class StubRequestsPreparedRequest:
     body: str = ""
     url: str = "http://www.test.com/"
 
+    def prepare_cookies(self, _):
+        """Do nothing."""
+
 
 @define(frozen=True)
 class StubRequestsResponse:
@@ -25,6 +29,7 @@ class StubRequestsResponse:
     url: str = "http://www.test.com/"
     reason: str = ""
     text: str = ""
+    cookies: CookieJar = None
     request: StubRequestsPreparedRequest = field(
         default=Factory(
             lambda self: StubRequestsPreparedRequest(url=self.url),

@@ -23,7 +23,7 @@ configargparse = "^1.7"
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
 pytest = "^7.2.2"
-pytest-unique = "^0.1.0"
+pytest-unique = "^0.1.1"
 pyhamcrest = "^2.0.4"
 
 [tool.poetry.group.check]
@@ -59,6 +59,10 @@ permaculture = "permaculture.testing.fixtures"
 "text/csv" = "permaculture.serializer:text_csv_serializer"
 "text/html" = "permaculture.serializer:text_html_serializer"
 "text/plain" = "permaculture.serializer:text_plain_serializer"
+
+[tool.poetry.plugins."pytest_unique.unique"]
+cookie = "permaculture.testing.unique:unique_cookie"
+cookies = "permaculture.testing.unique:unique_cookies"
 
 [tool.poetry.scripts]
 permaculture = "permaculture.command:main"
