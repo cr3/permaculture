@@ -60,9 +60,9 @@ def test_parse_http_timestamp(timestamp, expected):
     assert parse_http_timestamp(timestamp) == expected
 
 
-def test_parse_http_timestamp_invalid():
+def test_parse_http_timestamp_invalid(unique):
     """An invalid date timestamp should return None."""
-    assert parse_http_timestamp("test") is None
+    assert parse_http_timestamp(unique("text")) is None
 
 
 def test_http_cache_200_responses(http_cache):
@@ -342,16 +342,17 @@ def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
     assert http_cache_all.handle_304(req) is resp
 
 
-def test_http_cache_adapter_log_keys(logger_handler):
+def test_http_cache_adapter_log_keys(logger_handler, unique):
     """The HTTP cache adapter should log the expected header keys."""
-    resp = StubRequestsResponse(headers={"X-Test": "test"})
+    test = unique("text")
+    resp = StubRequestsResponse(headers={"X-Test": test})
     req = StubRequestsPreparedRequest("GET", url="http://www.test.com/")
 
     adapter = HTTPCacheAdapter(log_keys=["X-Test"])
     adapter.build_response(req, resp)
     result = logger_handler.records[0].message
 
-    assert result == "cache miss: GET http://www.test.com/ {'X-Test': 'test'}"
+    assert result == f"cache miss: GET http://www.test.com/ {'X-Test': {test}}"
 
 
 @pytest.mark.parametrize("method", HTTP_METHODS)

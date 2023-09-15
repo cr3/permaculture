@@ -15,13 +15,14 @@ from permaculture.de import (
 from .stubs import StubRequestsResponse
 
 
-def test_de_resources_perenial_plants():
+def test_de_resources_perenial_plants(unique):
     """Perenial plants should GET and return the spreadsheet."""
-    text = "<a href='https://docs.google.com/spreadsheets/d/test_id/edit'>"
+    doc_id = unique("text")
+    text = f"<a href='https://docs.google.com/spreadsheets/d/{doc_id}/edit'>"
     client = Mock(get=Mock(return_value=StubRequestsResponse(text=text)))
     plants = DesignEcologique(client).perenial_plants()
     client.get.assert_called_once_with("/liste-de-plantes-vivaces/")
-    assert plants.doc_id == "test_id"
+    assert plants.doc_id == doc_id
 
 
 def test_de_resources_perenial_plants_error():
