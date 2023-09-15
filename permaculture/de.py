@@ -193,10 +193,10 @@ def all_perenial_plants(de):
 
 
 class DesignEcologiqueDatabase(DatabaseIterablePlugin):
-    def iterate(self, cache_dir):
+    def iterate(self):
         de = DesignEcologique.from_url(
             "https://designecologique.ca",
-            cache_dir,
+            self.config.cache_dir,
         )
         for p in all_perenial_plants(de):
             yield DatabaseElement(
@@ -205,6 +205,3 @@ class DesignEcologiqueDatabase(DatabaseIterablePlugin):
                 [p["Nom Anglais"], p["Nom français"]],
                 p,
             )
-
-
-de_database = DesignEcologiqueDatabase()

@@ -6,7 +6,12 @@ from unittest.mock import Mock, patch
 import pytest
 
 from permaculture.database import DatabaseElement
-from permaculture.pfaf import Pfaf, all_plants, apply_legend, pfaf_database
+from permaculture.pfaf import (
+    Pfaf,
+    PfafDatabase,
+    all_plants,
+    apply_legend,
+)
 
 
 def test_pfaf_main_database():
@@ -78,7 +83,8 @@ def test_pfaf_database_iterate(mock_all_plants):
         }
     ]
 
-    elements = list(pfaf_database.iterate(""))
+    database = PfafDatabase(Mock(cache_dir=""))
+    elements = list(database.iterate())
     assert elements == [
         DatabaseElement(
             database="PFAF",

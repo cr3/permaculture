@@ -7,9 +7,9 @@ import pytest
 from permaculture.database import DatabaseElement
 from permaculture.de import (
     DesignEcologique,
+    DesignEcologiqueDatabase,
     all_perenial_plants,
     apply_legend,
-    de_database,
 )
 
 from .stubs import StubRequestsResponse
@@ -245,7 +245,8 @@ def test_de_database_iterate(mock_all_perenial_plants):
         }
     ]
 
-    elements = list(de_database.iterate(None))
+    database = DesignEcologiqueDatabase(Mock(cache_dir=""))
+    elements = list(database.iterate())
     assert elements == [
         DatabaseElement(
             database="DE",
