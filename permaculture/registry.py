@@ -1,23 +1,26 @@
 """Entry points based registry management."""
 import contextlib
-from importlib.metadata import distribution
+from importlib.metadata import entry_points
 
 
-def get_entry_points():
-    """Get the list of permaculture entry points."""
-    return distribution("permaculture").entry_points
+def get_entry_points(group):
+    """Get the list of pytest_unique entry points."""
+    try:
+        return entry_points().select(group=group)
+    except AttributeError:
+        # Backward compatibility with Python 3.8.
+        return entry_points().get(group, [])
 
 
-def registry_load(group, registry=None):
+def registry_load(name, registry=None):
     """Find all installed entry points."""
     if registry is None:
         registry = {}
 
-    absolute_group = f"permaculture.{group}"
-    for entry_point in get_entry_points():
-        if entry_point.group == absolute_group:
-            entry = entry_point.load()
-            registry_add(group, entry_point.name, entry, registry)
+    group = f"permaculture.{name}"
+    for entry_point in get_entry_points(group):
+        entry = entry_point.load()
+        registry_add(name, entry_point.name, entry, registry)
 
     return registry
 
