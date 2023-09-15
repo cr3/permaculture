@@ -107,7 +107,7 @@ def main(argv=None):
     config = config_parser.parse_args(remaining)
 
     setup_logger(config.log_level, config.log_file, name="permaculture")
-    database = Database.load(config.cache_dir)
+    database = Database.load(config)
 
     match args.command:
         case "lookup":

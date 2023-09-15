@@ -3,7 +3,11 @@
 from unittest.mock import ANY, Mock, patch
 
 from permaculture.database import DatabaseElement
-from permaculture.usda import UsdaPlants, all_characteristics, usda_database
+from permaculture.usda import (
+    UsdaPlants,
+    UsdaPlantsDatabase,
+    all_characteristics,
+)
 
 from .stubs import StubRequestsResponse
 
@@ -72,7 +76,8 @@ def test_usda_database_iterate(mock_all_characteristics):
         }
     ]
 
-    elements = list(usda_database.iterate(None))
+    database = UsdaPlantsDatabase(Mock(cache_dir=""))
+    elements = list(database.iterate())
     assert elements == [
         DatabaseElement(
             database="USDA",

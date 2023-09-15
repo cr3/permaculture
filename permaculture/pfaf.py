@@ -73,12 +73,9 @@ def all_plants(pfaf):
 
 
 class PfafDatabase(DatabaseIterablePlugin):
-    def iterate(self, cache_dir):
-        pfaf = Pfaf.with_cache_dir(cache_dir)
+    def iterate(self):
+        pfaf = Pfaf.with_cache_dir(self.config.cache_dir)
         for p in all_plants(pfaf):
             yield DatabaseElement(
                 "PFAF", p["Latin name"], [p["Common name"]], p
             )
-
-
-pfaf_database = PfafDatabase()
