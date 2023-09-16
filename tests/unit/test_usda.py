@@ -76,7 +76,7 @@ def test_usda_database_iterate(mock_all_characteristics):
         }
     ]
 
-    database = UsdaPlantsDatabase(Mock(cache_dir=""))
+    database = UsdaPlantsDatabase.from_config(Mock(cache_dir=""))
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(

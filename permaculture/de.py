@@ -192,13 +192,20 @@ def all_perenial_plants(de):
     return [apply_legend(row) for row in rows]
 
 
+@define(frozen=True)
 class DesignEcologiqueDatabase(DatabaseIterablePlugin):
-    def iterate(self):
+    de: DesignEcologique
+
+    @classmethod
+    def from_config(cls, config):
         de = DesignEcologique.from_url(
             "https://designecologique.ca",
-            self.config.cache_dir,
+            config.cache_dir,
         )
-        for p in all_perenial_plants(de):
+        return cls(de)
+
+    def iterate(self):
+        for p in all_perenial_plants(self.de):
             yield DatabaseElement(
                 "DE",
                 f"{p['Genre']} {p['Espèce']}",
