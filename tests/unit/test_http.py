@@ -1,9 +1,10 @@
 """Unit tests for the http module."""
 
 from datetime import datetime, timedelta
-from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
+from requests import Session
 
 from permaculture.http import (
     HTTP_CACHEABLE_METHODS,
@@ -357,15 +358,15 @@ def test_http_cache_adapter_log_keys(logger_handler):
 @pytest.mark.parametrize("method", HTTP_METHODS)
 def test_http_client_request(method):
     """The HTTP client request should append the path to the base URL."""
-    session = Mock()
-    client = HTTPClient("http://www.test.com", session=session)
-    client.request(method, "/a")
-    session.request.assert_called_once_with(method, "http://www.test.com/a")
+    with patch.object(Session, "request") as mock_request:
+        client = HTTPClient("http://www.test.com")
+        client.request(method, "/a")
+        mock_request.assert_called_once_with(method, "http://www.test.com/a")
 
 
 def test_http_client_get():
-    """The HTTP client should map partial methods to request."""
-    session = Mock()
-    client = HTTPClient("http://www.test.com", session=session)
-    client.get("/a/b")
-    session.request.assert_called_once_with("GET", "http://www.test.com/a/b")
+    """The HTTP client should map methods to request."""
+    with patch.object(HTTPClient, "request") as mock_request:
+        client = HTTPClient("http://www.test.com")
+        client.get("/a")
+        mock_request.assert_called_once_with("GET", "/a", allow_redirects=True)

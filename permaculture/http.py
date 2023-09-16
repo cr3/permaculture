@@ -2,14 +2,12 @@
 
 import logging
 from datetime import datetime, timedelta
-from functools import partialmethod
 from hashlib import md5
 from urllib.parse import urlparse
 
 from attrs import define, field
 from requests import Response, Session
 from requests.adapters import HTTPAdapter
-from yarl import URL
 
 from permaculture.serializer import json_serializer
 from permaculture.storage import FileStorage, MemoryStorage, Storage
@@ -252,26 +250,23 @@ class HTTPCacheAdapter(HTTPAdapter):
         return resp
 
 
-@define(frozen=True)
-class HTTPClient:
+class HTTPClient(Session):
     """An HTTP client with origin."""
 
-    origin: URL = field(converter=URL)
-    headers: dict[str, str] = field(factory=dict)
-    session: Session = field(factory=Session)
+    def __init__(self, origin, **kwargs):
+        super().__init__(**kwargs)
+        self.origin = origin
 
-    @classmethod
-    def with_cache_all(cls, url: URL, cache_dir=None):
+    def with_cache(self, cache_dir=None, cache_cls=HTTPCacheAll):
         storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
-        cache = HTTPCacheAll(storage)
+        cache = cache_cls(storage)
         adapter = HTTPCacheAdapter(cache)
-        return cls.with_adapter(url, adapter)
+        return self.with_adapter(adapter)
 
-    @classmethod
-    def with_adapter(cls, url: URL, adapter: HTTPAdapter, **kwargs):
-        session = Session()
-        session.mount(str(URL(url).origin()), adapter)
-        return cls(url, session=session, **kwargs)
+    def with_adapter(self, adapter: HTTPAdapter):
+        self.mount("https://", adapter)
+        self.mount("http://", adapter)
+        return self
 
     def request(self, method, path, **kwargs):
         """Send an HTTP request.
@@ -281,19 +276,7 @@ class HTTPClient:
         :param \\**kwargs: Optional keyword arguments passed to the session.
         """
         url = str(self.origin) + path
-        if self.headers or "headers" in kwargs:
-            kwargs["headers"] = {**self.headers, **kwargs.get("headers", {})}
-
-        response = self.session.request(method, url, **kwargs)
+        response = super().request(method, url, **kwargs)
         response.raise_for_status()
 
         return response
-
-    get = partialmethod(request, "GET")
-    head = partialmethod(request, "HEAD")
-    options = partialmethod(request, "OPTIONS")
-    post = partialmethod(request, "POST")
-    put = partialmethod(request, "PUT")
-    delete = partialmethod(request, "DELETE")
-    connect = partialmethod(request, "CONNECT")
-    patch = partialmethod(request, "PATCH")

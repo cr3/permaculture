@@ -26,7 +26,7 @@ class DesignEcologique:
     @classmethod
     def from_url(cls, url: URL, cache_dir=None):
         """Instantiate Design Ecologique from URL."""
-        client = HTTPClient.with_cache_all(url, cache_dir)
+        client = HTTPClient(url).with_cache(cache_dir)
         return cls(client, cache_dir)
 
     def perenial_plants(self):

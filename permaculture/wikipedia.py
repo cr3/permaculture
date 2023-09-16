@@ -9,12 +9,7 @@ import pandas as pd
 from attrs import define
 from bs4 import BeautifulSoup
 
-from permaculture.http import (
-    HTTPCacheAdapter,
-    HTTPCacheAll,
-    HTTPClient,
-)
-from permaculture.storage import FileStorage, MemoryStorage
+from permaculture.http import HTTPClient
 
 
 @define(frozen=True)
@@ -26,10 +21,7 @@ class Wikipedia:
     @classmethod
     def from_url(cls, url, cache_dir=None):
         """Instantiate Wikipedia from URL."""
-        storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
-        cache = HTTPCacheAll(storage)
-        adapter = HTTPCacheAdapter(cache)
-        client = HTTPClient.with_adapter(url, adapter)
+        client = HTTPClient(url).with_cache(cache_dir)
         return cls(client)
 
     def get(self, action="query", **kwargs):

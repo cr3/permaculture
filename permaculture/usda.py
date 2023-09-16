@@ -20,7 +20,7 @@ class UsdaPlants:
     @classmethod
     def from_url(cls, url: URL, cache_dir=None):
         """Instantiate USDA Plants from URL."""
-        client = HTTPClient.with_cache_all(url, cache_dir)
+        client = HTTPClient(url).with_cache(cache_dir)
         return cls(client)
 
     def characteristics_search(self) -> bytes:
