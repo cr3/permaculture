@@ -6,8 +6,8 @@ import pytest
 
 from permaculture.database import DatabaseElement
 from permaculture.de import (
-    DesignEcologique,
-    DesignEcologiqueDatabase,
+    DE,
+    DEDatabase,
     all_perenial_plants,
     apply_legend,
 )
@@ -20,7 +20,7 @@ def test_de_resources_perenial_plants(unique):
     doc_id = unique("text")
     text = f"<a href='https://docs.google.com/spreadsheets/d/{doc_id}/edit'>"
     client = Mock(get=Mock(return_value=StubRequestsResponse(text=text)))
-    plants = DesignEcologique(client).perenial_plants()
+    plants = DE(client).perenial_plants()
     client.get.assert_called_once_with("/liste-de-plantes-vivaces/")
     assert plants.doc_id == doc_id
 
@@ -29,7 +29,7 @@ def test_de_resources_perenial_plants_error():
     """Perenial plants should raise when spreadhseet is not found."""
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
     with pytest.raises(KeyError):
-        DesignEcologique(client).perenial_plants()
+        DE(client).perenial_plants()
 
 
 @pytest.mark.parametrize(
@@ -245,7 +245,7 @@ def test_de_database_iterate(mock_all_perenial_plants):
         }
     ]
 
-    database = DesignEcologiqueDatabase.from_config(Mock(cache_dir=""))
+    database = DEDatabase.from_config(Mock(cache_dir=""))
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(

@@ -1,4 +1,4 @@
-"""Plants for a future database."""
+"""Plants For A Future database."""
 
 import logging
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
-class Pfaf:
+class PFAF:
     storage: FileStorage
 
     @classmethod
@@ -73,12 +73,12 @@ def all_plants(pfaf):
 
 
 @define(frozen=True)
-class PfafDatabase(DatabaseIterablePlugin):
-    pfaf: Pfaf
+class PFAFDatabase(DatabaseIterablePlugin):
+    pfaf: PFAF
 
     @classmethod
     def from_config(cls, config):
-        pfaf = Pfaf.from_cache_dir(config.cache_dir)
+        pfaf = PFAF.from_cache_dir(config.cache_dir)
         return cls(pfaf)
 
     def iterate(self):
