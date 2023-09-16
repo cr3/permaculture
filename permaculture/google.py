@@ -3,7 +3,6 @@
 from pathlib import Path
 
 from attrs import define
-from requests.status_codes import codes
 from yarl import URL
 
 from permaculture.http import HTTPClient
@@ -18,20 +17,17 @@ class GoogleSpreadsheet:
 
     @classmethod
     def from_url(cls, url: URL, cache_dir=None):
-        client = HTTPClient.with_cache_all(url.origin(), cache_dir)
+        client = HTTPClient(url.origin()).with_cache(cache_dir)
         doc_id = Path(url.path).parent.name
         return cls(client, doc_id)
 
     def export(self, gid=1, fmt="csv"):
         response = self.client.get(
             f"/spreadsheets/d/{self.doc_id}/export",
-            params={"gid": gid, "format": fmt},
-            allow_redirects=False,
+            params={
+                "gid": gid,
+                "format": fmt,
+            },
         )
-        if response.status_code == codes.temporary_redirect:
-            adapter = self.client.session.adapters[str(self.client.origin)]
-            url = URL(response.headers["Location"])
-            client = HTTPClient.with_adapter(url.origin(), adapter)
-            response = client.get(url.path, params=url.query)
 
         return response.content.decode("utf8")
