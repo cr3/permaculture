@@ -25,14 +25,14 @@ def test_pfaf_main_database():
 
 def test_pfaf_main_database_error(tmpdir):
     """The main database should raise when file not found."""
-    pfaf = Pfaf.with_cache_dir(tmpdir)
+    pfaf = Pfaf.from_cache_dir(tmpdir)
     with pytest.raises(FileNotFoundError):
         pfaf.main_database()
 
 
 def test_all_plants_error(tmpdir):
     """All plants should return no plant when file not found."""
-    pfaf = Pfaf.with_cache_dir(tmpdir)
+    pfaf = Pfaf.from_cache_dir(tmpdir)
     plants = all_plants(pfaf)
     assert plants == []
 
@@ -83,7 +83,7 @@ def test_pfaf_database_iterate(mock_all_plants):
         }
     ]
 
-    database = PfafDatabase(Mock(cache_dir=""))
+    database = PfafDatabase.from_config(Mock(cache_dir=""))
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(

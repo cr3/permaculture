@@ -25,7 +25,6 @@ class DatabaseElement:
 
 @define(frozen=True)
 class DatabasePlugin(ABC):
-    config = field()
 
     @abstractmethod
     def search(self, common_name: str) -> Iterator[DatabaseElement]:
@@ -66,7 +65,8 @@ class Database:
             registry = registry_load("databases", registry)
 
         databases = {
-            k: v(config) for k, v in registry.get("databases", {}).items()
+            k: v.from_config(config)
+            for k, v in registry.get("databases", {}).items()
         }
 
         return cls(databases)

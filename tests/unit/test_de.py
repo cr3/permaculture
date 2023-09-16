@@ -245,7 +245,7 @@ def test_de_database_iterate(mock_all_perenial_plants):
         }
     ]
 
-    database = DesignEcologiqueDatabase(Mock(cache_dir=""))
+    database = DesignEcologiqueDatabase.from_config(Mock(cache_dir=""))
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(

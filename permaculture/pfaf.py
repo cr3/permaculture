@@ -16,7 +16,7 @@ class Pfaf:
     storage: FileStorage
 
     @classmethod
-    def with_cache_dir(cls, cache_dir):
+    def from_cache_dir(cls, cache_dir):
         storage = FileStorage(cache_dir)
         return cls(storage)
 
@@ -72,10 +72,17 @@ def all_plants(pfaf):
     return [apply_legend(row) for row in rows]
 
 
+@define(frozen=True)
 class PfafDatabase(DatabaseIterablePlugin):
+    pfaf: Pfaf
+
+    @classmethod
+    def from_config(cls, config):
+        pfaf = Pfaf.from_cache_dir(config.cache_dir)
+        return cls(pfaf)
+
     def iterate(self):
-        pfaf = Pfaf.with_cache_dir(self.config.cache_dir)
-        for p in all_plants(pfaf):
+        for p in all_plants(self.pfaf):
             yield DatabaseElement(
                 "PFAF", p["Latin name"], [p["Common name"]], p
             )

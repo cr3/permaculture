@@ -102,13 +102,21 @@ def all_characteristics(plants, cache_dir=None):
     return storage[key]
 
 
+@define(frozen=True)
 class UsdaPlantsDatabase(DatabaseIterablePlugin):
-    def iterate(self):
+    plants: UsdaPlants
+    cache_dir: str
+
+    @classmethod
+    def from_config(cls, config):
         plants = UsdaPlants.from_url(
             "https://plantsservices.sc.egov.usda.gov",
-            self.config.cache_dir,
+            config.cache_dir,
         )
-        for c in all_characteristics(plants, self.config.cache_dir):
+        return cls(plants, config.cache_dir)
+
+    def iterate(self):
+        for c in all_characteristics(self.plants, self.cache_dir):
             yield DatabaseElement(
                 "USDA",
                 c["General/ScientificName"],
