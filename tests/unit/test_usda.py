@@ -4,8 +4,8 @@ from unittest.mock import ANY, Mock, patch
 
 from permaculture.database import DatabaseElement
 from permaculture.usda import (
-    UsdaPlants,
-    UsdaPlantsDatabase,
+    USDAPlants,
+    USDAPlantsDatabase,
     all_characteristics,
 )
 
@@ -15,7 +15,7 @@ from .stubs import StubRequestsResponse
 def test_usda_plants_characteristics_search():
     """CharacteristicsSearch should POST a JSON payload."""
     client = Mock(post=Mock(return_value=StubRequestsResponse()))
-    UsdaPlants(client).characteristics_search()
+    USDAPlants(client).characteristics_search()
     client.post.assert_called_once_with(
         "/api/CharacteristicsSearch",
         json=ANY,
@@ -25,7 +25,7 @@ def test_usda_plants_characteristics_search():
 def test_usda_plants_plant_profile():
     """PlantProfile should GET with the symbol query param."""
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
-    UsdaPlants(client).plant_profile("test")
+    USDAPlants(client).plant_profile("test")
     client.get.assert_called_once_with(
         "/api/PlantProfile",
         params={"symbol": "test"},
@@ -35,7 +35,7 @@ def test_usda_plants_plant_profile():
 def test_usda_plants_plant_characteristics():
     """PlantCharacteristics should GET with the id in the URL."""
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
-    UsdaPlants(client).plant_characteristics(1234)
+    USDAPlants(client).plant_characteristics(1234)
     client.get.assert_called_once_with("/api/PlantCharacteristics/1234")
 
 
@@ -76,7 +76,7 @@ def test_usda_database_iterate(mock_all_characteristics):
         }
     ]
 
-    database = UsdaPlantsDatabase.from_config(Mock(cache_dir=""))
+    database = USDAPlantsDatabase.from_config(Mock(cache_dir=""))
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(

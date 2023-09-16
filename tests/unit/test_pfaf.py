@@ -7,8 +7,8 @@ import pytest
 
 from permaculture.database import DatabaseElement
 from permaculture.pfaf import (
-    Pfaf,
-    PfafDatabase,
+    PFAF,
+    PFAFDatabase,
     all_plants,
     apply_legend,
 )
@@ -18,21 +18,21 @@ def test_pfaf_main_database():
     """The main database should return the corresponding Excel worksheet."""
     path = Path(__file__).with_suffix(".xls")
     storage = Mock(key_to_path=Mock(return_value=path))
-    pfaf = Pfaf(storage)
+    pfaf = PFAF(storage)
     ws = pfaf.main_database()
     assert ws.cell(0, 0).value == "Test"
 
 
 def test_pfaf_main_database_error(tmpdir):
     """The main database should raise when file not found."""
-    pfaf = Pfaf.from_cache_dir(tmpdir)
+    pfaf = PFAF.from_cache_dir(tmpdir)
     with pytest.raises(FileNotFoundError):
         pfaf.main_database()
 
 
 def test_all_plants_error(tmpdir):
     """All plants should return no plant when file not found."""
-    pfaf = Pfaf.from_cache_dir(tmpdir)
+    pfaf = PFAF.from_cache_dir(tmpdir)
     plants = all_plants(pfaf)
     assert plants == []
 
@@ -83,7 +83,7 @@ def test_pfaf_database_iterate(mock_all_plants):
         }
     ]
 
-    database = PfafDatabase.from_config(Mock(cache_dir=""))
+    database = PFAFDatabase.from_config(Mock(cache_dir=""))
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(

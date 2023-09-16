@@ -25,7 +25,6 @@ class DatabaseElement:
 
 @define(frozen=True)
 class DatabasePlugin(ABC):
-
     @abstractmethod
     def search(self, common_name: str) -> Iterator[DatabaseElement]:
         """Search for the scientific name by common name."""

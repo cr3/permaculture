@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
-class DesignEcologique:
+class DE:
     """Design Ecologique web interface."""
 
     client: HTTPClient = field()
@@ -193,12 +193,12 @@ def all_perenial_plants(de):
 
 
 @define(frozen=True)
-class DesignEcologiqueDatabase(DatabaseIterablePlugin):
-    de: DesignEcologique
+class DEDatabase(DatabaseIterablePlugin):
+    de: DE
 
     @classmethod
     def from_config(cls, config):
-        de = DesignEcologique.from_url(
+        de = DE.from_url(
             "https://designecologique.ca",
             config.cache_dir,
         )

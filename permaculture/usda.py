@@ -12,7 +12,7 @@ from permaculture.storage import FileStorage, MemoryStorage
 
 
 @define(frozen=True)
-class UsdaPlants:
+class USDAPlants:
     """USDA Plants API."""
 
     client: HTTPClient
@@ -103,13 +103,13 @@ def all_characteristics(plants, cache_dir=None):
 
 
 @define(frozen=True)
-class UsdaPlantsDatabase(DatabaseIterablePlugin):
-    plants: UsdaPlants
+class USDAPlantsDatabase(DatabaseIterablePlugin):
+    plants: USDAPlants
     cache_dir: str
 
     @classmethod
     def from_config(cls, config):
-        plants = UsdaPlants.from_url(
+        plants = USDAPlants.from_url(
             "https://plantsservices.sc.egov.usda.gov",
             config.cache_dir,
         )
