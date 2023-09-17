@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture.testing package &mdash; permaculture 0.0.3 documentation</title>
+  <title>permaculture.locales package &mdash; permaculture 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="How to contribute" href="contributing.html" />
-    <link rel="prev" title="permaculture.locales package" href="permaculture.locales.html" /> 
+    <link rel="next" title="permaculture.testing package" href="permaculture.testing.html" />
+    <link rel="prev" title="permaculture package" href="permaculture.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,8 +57,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">permaculture</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="permaculture.html">permaculture package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="permaculture.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="permaculture.locales.html">permaculture.locales package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">permaculture.testing package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">permaculture.locales package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html">permaculture.testing package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#submodules">Submodules</a></li>
@@ -105,9 +105,9 @@
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">permaculture</a></li>
           <li class="breadcrumb-item"><a href="permaculture.html">permaculture package</a></li>
-      <li class="breadcrumb-item active">permaculture.testing package</li>
+      <li class="breadcrumb-item active">permaculture.locales package</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/permaculture.testing.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/permaculture.locales.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -115,69 +115,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="permaculture-testing-package">
-<h1>permaculture.testing package<a class="headerlink" href="#permaculture-testing-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
-<section id="module-permaculture.testing.fixtures">
-<span id="permaculture-testing-fixtures-module"></span><h2>permaculture.testing.fixtures module<a class="headerlink" href="#module-permaculture.testing.fixtures" title="Permalink to this heading"></a></h2>
-<p>Testing fixtures.</p>
-<p>The logger_handler fixture is automatically provided by this package,
-it does not need to be imported in conftest.py explicitly.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.testing.fixtures.logger_handler">
-<span class="sig-prename descclassname"><span class="pre">permaculture.testing.fixtures.</span></span><span class="sig-name descname"><span class="pre">logger_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.testing.fixtures.logger_handler" title="Permalink to this definition"></a></dt>
-<dd><p>Logger handler fixture.</p>
-</dd></dl>
-
-</section>
-<section id="module-permaculture.testing.logger">
-<span id="permaculture-testing-logger-module"></span><h2>permaculture.testing.logger module<a class="headerlink" href="#module-permaculture.testing.logger" title="Permalink to this heading"></a></h2>
-<p>Logger testing module.</p>
+  <section id="permaculture-locales-package">
+<h1>permaculture.locales package<a class="headerlink" href="#permaculture-locales-package" title="Permalink to this heading"></a></h1>
+<section id="module-permaculture.locales">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-permaculture.locales" title="Permalink to this heading"></a></h2>
+<p>Locales for naming conventions.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="permaculture.testing.logger.LoggerHandler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.testing.logger.</span></span><span class="sig-name descname"><span class="pre">LoggerHandler</span></span><a class="headerlink" href="#permaculture.testing.logger.LoggerHandler" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></p>
-<p>Logger handler for recording log messages.</p>
+<dt class="sig sig-object py" id="permaculture.locales.Locales">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.locales.</span></span><span class="sig-name descname"><span class="pre">Locales</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">translations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GNUTranslations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.locales.Locales" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.testing.logger.LoggerHandler.emit">
-<span class="sig-name descname"><span class="pre">emit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.testing.logger.LoggerHandler.emit" title="Permalink to this definition"></a></dt>
-<dd><p>Append to the list of records.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="permaculture.locales.Locales.from_domain">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locales_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('/home/runner/work/permaculture/permaculture/permaculture/locales')</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.locales.Locales.from_domain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.locales.Locales.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#permaculture.locales.Locales.translate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.locales.Locales.translations">
+<span class="sig-name descname"><span class="pre">translations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">GNUTranslations</span></em><a class="headerlink" href="#permaculture.locales.Locales.translations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.testing.logger.logger_time">
-<span class="sig-prename descclassname"><span class="pre">permaculture.testing.logger.</span></span><span class="sig-name descname"><span class="pre">logger_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.testing.logger.logger_time" title="Permalink to this definition"></a></dt>
-<dd><p>Set the logger time to the given <cite>seconds</cite> within a context.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>seconds</strong> – Time as returned by <cite>time.time()</cite>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-permaculture.testing.unique">
-<span id="permaculture-testing-unique-module"></span><h2>permaculture.testing.unique module<a class="headerlink" href="#module-permaculture.testing.unique" title="Permalink to this heading"></a></h2>
-<p>Unique plugins.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.testing.unique.unique_cookie">
-<span class="sig-prename descclassname"><span class="pre">permaculture.testing.unique.</span></span><span class="sig-name descname"><span class="pre">unique_cookie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unique</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.testing.unique.unique_cookie" title="Permalink to this definition"></a></dt>
-<dd><p>Generate a unique cookie.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.testing.unique.unique_cookies">
-<span class="sig-prename descclassname"><span class="pre">permaculture.testing.unique.</span></span><span class="sig-name descname"><span class="pre">unique_cookies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unique</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.testing.unique.unique_cookies" title="Permalink to this definition"></a></dt>
-<dd><p>Generate a cookie jar with unique cookies.</p>
-</dd></dl>
-
-</section>
-<section id="module-permaculture.testing">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-permaculture.testing" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 
@@ -185,8 +148,8 @@ it does not need to be imported in conftest.py explicitly.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="permaculture.locales.html" class="btn btn-neutral float-left" title="permaculture.locales package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="contributing.html" class="btn btn-neutral float-right" title="How to contribute" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="permaculture.html" class="btn btn-neutral float-left" title="permaculture package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="permaculture.testing.html" class="btn btn-neutral float-right" title="permaculture.testing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

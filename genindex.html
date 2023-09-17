@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; permaculture 0.0.2 documentation</title>
+  <title>Index &mdash; permaculture 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -32,7 +32,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.2
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -43,6 +43,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="nc.html">Natural Capital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="la-ferme-impossible.html">La ferme impossible</a></li>
 <li class="toctree-l1"><a class="reference internal" href="la-revolution-dun-seul-brin-de-paille.html">La révolution d’un seul brin de paille</a></li>
 </ul>
@@ -50,7 +54,6 @@
 <li class="toctree-l1"><a class="reference internal" href="modules.html">permaculture</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">How to contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
@@ -103,6 +106,7 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
  
@@ -110,22 +114,14 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.adapter">adapter (permaculture.http.HTTPClient attribute)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.usda.all_characteristics">all_characteristics() (in module permaculture.usda)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.de.all_perenial_plants">all_perenial_plants() (in module permaculture.de)</a>
+      <li><a href="permaculture.html#permaculture.usda.USDAModel.all_characteristics">all_characteristics() (permaculture.usda.USDAModel method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.pfaf.all_plants">all_plants() (in module permaculture.pfaf)</a>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.all_plants">all_plants() (permaculture.pfaf.PFAFModel method)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.de.apply_legend">apply_legend() (in module permaculture.de)</a>
-
-      <ul>
-        <li><a href="permaculture.html#permaculture.pfaf.apply_legend">(in module permaculture.pfaf)</a>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthentication.authenticate">authenticate() (permaculture.nc.NCAuthentication method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -144,32 +140,40 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.iterator.Iterator.cache_dir">cache_dir (permaculture.iterator.Iterator attribute)</a>
+      <li><a href="permaculture.html#permaculture.database.DatabaseElement.characteristics">characteristics (permaculture.database.DatabaseElement attribute)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.iterator.IteratorElement.characteristics">characteristics (permaculture.iterator.IteratorElement attribute)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.usda.UsdaPlants.characteristics_search">characteristics_search() (permaculture.usda.UsdaPlants method)</a>
+      <li><a href="permaculture.html#permaculture.usda.USDAWeb.characteristics_search">characteristics_search() (permaculture.usda.USDAWeb method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.serializer.SerializerPlugin.charset">charset (permaculture.serializer.SerializerPlugin attribute)</a>
 </li>
       <li><a href="permaculture.html#permaculture.logger.LoggerLevelAction.choices">choices (permaculture.logger.LoggerLevelAction attribute)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.de.DesignEcologique.client">client (permaculture.de.DesignEcologique attribute)</a>
+      <li><a href="permaculture.html#permaculture.de.DEWeb.client">client (permaculture.de.DEWeb attribute)</a>
 
       <ul>
         <li><a href="permaculture.html#permaculture.google.GoogleSpreadsheet.client">(permaculture.google.GoogleSpreadsheet attribute)</a>
 </li>
-        <li><a href="permaculture.html#permaculture.usda.UsdaPlants.client">(permaculture.usda.UsdaPlants attribute)</a>
+        <li><a href="permaculture.html#permaculture.nc.NCWeb.client">(permaculture.nc.NCWeb attribute)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDAWeb.client">(permaculture.usda.USDAWeb attribute)</a>
 </li>
         <li><a href="permaculture.html#permaculture.wikipedia.Wikipedia.client">(permaculture.wikipedia.Wikipedia attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.iterator.IteratorElement.common_names">common_names (permaculture.iterator.IteratorElement attribute)</a>
+      <li><a href="permaculture.html#permaculture.database.DatabaseElement.common_names">common_names (permaculture.database.DatabaseElement attribute)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.connect">connect() (permaculture.http.HTTPClient method)</a>
+      <li><a href="permaculture.html#permaculture.de.DEModel.convert">convert() (permaculture.de.DEModel method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCModel.convert">(permaculture.nc.NCModel method)</a>
 </li>
+        <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.convert">(permaculture.pfaf.PFAFModel method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDAModel.convert">(permaculture.usda.USDAModel method)</a>
+</li>
+      </ul></li>
       <li><a href="permaculture.html#permaculture.logger.LoggerFormatter.converter">converter() (permaculture.logger.LoggerFormatter method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.http.HTTPEntry.creation">creation (permaculture.http.HTTPEntry attribute)</a>
@@ -180,19 +184,33 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.database.Database">Database (class in permaculture.database)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.database.DatabaseElement.database">database (permaculture.database.DatabaseElement attribute)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.database.DatabaseElement">DatabaseElement (class in permaculture.database)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.database.DatabaseElementNotFound">DatabaseElementNotFound</a>
+</li>
+      <li><a href="permaculture.html#permaculture.database.DatabaseIterablePlugin">DatabaseIterablePlugin (class in permaculture.database)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.database.DatabasePlugin">DatabasePlugin (class in permaculture.database)</a>
+</li>
       <li><a href="permaculture.html#permaculture.serializer.SerializerPlugin.decode">decode (permaculture.serializer.SerializerPlugin attribute)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.serializer.Serializer.decode">decode() (permaculture.serializer.Serializer method)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.logger.LoggerLevelAction.default">default (permaculture.logger.LoggerLevelAction attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.serializer.Serializer.decode">decode() (permaculture.serializer.Serializer method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.de.DEDatabase">DEDatabase (class in permaculture.de)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.logger.LoggerLevelAction.default">default (permaculture.logger.LoggerLevelAction attribute)</a>
+</li>
       <li><a href="permaculture.html#permaculture.serializer.Serializer.default_content_type">default_content_type (permaculture.serializer.Serializer attribute)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.delete">delete() (permaculture.http.HTTPClient method)</a>
+      <li><a href="permaculture.html#permaculture.de.DEModel">DEModel (class in permaculture.de)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.de.DesignEcologique">DesignEcologique (class in permaculture.de)</a>
+      <li><a href="permaculture.html#permaculture.de.DEWeb">DEWeb (class in permaculture.de)</a>
 </li>
       <li><a href="permaculture.html#permaculture.google.GoogleSpreadsheet.doc_id">doc_id (permaculture.google.GoogleSpreadsheet attribute)</a>
 </li>
@@ -222,20 +240,38 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.file">file (permaculture.pfaf.PFAFModel attribute)</a>
+</li>
       <li><a href="permaculture.html#permaculture.storage.FileStorage">FileStorage (class in permaculture.storage)</a>
 </li>
       <li><a href="permaculture.html#permaculture.logger.JsonFormatter.formatMessage">formatMessage() (permaculture.logger.JsonFormatter method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.logger.LoggerFormatter.formatTime">formatTime() (permaculture.logger.LoggerFormatter method)</a>
 </li>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.from_cache_dir">from_cache_dir() (permaculture.pfaf.PFAFModel class method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.de.DEDatabase.from_config">from_config() (permaculture.de.DEDatabase class method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCDatabase.from_config">(permaculture.nc.NCDatabase class method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.pfaf.PFAFDatabase.from_config">(permaculture.pfaf.PFAFDatabase class method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDADatabase.from_config">(permaculture.usda.USDADatabase class method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.de.DesignEcologique.from_url">from_url() (permaculture.de.DesignEcologique class method)</a>
+      <li><a href="permaculture.locales.html#permaculture.locales.Locales.from_domain">from_domain() (permaculture.locales.Locales class method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.de.DEModel.from_url">from_url() (permaculture.de.DEModel class method)</a>
 
       <ul>
         <li><a href="permaculture.html#permaculture.google.GoogleSpreadsheet.from_url">(permaculture.google.GoogleSpreadsheet class method)</a>
 </li>
-        <li><a href="permaculture.html#permaculture.usda.UsdaPlants.from_url">(permaculture.usda.UsdaPlants class method)</a>
+        <li><a href="permaculture.html#permaculture.nc.NCModel.from_url">(permaculture.nc.NCModel class method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDAModel.from_url">(permaculture.usda.USDAModel class method)</a>
 </li>
         <li><a href="permaculture.html#permaculture.wikipedia.Wikipedia.from_url">(permaculture.wikipedia.Wikipedia class method)</a>
 </li>
@@ -246,19 +282,25 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.get">get() (permaculture.http.HTTPClient method)</a>
-
-      <ul>
-        <li><a href="permaculture.html#permaculture.wikipedia.Wikipedia.get">(permaculture.wikipedia.Wikipedia method)</a>
+      <li><a href="permaculture.html#permaculture.wikipedia.Wikipedia.get">get() (permaculture.wikipedia.Wikipedia method)</a>
 </li>
-      </ul></li>
       <li><a href="permaculture.html#permaculture.wikipedia.get_companion_plants">get_companion_plants() (in module permaculture.wikipedia)</a>
 </li>
       <li><a href="permaculture.html#permaculture.registry.get_entry_points">get_entry_points() (in module permaculture.registry)</a>
 </li>
+      <li><a href="permaculture.html#permaculture.logger.LoggerHandlerAction.get_handler">get_handler() (permaculture.logger.LoggerHandlerAction class method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthentication.get_payload">get_payload() (permaculture.nc.NCAuthentication method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.de.DEModel.get_perenial_plants">get_perenial_plants() (permaculture.de.DEModel method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.logger.LoggerHandlerAction.get_handler">get_handler() (permaculture.logger.LoggerHandlerAction class method)</a>
+      <li><a href="permaculture.html#permaculture.nc.NCModel.get_plant">get_plant() (permaculture.nc.NCModel method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCModel.get_plant_companions">get_plant_companions() (permaculture.nc.NCModel method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCModel.get_plants">get_plants() (permaculture.nc.NCModel method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.serializer.SerializerAction.get_serializer">get_serializer() (permaculture.serializer.SerializerAction class method)</a>
 </li>
@@ -278,14 +320,10 @@
         <li><a href="permaculture.html#permaculture.http.HTTPCacheAll.handle_304">(permaculture.http.HTTPCacheAll method)</a>
 </li>
       </ul></li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.head">head() (permaculture.http.HTTPClient method)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.headers">headers (permaculture.http.HTTPClient attribute)</a>
+      <li><a href="permaculture.html#permaculture.http.HTTPCache">HTTPCache (class in permaculture.http)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.http.HTTPCache">HTTPCache (class in permaculture.http)</a>
-</li>
       <li><a href="permaculture.html#permaculture.http.HTTPCacheAdapter">HTTPCacheAdapter (class in permaculture.http)</a>
 </li>
       <li><a href="permaculture.html#permaculture.http.HTTPCacheAll">HTTPCacheAll (class in permaculture.http)</a>
@@ -300,24 +338,18 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.iterator.Iterator.iterate">iterate() (permaculture.iterator.Iterator method)</a>
+      <li><a href="permaculture.html#permaculture.nc.NCLink.identifier">identifier (permaculture.nc.NCLink property)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.iterator.Iterator">Iterator (class in permaculture.iterator)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.de.iterator">iterator() (in module permaculture.de)</a>
+      <li><a href="permaculture.html#permaculture.database.DatabaseIterablePlugin.iterate">iterate() (permaculture.database.DatabaseIterablePlugin method)</a>
 
       <ul>
-        <li><a href="permaculture.html#permaculture.pfaf.iterator">(in module permaculture.pfaf)</a>
+        <li><a href="permaculture.html#permaculture.de.DEDatabase.iterate">(permaculture.de.DEDatabase method)</a>
 </li>
-        <li><a href="permaculture.html#permaculture.usda.iterator">(in module permaculture.usda)</a>
+        <li><a href="permaculture.html#permaculture.pfaf.PFAFDatabase.iterate">(permaculture.pfaf.PFAFDatabase method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDADatabase.iterate">(permaculture.usda.USDADatabase method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.iterator.IteratorElement">IteratorElement (class in permaculture.iterator)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.iterator.IteratorElementNotFound">IteratorElementNotFound</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -344,20 +376,32 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.iterator.Iterator.load">load() (permaculture.iterator.Iterator class method)</a>
+      <li><a href="permaculture.html#permaculture.database.Database.load">load() (permaculture.database.Database class method)</a>
 
       <ul>
         <li><a href="permaculture.html#permaculture.serializer.Serializer.load">(permaculture.serializer.Serializer class method)</a>
+</li>
+      </ul></li>
+      <li><a href="permaculture.locales.html#permaculture.locales.Locales">Locales (class in permaculture.locales)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.de.DEModel.locales">locales (permaculture.de.DEModel attribute)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCModel.locales">(permaculture.nc.NCModel attribute)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.locales">(permaculture.pfaf.PFAFModel attribute)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDAModel.locales">(permaculture.usda.USDAModel attribute)</a>
 </li>
       </ul></li>
       <li><a href="permaculture.html#permaculture.logger.logger_context">logger_context() (in module permaculture.logger)</a>
 </li>
       <li><a href="permaculture.testing.html#permaculture.testing.fixtures.logger_handler">logger_handler() (in module permaculture.testing.fixtures)</a>
 </li>
-      <li><a href="permaculture.testing.html#permaculture.testing.logger.logger_time">logger_time() (in module permaculture.testing.logger)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.testing.html#permaculture.testing.logger.logger_time">logger_time() (in module permaculture.testing.logger)</a>
+</li>
       <li><a href="permaculture.html#permaculture.logger.LoggerFormatter">LoggerFormatter (class in permaculture.logger)</a>
 </li>
       <li><a href="permaculture.testing.html#permaculture.testing.logger.LoggerHandler">LoggerHandler (class in permaculture.testing.logger)</a>
@@ -366,8 +410,16 @@
 </li>
       <li><a href="permaculture.html#permaculture.logger.LoggerLevelAction">LoggerLevelAction (class in permaculture.logger)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.iterator.Iterator.lookup">lookup() (permaculture.iterator.Iterator method)</a>
+      <li><a href="permaculture.html#permaculture.database.Database.lookup">lookup() (permaculture.database.Database method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.database.DatabaseIterablePlugin.lookup">(permaculture.database.DatabaseIterablePlugin method)</a>
 </li>
+        <li><a href="permaculture.html#permaculture.database.DatabasePlugin.lookup">(permaculture.database.DatabasePlugin method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.nc.NCDatabase.lookup">(permaculture.nc.NCDatabase method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -376,7 +428,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="permaculture.html#permaculture.command.main">main() (in module permaculture.command)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.pfaf.Pfaf.main_database">main_database() (permaculture.pfaf.Pfaf method)</a>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFFile.main_database">main_database() (permaculture.pfaf.PFAFFile method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.command.make_args_parser">make_args_parser() (in module permaculture.command)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.command.make_config_parser">make_config_parser() (in module permaculture.command)</a>
 </li>
       <li><a href="permaculture.html#permaculture.logger.LoggerHandlerAction.metavar">metavar (permaculture.logger.LoggerHandlerAction attribute)</a>
 
@@ -384,6 +440,16 @@
         <li><a href="permaculture.html#permaculture.logger.LoggerLevelAction.metavar">(permaculture.logger.LoggerLevelAction attribute)</a>
 </li>
         <li><a href="permaculture.html#permaculture.serializer.SerializerAction.metavar">(permaculture.serializer.SerializerAction attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="permaculture.html#permaculture.de.DEDatabase.model">model (permaculture.de.DEDatabase attribute)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCDatabase.model">(permaculture.nc.NCDatabase attribute)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.pfaf.PFAFDatabase.model">(permaculture.pfaf.PFAFDatabase attribute)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDADatabase.model">(permaculture.usda.USDADatabase attribute)</a>
 </li>
       </ul></li>
       <li>
@@ -396,17 +462,19 @@
 </li>
         <li><a href="permaculture.html#module-permaculture.command">permaculture.command</a>
 </li>
+        <li><a href="permaculture.html#module-permaculture.database">permaculture.database</a>
+</li>
         <li><a href="permaculture.html#module-permaculture.de">permaculture.de</a>
 </li>
         <li><a href="permaculture.html#module-permaculture.google">permaculture.google</a>
 </li>
-        <li><a href="permaculture.html#module-permaculture.html">permaculture.html</a>
-</li>
         <li><a href="permaculture.html#module-permaculture.http">permaculture.http</a>
 </li>
-        <li><a href="permaculture.html#module-permaculture.iterator">permaculture.iterator</a>
+        <li><a href="permaculture.locales.html#module-permaculture.locales">permaculture.locales</a>
 </li>
         <li><a href="permaculture.html#module-permaculture.logger">permaculture.logger</a>
+</li>
+        <li><a href="permaculture.html#module-permaculture.nc">permaculture.nc</a>
 </li>
         <li><a href="permaculture.html#module-permaculture.pfaf">permaculture.pfaf</a>
 </li>
@@ -422,6 +490,8 @@
 </li>
         <li><a href="permaculture.testing.html#module-permaculture.testing.logger">permaculture.testing.logger</a>
 </li>
+        <li><a href="permaculture.testing.html#module-permaculture.testing.unique">permaculture.testing.unique</a>
+</li>
         <li><a href="permaculture.html#module-permaculture.tokenizer">permaculture.tokenizer</a>
 </li>
         <li><a href="permaculture.html#module-permaculture.usda">permaculture.usda</a>
@@ -435,6 +505,22 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.nc.NCAdapter">NCAdapter (class in permaculture.nc)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthentication">NCAuthentication (class in permaculture.nc)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthenticationError">NCAuthenticationError</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCDatabase">NCDatabase (class in permaculture.nc)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.nc.NCLink">NCLink (class in permaculture.nc)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCModel">NCModel (class in permaculture.nc)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCWeb">NCWeb (class in permaculture.nc)</a>
+</li>
       <li><a href="permaculture.html#permaculture.storage.NullStorage">NullStorage (class in permaculture.storage)</a>
 </li>
   </ul></td>
@@ -446,30 +532,38 @@
       <li><a href="permaculture.html#permaculture.serializer.octet_stream_serializer">octet_stream_serializer (in module permaculture.serializer)</a>
 </li>
   </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.options">options() (permaculture.http.HTTPClient method)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.origin">origin (permaculture.http.HTTPClient attribute)</a>
-</li>
-  </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.nc.NCModel.parse_detail">parse_detail() (permaculture.nc.NCModel method)</a>
+</li>
       <li><a href="permaculture.html#permaculture.http.parse_http_expiry">parse_http_expiry() (in module permaculture.http)</a>
 </li>
       <li><a href="permaculture.html#permaculture.http.parse_http_timestamp">parse_http_timestamp() (in module permaculture.http)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.html.parse_table">parse_table() (in module permaculture.html)</a>
+      <li><a href="permaculture.html#permaculture.nc.NCModel.parse_key_value">parse_key_value() (permaculture.nc.NCModel method)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.html.parse_tables">parse_tables() (in module permaculture.html)</a>
+      <li><a href="permaculture.html#permaculture.wikipedia.parse_table">parse_table() (in module permaculture.wikipedia)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCModel.parse_table">(permaculture.nc.NCModel method)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.patch">patch() (permaculture.http.HTTPClient method)</a>
+      </ul></li>
+      <li><a href="permaculture.html#permaculture.wikipedia.parse_tables">parse_tables() (in module permaculture.wikipedia)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCModel.parse_tables">(permaculture.nc.NCModel method)</a>
+</li>
+      </ul></li>
+      <li><a href="permaculture.html#permaculture.nc.NCModel.parse_tr">parse_tr() (permaculture.nc.NCModel method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthentication.password">password (permaculture.nc.NCAuthentication attribute)</a>
 </li>
       <li><a href="permaculture.html#permaculture.storage.FileStorage.path_to_key">path_to_key() (permaculture.storage.FileStorage method)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.de.DesignEcologique.perenial_plants">perenial_plants() (permaculture.de.DesignEcologique method)</a>
+      <li><a href="permaculture.html#permaculture.de.DEWeb.perenial_plants_list">perenial_plants_list() (permaculture.de.DEWeb method)</a>
 </li>
       <li>
     permaculture
@@ -493,6 +587,13 @@
 </li>
       </ul></li>
       <li>
+    permaculture.database
+
+      <ul>
+        <li><a href="permaculture.html#module-permaculture.database">module</a>
+</li>
+      </ul></li>
+      <li>
     permaculture.de
 
       <ul>
@@ -507,13 +608,6 @@
 </li>
       </ul></li>
       <li>
-    permaculture.html
-
-      <ul>
-        <li><a href="permaculture.html#module-permaculture.html">module</a>
-</li>
-      </ul></li>
-      <li>
     permaculture.http
 
       <ul>
@@ -521,10 +615,10 @@
 </li>
       </ul></li>
       <li>
-    permaculture.iterator
+    permaculture.locales
 
       <ul>
-        <li><a href="permaculture.html#module-permaculture.iterator">module</a>
+        <li><a href="permaculture.locales.html#module-permaculture.locales">module</a>
 </li>
       </ul></li>
       <li>
@@ -536,6 +630,13 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    permaculture.nc
+
+      <ul>
+        <li><a href="permaculture.html#module-permaculture.nc">module</a>
+</li>
+      </ul></li>
       <li>
     permaculture.pfaf
 
@@ -586,6 +687,13 @@
 </li>
       </ul></li>
       <li>
+    permaculture.testing.unique
+
+      <ul>
+        <li><a href="permaculture.testing.html#module-permaculture.testing.unique">module</a>
+</li>
+      </ul></li>
+      <li>
     permaculture.tokenizer
 
       <ul>
@@ -606,17 +714,21 @@
         <li><a href="permaculture.html#module-permaculture.wikipedia">module</a>
 </li>
       </ul></li>
-      <li><a href="permaculture.html#permaculture.pfaf.Pfaf">Pfaf (class in permaculture.pfaf)</a>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFDatabase">PFAFDatabase (class in permaculture.pfaf)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFFile">PFAFFile (class in permaculture.pfaf)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFModel">PFAFModel (class in permaculture.pfaf)</a>
 </li>
       <li><a href="permaculture.html#permaculture.serializer.pickle_serializer">pickle_serializer (in module permaculture.serializer)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.usda.UsdaPlants.plant_characteristics">plant_characteristics() (permaculture.usda.UsdaPlants method)</a>
+      <li><a href="permaculture.html#permaculture.usda.USDAModel.plant_characteristics">plant_characteristics() (permaculture.usda.USDAModel method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.usda.USDAWeb.plant_characteristics">(permaculture.usda.USDAWeb method)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.usda.UsdaPlants.plant_profile">plant_profile() (permaculture.usda.UsdaPlants method)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.post">post() (permaculture.http.HTTPClient method)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.put">put() (permaculture.http.HTTPClient method)</a>
+      </ul></li>
+      <li><a href="permaculture.html#permaculture.usda.USDAWeb.plant_profile">plant_profile() (permaculture.usda.USDAWeb method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -652,12 +764,24 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.iterator.IteratorElement.scientific_name">scientific_name (permaculture.iterator.IteratorElement attribute)</a>
+      <li><a href="permaculture.html#permaculture.database.DatabaseElement.scientific_name">scientific_name (permaculture.database.DatabaseElement attribute)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.iterator.Iterator.search">search() (permaculture.iterator.Iterator method)</a>
+      <li><a href="permaculture.html#permaculture.database.Database.search">search() (permaculture.database.Database method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.database.DatabaseIterablePlugin.search">(permaculture.database.DatabaseIterablePlugin method)</a>
 </li>
+        <li><a href="permaculture.html#permaculture.database.DatabasePlugin.search">(permaculture.database.DatabasePlugin method)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.nc.NCDatabase.search">(permaculture.nc.NCDatabase method)</a>
+</li>
+      </ul></li>
       <li><a href="permaculture.html#permaculture.http.HTTPCacheAdapter.send">send() (permaculture.http.HTTPCacheAdapter method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCAdapter.send">(permaculture.nc.NCAdapter method)</a>
 </li>
+      </ul></li>
       <li><a href="permaculture.html#permaculture.serializer.Serializer">Serializer (class in permaculture.serializer)</a>
 </li>
       <li><a href="permaculture.html#permaculture.storage.FileStorage.serializer">serializer (permaculture.storage.FileStorage attribute)</a>
@@ -666,11 +790,11 @@
 </li>
       <li><a href="permaculture.html#permaculture.serializer.SerializerNotFound">SerializerNotFound</a>
 </li>
-      <li><a href="permaculture.html#permaculture.serializer.SerializerPlugin">SerializerPlugin (class in permaculture.serializer)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.session">session (permaculture.http.HTTPClient attribute)</a>
+      <li><a href="permaculture.html#permaculture.serializer.SerializerPlugin">SerializerPlugin (class in permaculture.serializer)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthentication.session">session (permaculture.nc.NCAuthentication attribute)</a>
 </li>
       <li><a href="permaculture.html#permaculture.logger.set_log_context">set_log_context() (in module permaculture.logger)</a>
 </li>
@@ -683,7 +807,9 @@
       <ul>
         <li><a href="permaculture.html#permaculture.http.HTTPCacheAll.storage">(permaculture.http.HTTPCacheAll attribute)</a>
 </li>
-        <li><a href="permaculture.html#permaculture.pfaf.Pfaf.storage">(permaculture.pfaf.Pfaf attribute)</a>
+        <li><a href="permaculture.html#permaculture.pfaf.PFAFFile.storage">(permaculture.pfaf.PFAFFile attribute)</a>
+</li>
+        <li><a href="permaculture.html#permaculture.usda.USDAModel.storage">(permaculture.usda.USDAModel attribute)</a>
 </li>
       </ul></li>
       <li><a href="permaculture.html#permaculture.http.HTTPCache.store">store() (permaculture.http.HTTPCache method)</a>
@@ -698,6 +824,8 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.nc.NCLink.text">text (permaculture.nc.NCLink attribute)</a>
+</li>
       <li><a href="permaculture.html#permaculture.serializer.text_csv_serializer">text_csv_serializer (in module permaculture.serializer)</a>
 </li>
       <li><a href="permaculture.html#permaculture.serializer.text_html_serializer">text_html_serializer (in module permaculture.serializer)</a>
@@ -708,13 +836,45 @@
 </li>
       <li><a href="permaculture.html#permaculture.tokenizer.tokenize">tokenize() (in module permaculture.tokenizer)</a>
 </li>
+      <li><a href="permaculture.locales.html#permaculture.locales.Locales.translate">translate() (permaculture.locales.Locales method)</a>
+</li>
+      <li><a href="permaculture.locales.html#permaculture.locales.Locales.translations">translations (permaculture.locales.Locales attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.usda.UsdaPlants">UsdaPlants (class in permaculture.usda)</a>
+      <li><a href="permaculture.testing.html#permaculture.testing.unique.unique_cookie">unique_cookie() (in module permaculture.testing.unique)</a>
+</li>
+      <li><a href="permaculture.testing.html#permaculture.testing.unique.unique_cookies">unique_cookies() (in module permaculture.testing.unique)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCLink.url">url (permaculture.nc.NCLink attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.usda.USDADatabase">USDADatabase (class in permaculture.usda)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.usda.USDAModel">USDAModel (class in permaculture.usda)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.usda.USDAWeb">USDAWeb (class in permaculture.usda)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCAuthentication.username">username (permaculture.nc.NCAuthentication attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.nc.NCWeb.view_complist">view_complist() (permaculture.nc.NCWeb method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="permaculture.html#permaculture.nc.NCWeb.view_detail">view_detail() (permaculture.nc.NCWeb method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.nc.NCWeb.view_list">view_list() (permaculture.nc.NCWeb method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -722,13 +882,21 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.wikipedia.Wikipedia">Wikipedia (class in permaculture.wikipedia)</a>
+      <li><a href="permaculture.html#permaculture.de.DEModel.web">web (permaculture.de.DEModel attribute)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.nc.NCModel.web">(permaculture.nc.NCModel attribute)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.http.HTTPClient.with_cache_all">with_cache_all() (permaculture.http.HTTPClient class method)</a>
+        <li><a href="permaculture.html#permaculture.usda.USDAModel.web">(permaculture.usda.USDAModel attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="permaculture.html#permaculture.pfaf.Pfaf.with_cache_dir">with_cache_dir() (permaculture.pfaf.Pfaf class method)</a>
+      <li><a href="permaculture.html#permaculture.wikipedia.Wikipedia">Wikipedia (class in permaculture.wikipedia)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.http.HTTPClient.with_adapter">with_adapter() (permaculture.http.HTTPClient method)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.http.HTTPClient.with_cache">with_cache() (permaculture.http.HTTPClient method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.serializer.www_form_serializer">www_form_serializer (in module permaculture.serializer)</a>
 </li>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How to contribute &mdash; permaculture 0.0.2 documentation</title>
+  <title>How to contribute &mdash; permaculture 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="License" href="license.html" />
-    <link rel="prev" title="Plants for a Future" href="pfaf.html" /> 
+    <link rel="prev" title="permaculture.testing package" href="permaculture.testing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.2
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -46,6 +46,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="nc.html">Natural Capital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="la-ferme-impossible.html">La ferme impossible</a></li>
 <li class="toctree-l1"><a class="reference internal" href="la-revolution-dun-seul-brin-de-paille.html">La révolution d’un seul brin de paille</a></li>
 </ul>
@@ -53,12 +57,10 @@
 <li class="toctree-l1"><a class="reference internal" href="modules.html">permaculture</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">How to contribute</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#reporting-issues">Reporting issues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#submitting-patches">Submitting patches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up">Setting up</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#starting-to-code">Starting to code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#checking-the-syntax">Checking the syntax</a></li>
@@ -138,7 +140,6 @@ relevant docstrings.</p></li>
 <li><p>Download and install:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://git-scm.com/download/win">Git</a></p></li>
-<li><p><a class="reference external" href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe">Miniconda</a> - Check the box “Add to PATH environment variable”</p></li>
 </ul>
 </li>
 <li><p>Make sure you have a <a class="reference external" href="https://github.com/join">GitHub account</a>.</p></li>
@@ -176,19 +177,6 @@ Cloning into &#39;python-template&#39;...
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; make setup
 </pre></div>
 </div>
-</li>
-</ul>
-</section>
-<section id="troubleshooting">
-<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h2>
-<ul>
-<li><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Solving environment: failed
-
-ResolvePackageNotFound:
-  - python=3.11
-</pre></div>
-</div>
-<p>The cache is probably corrupt - run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">clean</span> <span class="pre">-a</span></code>.</p>
 </li>
 </ul>
 </section>
@@ -249,7 +237,7 @@ test fails without your patch. Run the tests as described below.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pfaf.html" class="btn btn-neutral float-left" title="Plants for a Future" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="permaculture.testing.html" class="btn btn-neutral float-left" title="permaculture.testing package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="license.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture package &mdash; permaculture 0.0.2 documentation</title>
+  <title>permaculture package &mdash; permaculture 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="permaculture.testing package" href="permaculture.testing.html" />
+    <link rel="next" title="permaculture.locales package" href="permaculture.locales.html" />
     <link rel="prev" title="permaculture" href="modules.html" /> 
 </head>
 
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.2
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -46,6 +46,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="nc.html">Natural Capital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="la-ferme-impossible.html">La ferme impossible</a></li>
 <li class="toctree-l1"><a class="reference internal" href="la-revolution-dun-seul-brin-de-paille.html">La révolution d’un seul brin de paille</a></li>
 </ul>
@@ -53,6 +57,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">permaculture</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">permaculture package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.locales.html">permaculture.locales package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html">permaculture.testing package</a></li>
 </ul>
 </li>
@@ -64,22 +69,26 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.command">permaculture.command module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.command.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.command.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.command.make_config_parser"><code class="docutils literal notranslate"><span class="pre">make_config_parser()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.database">permaculture.database module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.database.Database"><code class="docutils literal notranslate"><span class="pre">Database</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.database.DatabaseElement"><code class="docutils literal notranslate"><span class="pre">DatabaseElement</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.database.DatabaseElementNotFound"><code class="docutils literal notranslate"><span class="pre">DatabaseElementNotFound</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.database.DatabaseIterablePlugin"><code class="docutils literal notranslate"><span class="pre">DatabaseIterablePlugin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.database.DatabasePlugin"><code class="docutils literal notranslate"><span class="pre">DatabasePlugin</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.de">permaculture.de module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.DesignEcologique"><code class="docutils literal notranslate"><span class="pre">DesignEcologique</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.all_perenial_plants"><code class="docutils literal notranslate"><span class="pre">all_perenial_plants()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.apply_legend"><code class="docutils literal notranslate"><span class="pre">apply_legend()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.iterator"><code class="docutils literal notranslate"><span class="pre">iterator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.DEDatabase"><code class="docutils literal notranslate"><span class="pre">DEDatabase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.DEModel"><code class="docutils literal notranslate"><span class="pre">DEModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.de.DEWeb"><code class="docutils literal notranslate"><span class="pre">DEWeb</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.google">permaculture.google module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.google.GoogleSpreadsheet"><code class="docutils literal notranslate"><span class="pre">GoogleSpreadsheet</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.html">permaculture.html module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.html.parse_table"><code class="docutils literal notranslate"><span class="pre">parse_table()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.html.parse_tables"><code class="docutils literal notranslate"><span class="pre">parse_tables()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.http">permaculture.http module</a><ul>
@@ -90,12 +99,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.http.HTTPEntry"><code class="docutils literal notranslate"><span class="pre">HTTPEntry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.http.parse_http_expiry"><code class="docutils literal notranslate"><span class="pre">parse_http_expiry()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.http.parse_http_timestamp"><code class="docutils literal notranslate"><span class="pre">parse_http_timestamp()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.iterator">permaculture.iterator module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.iterator.Iterator"><code class="docutils literal notranslate"><span class="pre">Iterator</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.iterator.IteratorElement"><code class="docutils literal notranslate"><span class="pre">IteratorElement</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.iterator.IteratorElementNotFound"><code class="docutils literal notranslate"><span class="pre">IteratorElementNotFound</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.logger">permaculture.logger module</a><ul>
@@ -109,11 +112,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.logger.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.nc">permaculture.nc module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCAdapter"><code class="docutils literal notranslate"><span class="pre">NCAdapter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCAuthentication"><code class="docutils literal notranslate"><span class="pre">NCAuthentication</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCAuthenticationError"><code class="docutils literal notranslate"><span class="pre">NCAuthenticationError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCDatabase"><code class="docutils literal notranslate"><span class="pre">NCDatabase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCLink"><code class="docutils literal notranslate"><span class="pre">NCLink</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCModel"><code class="docutils literal notranslate"><span class="pre">NCModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.nc.NCWeb"><code class="docutils literal notranslate"><span class="pre">NCWeb</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.pfaf">permaculture.pfaf module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.Pfaf"><code class="docutils literal notranslate"><span class="pre">Pfaf</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.all_plants"><code class="docutils literal notranslate"><span class="pre">all_plants()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.apply_legend"><code class="docutils literal notranslate"><span class="pre">apply_legend()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.iterator"><code class="docutils literal notranslate"><span class="pre">iterator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.PFAFDatabase"><code class="docutils literal notranslate"><span class="pre">PFAFDatabase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.PFAFFile"><code class="docutils literal notranslate"><span class="pre">PFAFFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.pfaf.PFAFModel"><code class="docutils literal notranslate"><span class="pre">PFAFModel</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.registry">permaculture.registry module</a><ul>
@@ -149,14 +161,16 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.usda">permaculture.usda module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.UsdaPlants"><code class="docutils literal notranslate"><span class="pre">UsdaPlants</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.all_characteristics"><code class="docutils literal notranslate"><span class="pre">all_characteristics()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.iterator"><code class="docutils literal notranslate"><span class="pre">iterator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.USDADatabase"><code class="docutils literal notranslate"><span class="pre">USDADatabase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.USDAModel"><code class="docutils literal notranslate"><span class="pre">USDAModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.USDAWeb"><code class="docutils literal notranslate"><span class="pre">USDAWeb</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.wikipedia">permaculture.wikipedia module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.Wikipedia"><code class="docutils literal notranslate"><span class="pre">Wikipedia</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.get_companion_plants"><code class="docutils literal notranslate"><span class="pre">get_companion_plants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.parse_table"><code class="docutils literal notranslate"><span class="pre">parse_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.parse_tables"><code class="docutils literal notranslate"><span class="pre">parse_tables()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture">Module contents</a></li>
@@ -166,7 +180,6 @@
 </li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">How to contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
@@ -203,6 +216,18 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="permaculture.locales.html">permaculture.locales package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="permaculture.locales.html#module-permaculture.locales">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales"><code class="docutils literal notranslate"><span class="pre">Locales</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales.from_domain"><code class="docutils literal notranslate"><span class="pre">Locales.from_domain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales.translate"><code class="docutils literal notranslate"><span class="pre">Locales.translate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales.translations"><code class="docutils literal notranslate"><span class="pre">Locales.translations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="permaculture.testing.html">permaculture.testing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.testing.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing.fixtures">permaculture.testing.fixtures module</a><ul>
@@ -215,6 +240,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.testing.html#permaculture.testing.logger.logger_time"><code class="docutils literal notranslate"><span class="pre">logger_time()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing.unique">permaculture.testing.unique module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.testing.html#permaculture.testing.unique.unique_cookie"><code class="docutils literal notranslate"><span class="pre">unique_cookie()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.testing.html#permaculture.testing.unique.unique_cookies"><code class="docutils literal notranslate"><span class="pre">unique_cookies()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing">Module contents</a></li>
@@ -252,47 +282,201 @@
 <dd><p>Entry point to the permaculture command.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="permaculture.command.make_args_parser">
+<span class="sig-prename descclassname"><span class="pre">permaculture.command.</span></span><span class="sig-name descname"><span class="pre">make_args_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.command.make_args_parser" title="Permalink to this definition"></a></dt>
+<dd><p>Make a parser for command-line arguments only.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="permaculture.command.make_config_parser">
+<span class="sig-prename descclassname"><span class="pre">permaculture.command.</span></span><span class="sig-name descname"><span class="pre">make_config_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.command.make_config_parser" title="Permalink to this definition"></a></dt>
+<dd><p>Make a parser for configuration files and command-line arguments.</p>
+</dd></dl>
+
+</section>
+<section id="module-permaculture.database">
+<span id="permaculture-database-module"></span><h2>permaculture.database module<a class="headerlink" href="#module-permaculture.database" title="Permalink to this heading"></a></h2>
+<p>Database utilities.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.database.Database">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.database.</span></span><span class="sig-name descname"><span class="pre">Database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">databases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.database.DatabasePlugin" title="permaculture.database.DatabasePlugin"><span class="pre">permaculture.database.DatabasePlugin</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.Database.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load databases from registry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.Database.lookup">
+<span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientific_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.lookup" title="Permalink to this definition"></a></dt>
+<dd><p>Lookup characteristics by scientific name in all databases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.Database.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">common_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for the scientific name by common name in all databases.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseElement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.database.</span></span><span class="sig-name descname"><span class="pre">DatabaseElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scientific_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characteristics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.DatabaseElement" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseElement.characteristics">
+<span class="sig-name descname"><span class="pre">characteristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#permaculture.database.DatabaseElement.characteristics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseElement.common_names">
+<span class="sig-name descname"><span class="pre">common_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#permaculture.database.DatabaseElement.common_names" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseElement.database">
+<span class="sig-name descname"><span class="pre">database</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#permaculture.database.DatabaseElement.database" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseElement.scientific_name">
+<span class="sig-name descname"><span class="pre">scientific_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#permaculture.database.DatabaseElement.scientific_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseElementNotFound">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.database.</span></span><span class="sig-name descname"><span class="pre">DatabaseElementNotFound</span></span><a class="headerlink" href="#permaculture.database.DatabaseElementNotFound" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when a database element is not found.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseIterablePlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.database.</span></span><span class="sig-name descname"><span class="pre">DatabaseIterablePlugin</span></span><a class="headerlink" href="#permaculture.database.DatabaseIterablePlugin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#permaculture.database.DatabasePlugin" title="permaculture.database.DatabasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabasePlugin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseIterablePlugin.iterate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.database.DatabaseElement" title="permaculture.database.DatabaseElement"><span class="pre">DatabaseElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#permaculture.database.DatabaseIterablePlugin.iterate" title="Permalink to this definition"></a></dt>
+<dd><p>Iterate over all plants.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseIterablePlugin.lookup">
+<span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientific_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.database.DatabaseElement" title="permaculture.database.DatabaseElement"><span class="pre">DatabaseElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#permaculture.database.DatabaseIterablePlugin.lookup" title="Permalink to this definition"></a></dt>
+<dd><p>Lookup characteristics by scientific name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.DatabaseIterablePlugin.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">common_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.database.DatabaseElement" title="permaculture.database.DatabaseElement"><span class="pre">DatabaseElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#permaculture.database.DatabaseIterablePlugin.search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for the scientific name by common name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.database.DatabasePlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.database.</span></span><span class="sig-name descname"><span class="pre">DatabasePlugin</span></span><a class="headerlink" href="#permaculture.database.DatabasePlugin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.DatabasePlugin.lookup">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientific_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.database.DatabaseElement" title="permaculture.database.DatabaseElement"><span class="pre">DatabaseElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#permaculture.database.DatabasePlugin.lookup" title="Permalink to this definition"></a></dt>
+<dd><p>Lookup characteristics by scientific name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.DatabasePlugin.search">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">common_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.database.DatabaseElement" title="permaculture.database.DatabaseElement"><span class="pre">DatabaseElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#permaculture.database.DatabasePlugin.search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for the scientific name by common name.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-permaculture.de">
 <span id="permaculture-de-module"></span><h2>permaculture.de module<a class="headerlink" href="#module-permaculture.de" title="Permalink to this heading"></a></h2>
-<p>Design Ecologique web interface.</p>
+<p>Design Ecologique database.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="permaculture.de.DesignEcologique">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">DesignEcologique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DesignEcologique" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.de.DEDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">DEDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.de.DEModel" title="permaculture.de.DEModel"><span class="pre">DEModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEDatabase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#permaculture.database.DatabaseIterablePlugin" title="permaculture.database.DatabaseIterablePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseIterablePlugin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.de.DEDatabase.from_config">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEDatabase.from_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.de.DEDatabase.iterate">
+<span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEDatabase.iterate" title="Permalink to this definition"></a></dt>
+<dd><p>Iterate over all plants.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.de.DEDatabase.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.de.DEModel" title="permaculture.de.DEModel"><span class="pre">DEModel</span></a></em><a class="headerlink" href="#permaculture.de.DEDatabase.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.de.DEModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">DEModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.de.DEWeb" title="permaculture.de.DEWeb"><span class="pre">DEWeb</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">locales</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.de.DEModel.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEModel.convert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.de.DEModel.from_url">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEModel.from_url" title="Permalink to this definition"></a></dt>
+<dd><p>Instantiate a Design Ecologique model from URL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.de.DEModel.get_perenial_plants">
+<span class="sig-name descname"><span class="pre">get_perenial_plants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEModel.get_perenial_plants" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.de.DEModel.locales">
+<span class="sig-name descname"><span class="pre">locales</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></em><a class="headerlink" href="#permaculture.de.DEModel.locales" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.de.DEModel.web">
+<span class="sig-name descname"><span class="pre">web</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.de.DEWeb" title="permaculture.de.DEWeb"><span class="pre">DEWeb</span></a></em><a class="headerlink" href="#permaculture.de.DEModel.web" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.de.DEWeb">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">DEWeb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEWeb" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Design Ecologique web interface.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.de.DesignEcologique.client">
-<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></em><a class="headerlink" href="#permaculture.de.DesignEcologique.client" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.de.DEWeb.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></em><a class="headerlink" href="#permaculture.de.DEWeb.client" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.de.DesignEcologique.from_url">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DesignEcologique.from_url" title="Permalink to this definition"></a></dt>
-<dd><p>Instantiate Design Ecologique from URL.</p>
+<dt class="sig sig-object py" id="permaculture.de.DEWeb.perenial_plants_list">
+<span class="sig-name descname"><span class="pre">perenial_plants_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEWeb.perenial_plants_list" title="Permalink to this definition"></a></dt>
+<dd><p>List of perenial plants useful for permaculture in Quebec.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Google spreadsheet with plants.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.de.DesignEcologique.perenial_plants">
-<span class="sig-name descname"><span class="pre">perenial_plants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DesignEcologique.perenial_plants" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.de.all_perenial_plants">
-<span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">all_perenial_plants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">de</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.all_perenial_plants" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.de.apply_legend">
-<span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">apply_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.apply_legend" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.de.iterator">
-<span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">iterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.iterator" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-permaculture.google">
@@ -323,22 +507,6 @@
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.google.GoogleSpreadsheet.from_url" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-</section>
-<section id="module-permaculture.html">
-<span id="permaculture-html-module"></span><h2>permaculture.html module<a class="headerlink" href="#module-permaculture.html" title="Permalink to this heading"></a></h2>
-<p>HTML utilities.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.html.parse_table">
-<span class="sig-prename descclassname"><span class="pre">permaculture.html.</span></span><span class="sig-name descname"><span class="pre">parse_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.html.parse_table" title="Permalink to this definition"></a></dt>
-<dd><p>Parse an HTML table into a dictionary of values.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.html.parse_tables">
-<span class="sig-prename descclassname"><span class="pre">permaculture.html.</span></span><span class="sig-name descname"><span class="pre">parse_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.html.parse_tables" title="Permalink to this definition"></a></dt>
-<dd><p>Parse HTML text into a list of tables.</p>
 </dd></dl>
 
 </section>
@@ -427,64 +595,9 @@ HTTP caching.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="permaculture.http.HTTPClient">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.http.</span></span><span class="sig-name descname"><span class="pre">HTTPClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adapter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HTTPAdapter</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.http.</span></span><span class="sig-name descname"><span class="pre">HTTPClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></p>
 <p>An HTTP client with origin.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.adapter">
-<span class="sig-name descname"><span class="pre">adapter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">HTTPAdapter</span></em><a class="headerlink" href="#permaculture.http.HTTPClient.adapter" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.connect">
-<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.connect" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.delete">
-<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.delete" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.get" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.head">
-<span class="sig-name descname"><span class="pre">head</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.head" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.headers">
-<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#permaculture.http.HTTPClient.headers" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.options">
-<span class="sig-name descname"><span class="pre">options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.options" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.origin">
-<span class="sig-name descname"><span class="pre">origin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">URL</span></em><a class="headerlink" href="#permaculture.http.HTTPClient.origin" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.patch">
-<span class="sig-name descname"><span class="pre">patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.patch" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.post">
-<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.post" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.put">
-<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.put" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="permaculture.http.HTTPClient.request">
 <span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.request" title="Permalink to this definition"></a></dt>
@@ -500,14 +613,14 @@ HTTP caching.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.session">
-<span class="sig-name descname"><span class="pre">session</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Session</span></em><a class="headerlink" href="#permaculture.http.HTTPClient.session" title="Permalink to this definition"></a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.http.HTTPClient.with_adapter">
+<span class="sig-name descname"><span class="pre">with_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adapter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HTTPAdapter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.with_adapter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.http.HTTPClient.with_cache_all">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">with_cache_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.with_cache_all" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.http.HTTPClient.with_cache">
+<span class="sig-name descname"><span class="pre">with_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_cls=&lt;class</span> <span class="pre">'permaculture.http.HTTPCacheAll'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPClient.with_cache" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -544,70 +657,6 @@ HTTP caching.</p>
 <dt class="sig sig-object py" id="permaculture.http.parse_http_timestamp">
 <span class="sig-prename descclassname"><span class="pre">permaculture.http.</span></span><span class="sig-name descname"><span class="pre">parse_http_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.parse_http_timestamp" title="Permalink to this definition"></a></dt>
 <dd><p>Parse an HTTP timestamp as RFC 2616.</p>
-</dd></dl>
-
-</section>
-<section id="module-permaculture.iterator">
-<span id="permaculture-iterator-module"></span><h2>permaculture.iterator module<a class="headerlink" href="#module-permaculture.iterator" title="Permalink to this heading"></a></h2>
-<p>Iterator utilities.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="permaculture.iterator.Iterator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.iterator.</span></span><span class="sig-name descname"><span class="pre">Iterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterators</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">collections.abc.Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.iterator.IteratorElement" title="permaculture.iterator.IteratorElement"><span class="pre">permaculture.iterator.IteratorElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.iterator.Iterator" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.iterator.Iterator.cache_dir">
-<span class="sig-name descname"><span class="pre">cache_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#permaculture.iterator.Iterator.cache_dir" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.iterator.Iterator.iterate">
-<span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.iterator.Iterator.iterate" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.iterator.Iterator.load">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.iterator.Iterator.load" title="Permalink to this definition"></a></dt>
-<dd><p>Load iterators from registry.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.iterator.Iterator.lookup">
-<span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.iterator.Iterator.lookup" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.iterator.Iterator.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.iterator.Iterator.search" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="permaculture.iterator.IteratorElement">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.iterator.</span></span><span class="sig-name descname"><span class="pre">IteratorElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientific_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characteristics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.iterator.IteratorElement" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.iterator.IteratorElement.characteristics">
-<span class="sig-name descname"><span class="pre">characteristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#permaculture.iterator.IteratorElement.characteristics" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.iterator.IteratorElement.common_names">
-<span class="sig-name descname"><span class="pre">common_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#permaculture.iterator.IteratorElement.common_names" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.iterator.IteratorElement.scientific_name">
-<span class="sig-name descname"><span class="pre">scientific_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#permaculture.iterator.IteratorElement.scientific_name" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="permaculture.iterator.IteratorElementNotFound">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.iterator.</span></span><span class="sig-name descname"><span class="pre">IteratorElementNotFound</span></span><a class="headerlink" href="#permaculture.iterator.IteratorElementNotFound" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Raised when an iterator element is not found.</p>
 </dd></dl>
 
 </section>
@@ -764,44 +813,279 @@ stdout with ‘-’ or a file handler.</p>
 </dd></dl>
 
 </section>
-<section id="module-permaculture.pfaf">
-<span id="permaculture-pfaf-module"></span><h2>permaculture.pfaf module<a class="headerlink" href="#module-permaculture.pfaf" title="Permalink to this heading"></a></h2>
-<p>Plants for a future.</p>
+<section id="module-permaculture.nc">
+<span id="permaculture-nc-module"></span><h2>permaculture.nc module<a class="headerlink" href="#module-permaculture.nc" title="Permalink to this heading"></a></h2>
+<p>Natural Capital website.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="permaculture.pfaf.Pfaf">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">Pfaf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.storage.FileStorage" title="permaculture.storage.FileStorage"><span class="pre">FileStorage</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.Pfaf" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.nc.NCAdapter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">authentication</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCAdapter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#permaculture.http.HTTPCacheAdapter" title="permaculture.http.HTTPCacheAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPCacheAdapter</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCAdapter.send">
+<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCAdapter.send" title="Permalink to this definition"></a></dt>
+<dd><p>Send a PreparedRequest object respecting RFC 2616 rules about
+HTTP caching.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthentication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCAuthentication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCAuthentication" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.pfaf.Pfaf.main_database">
-<span class="sig-name descname"><span class="pre">main_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.Pfaf.main_database" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthentication.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCAuthentication.authenticate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthentication.get_payload">
+<span class="sig-name descname"><span class="pre">get_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCAuthentication.get_payload" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.pfaf.Pfaf.storage">
-<span class="sig-name descname"><span class="pre">storage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.storage.FileStorage" title="permaculture.storage.FileStorage"><span class="pre">FileStorage</span></a></em><a class="headerlink" href="#permaculture.pfaf.Pfaf.storage" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthentication.password">
+<span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#permaculture.nc.NCAuthentication.password" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.pfaf.Pfaf.with_cache_dir">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">with_cache_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.Pfaf.with_cache_dir" title="Permalink to this definition"></a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthentication.session">
+<span class="sig-name descname"><span class="pre">session</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Session</span></em><a class="headerlink" href="#permaculture.nc.NCAuthentication.session" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthentication.username">
+<span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#permaculture.nc.NCAuthentication.username" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.pfaf.all_plants">
-<span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">all_plants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfaf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.all_plants" title="Permalink to this definition"></a></dt>
+<dl class="py exception">
+<dt class="sig sig-object py" id="permaculture.nc.NCAuthenticationError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCAuthenticationError</span></span><a class="headerlink" href="#permaculture.nc.NCAuthenticationError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when authentication fails.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.nc.NCDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.nc.NCModel" title="permaculture.nc.NCModel"><span class="pre">NCModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCDatabase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#permaculture.database.DatabasePlugin" title="permaculture.database.DatabasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabasePlugin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCDatabase.from_config">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCDatabase.from_config" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.pfaf.apply_legend">
-<span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">apply_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.apply_legend" title="Permalink to this definition"></a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCDatabase.lookup">
+<span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientific_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCDatabase.lookup" title="Permalink to this definition"></a></dt>
+<dd><p>Lookup characteristics by scientific name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCDatabase.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.nc.NCModel" title="permaculture.nc.NCModel"><span class="pre">NCModel</span></a></em><a class="headerlink" href="#permaculture.nc.NCDatabase.model" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.pfaf.iterator">
-<span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">iterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.iterator" title="Permalink to this definition"></a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCDatabase.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">common_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCDatabase.search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for the scientific name by common name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.nc.NCLink">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCLink" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="permaculture.nc.NCLink.identifier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identifier</span></span><a class="headerlink" href="#permaculture.nc.NCLink.identifier" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCLink.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#permaculture.nc.NCLink.text" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCLink.url">
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">URL</span></em><a class="headerlink" href="#permaculture.nc.NCLink.url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.nc.NCWeb" title="permaculture.nc.NCWeb"><span class="pre">NCWeb</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">locales</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.convert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.from_url">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.from_url" title="Permalink to this definition"></a></dt>
+<dd><p>Instantiate a Natural Capital model from URL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.get_plant">
+<span class="sig-name descname"><span class="pre">get_plant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.get_plant" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.get_plant_companions">
+<span class="sig-name descname"><span class="pre">get_plant_companions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.get_plant_companions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.get_plants">
+<span class="sig-name descname"><span class="pre">get_plants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sci_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.get_plants" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.locales">
+<span class="sig-name descname"><span class="pre">locales</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></em><a class="headerlink" href="#permaculture.nc.NCModel.locales" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.parse_detail">
+<span class="sig-name descname"><span class="pre">parse_detail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.parse_detail" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.parse_key_value">
+<span class="sig-name descname"><span class="pre">parse_key_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.parse_key_value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.parse_table">
+<span class="sig-name descname"><span class="pre">parse_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.parse_table" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.parse_tables">
+<span class="sig-name descname"><span class="pre">parse_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.parse_tables" title="Permalink to this definition"></a></dt>
+<dd><p>Parse a table with header into a list of dictionaries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.parse_tr">
+<span class="sig-name descname"><span class="pre">parse_tr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCModel.parse_tr" title="Permalink to this definition"></a></dt>
+<dd><p>Parse a table row into an iterator of text or links.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCModel.web">
+<span class="sig-name descname"><span class="pre">web</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.nc.NCWeb" title="permaculture.nc.NCWeb"><span class="pre">NCWeb</span></a></em><a class="headerlink" href="#permaculture.nc.NCModel.web" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.nc.NCWeb">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.nc.</span></span><span class="sig-name descname"><span class="pre">NCWeb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCWeb" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.nc.NCWeb.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></em><a class="headerlink" href="#permaculture.nc.NCWeb.client" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCWeb.view_complist">
+<span class="sig-name descname"><span class="pre">view_complist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCWeb.view_complist" title="Permalink to this definition"></a></dt>
+<dd><p>View companion list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCWeb.view_detail">
+<span class="sig-name descname"><span class="pre">view_detail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCWeb.view_detail" title="Permalink to this definition"></a></dt>
+<dd><p>View plant detail.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.nc.NCWeb.view_list">
+<span class="sig-name descname"><span class="pre">view_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sci_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.nc.NCWeb.view_list" title="Permalink to this definition"></a></dt>
+<dd><p>View plant list.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-permaculture.pfaf">
+<span id="permaculture-pfaf-module"></span><h2>permaculture.pfaf module<a class="headerlink" href="#module-permaculture.pfaf" title="Permalink to this heading"></a></h2>
+<p>Plants For A Future database.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">PFAFDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.pfaf.PFAFModel" title="permaculture.pfaf.PFAFModel"><span class="pre">PFAFModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFDatabase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#permaculture.database.DatabaseIterablePlugin" title="permaculture.database.DatabaseIterablePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseIterablePlugin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFDatabase.from_config">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFDatabase.from_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFDatabase.iterate">
+<span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFDatabase.iterate" title="Permalink to this definition"></a></dt>
+<dd><p>Iterate over all plants.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFDatabase.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.pfaf.PFAFModel" title="permaculture.pfaf.PFAFModel"><span class="pre">PFAFModel</span></a></em><a class="headerlink" href="#permaculture.pfaf.PFAFDatabase.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">PFAFFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.storage.FileStorage" title="permaculture.storage.FileStorage"><span class="pre">FileStorage</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFFile" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile.main_database">
+<span class="sig-name descname"><span class="pre">main_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFFile.main_database" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile.storage">
+<span class="sig-name descname"><span class="pre">storage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.storage.FileStorage" title="permaculture.storage.FileStorage"><span class="pre">FileStorage</span></a></em><a class="headerlink" href="#permaculture.pfaf.PFAFFile.storage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">PFAFModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.pfaf.PFAFFile" title="permaculture.pfaf.PFAFFile"><span class="pre">PFAFFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">locales</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.all_plants">
+<span class="sig-name descname"><span class="pre">all_plants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFModel.all_plants" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFModel.convert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.file">
+<span class="sig-name descname"><span class="pre">file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.pfaf.PFAFFile" title="permaculture.pfaf.PFAFFile"><span class="pre">PFAFFile</span></a></em><a class="headerlink" href="#permaculture.pfaf.PFAFModel.file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.from_cache_dir">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_cache_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFModel.from_cache_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.locales">
+<span class="sig-name descname"><span class="pre">locales</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></em><a class="headerlink" href="#permaculture.pfaf.PFAFModel.locales" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
 
 </section>
 <section id="module-permaculture.registry">
@@ -809,8 +1093,8 @@ stdout with ‘-’ or a file handler.</p>
 <p>Entry points based registry management.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="permaculture.registry.get_entry_points">
-<span class="sig-prename descclassname"><span class="pre">permaculture.registry.</span></span><span class="sig-name descname"><span class="pre">get_entry_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.registry.get_entry_points" title="Permalink to this definition"></a></dt>
-<dd><p>Get the list of permaculture entry points.</p>
+<span class="sig-prename descclassname"><span class="pre">permaculture.registry.</span></span><span class="sig-name descname"><span class="pre">get_entry_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.registry.get_entry_points" title="Permalink to this definition"></a></dt>
+<dd><p>Get the list of pytest_unique entry points.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -854,7 +1138,7 @@ the registry is loaded again.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="permaculture.registry.registry_load">
-<span class="sig-prename descclassname"><span class="pre">permaculture.registry.</span></span><span class="sig-name descname"><span class="pre">registry_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.registry.registry_load" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">permaculture.registry.</span></span><span class="sig-name descname"><span class="pre">registry_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.registry.registry_load" title="Permalink to this definition"></a></dt>
 <dd><p>Find all installed entry points.</p>
 </dd></dl>
 
@@ -965,7 +1249,7 @@ content type.</p>
 <p>Argument action for a serializer.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="permaculture.serializer.SerializerAction.get_serializer">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'application/x-yaml'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.serializer.SerializerAction.get_serializer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.serializer.SerializerAction.get_serializer" title="Permalink to this definition"></a></dt>
 <dd><p>Get a serializer with a default content-type.</p>
 </dd></dl>
 
@@ -1113,52 +1397,103 @@ content type.</p>
 </section>
 <section id="module-permaculture.usda">
 <span id="permaculture-usda-module"></span><h2>permaculture.usda module<a class="headerlink" href="#module-permaculture.usda" title="Permalink to this heading"></a></h2>
-<p>USDA Plants API.</p>
+<p>USDA Plants database.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="permaculture.usda.UsdaPlants">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.usda.</span></span><span class="sig-name descname"><span class="pre">UsdaPlants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.UsdaPlants" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>USDA Plants API.</p>
+<dt class="sig sig-object py" id="permaculture.usda.USDADatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.usda.</span></span><span class="sig-name descname"><span class="pre">USDADatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.usda.USDAModel" title="permaculture.usda.USDAModel"><span class="pre">USDAModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDADatabase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#permaculture.database.DatabaseIterablePlugin" title="permaculture.database.DatabaseIterablePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseIterablePlugin</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.usda.UsdaPlants.characteristics_search">
-<span class="sig-name descname"><span class="pre">characteristics_search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#permaculture.usda.UsdaPlants.characteristics_search" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.usda.USDADatabase.from_config">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDADatabase.from_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.usda.USDADatabase.iterate">
+<span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDADatabase.iterate" title="Permalink to this definition"></a></dt>
+<dd><p>Iterate over all plants.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.usda.USDADatabase.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.usda.USDAModel" title="permaculture.usda.USDAModel"><span class="pre">USDAModel</span></a></em><a class="headerlink" href="#permaculture.usda.USDADatabase.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.usda.</span></span><span class="sig-name descname"><span class="pre">USDAModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.usda.USDAWeb" title="permaculture.usda.USDAWeb"><span class="pre">USDAWeb</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableMapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locales</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>USDA model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.all_characteristics">
+<span class="sig-name descname"><span class="pre">all_characteristics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAModel.all_characteristics" title="Permalink to this definition"></a></dt>
+<dd><p>Return the characteristics for all plants.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAModel.convert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.from_url">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAModel.from_url" title="Permalink to this definition"></a></dt>
+<dd><p>Instantiate USDA Plants from URL.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.locales">
+<span class="sig-name descname"><span class="pre">locales</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="permaculture.locales.html#permaculture.locales.Locales" title="permaculture.locales.Locales"><span class="pre">Locales</span></a></em><a class="headerlink" href="#permaculture.usda.USDAModel.locales" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.plant_characteristics">
+<span class="sig-name descname"><span class="pre">plant_characteristics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAModel.plant_characteristics" title="Permalink to this definition"></a></dt>
+<dd><p>Return the characteristics for a single plant.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.storage">
+<span class="sig-name descname"><span class="pre">storage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MutableMapping</span></em><a class="headerlink" href="#permaculture.usda.USDAModel.storage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.usda.USDAModel.web">
+<span class="sig-name descname"><span class="pre">web</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.usda.USDAWeb" title="permaculture.usda.USDAWeb"><span class="pre">USDAWeb</span></a></em><a class="headerlink" href="#permaculture.usda.USDAModel.web" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="permaculture.usda.USDAWeb">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.usda.</span></span><span class="sig-name descname"><span class="pre">USDAWeb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAWeb" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>USDA web interface.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.usda.USDAWeb.characteristics_search">
+<span class="sig-name descname"><span class="pre">characteristics_search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#permaculture.usda.USDAWeb.characteristics_search" title="Permalink to this definition"></a></dt>
 <dd><p>Search characteristics.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.usda.UsdaPlants.client">
-<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></em><a class="headerlink" href="#permaculture.usda.UsdaPlants.client" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.usda.USDAWeb.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPClient" title="permaculture.http.HTTPClient"><span class="pre">HTTPClient</span></a></em><a class="headerlink" href="#permaculture.usda.USDAWeb.client" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.usda.UsdaPlants.from_url">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">URL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.UsdaPlants.from_url" title="Permalink to this definition"></a></dt>
-<dd><p>Instantiate USDA Plants from URL.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.usda.UsdaPlants.plant_characteristics">
-<span class="sig-name descname"><span class="pre">plant_characteristics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.UsdaPlants.plant_characteristics" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.usda.USDAWeb.plant_characteristics">
+<span class="sig-name descname"><span class="pre">plant_characteristics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAWeb.plant_characteristics" title="Permalink to this definition"></a></dt>
 <dd><p>Plant characteristics for an identifier.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.usda.UsdaPlants.plant_profile">
-<span class="sig-name descname"><span class="pre">plant_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.UsdaPlants.plant_profile" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.usda.USDAWeb.plant_profile">
+<span class="sig-name descname"><span class="pre">plant_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.USDAWeb.plant_profile" title="Permalink to this definition"></a></dt>
 <dd><p>Plant profile for a symbol.</p>
 </dd></dl>
 
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.usda.all_characteristics">
-<span class="sig-prename descclassname"><span class="pre">permaculture.usda.</span></span><span class="sig-name descname"><span class="pre">all_characteristics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.all_characteristics" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.usda.iterator">
-<span class="sig-prename descclassname"><span class="pre">permaculture.usda.</span></span><span class="sig-name descname"><span class="pre">iterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.usda.iterator" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-permaculture.wikipedia">
@@ -1198,6 +1533,18 @@ content type.</p>
 <dd><p>Get companion plants from Wikipedia and return a DataFrame.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="permaculture.wikipedia.parse_table">
+<span class="sig-prename descclassname"><span class="pre">permaculture.wikipedia.</span></span><span class="sig-name descname"><span class="pre">parse_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.parse_table" title="Permalink to this definition"></a></dt>
+<dd><p>Parse an HTML table into a dictionary of values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="permaculture.wikipedia.parse_tables">
+<span class="sig-prename descclassname"><span class="pre">permaculture.wikipedia.</span></span><span class="sig-name descname"><span class="pre">parse_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.parse_tables" title="Permalink to this definition"></a></dt>
+<dd><p>Parse HTML text into a list of tables.</p>
+</dd></dl>
+
 </section>
 <section id="module-permaculture">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-permaculture" title="Permalink to this heading"></a></h2>
@@ -1209,7 +1556,7 @@ content type.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="permaculture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="permaculture.testing.html" class="btn btn-neutral float-right" title="permaculture.testing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="permaculture.locales.html" class="btn btn-neutral float-right" title="permaculture.locales package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

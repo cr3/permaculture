@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture &mdash; permaculture 0.0.2 documentation</title>
+  <title>permaculture &mdash; permaculture 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.2
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -46,6 +46,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="nc.html">Natural Capital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="la-ferme-impossible.html">La ferme impossible</a></li>
 <li class="toctree-l1"><a class="reference internal" href="la-revolution-dun-seul-brin-de-paille.html">La révolution d’un seul brin de paille</a></li>
 </ul>
@@ -56,7 +60,6 @@
 </li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pfaf.html">Plants for a Future</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">How to contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
@@ -92,10 +95,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="permaculture.html">permaculture package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.locales.html">permaculture.locales package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.locales.html#module-permaculture.locales">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.testing.html">permaculture.testing package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing.fixtures">permaculture.testing.fixtures module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing.logger">permaculture.testing.logger module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing.unique">permaculture.testing.unique module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="permaculture.testing.html#module-permaculture.testing">Module contents</a></li>
 </ul>
 </li>
@@ -109,18 +117,58 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.command">permaculture.command module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.command.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.command.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.command.make_config_parser"><code class="docutils literal notranslate"><span class="pre">make_config_parser()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.database">permaculture.database module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.database.Database"><code class="docutils literal notranslate"><span class="pre">Database</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.Database.load"><code class="docutils literal notranslate"><span class="pre">Database.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.Database.lookup"><code class="docutils literal notranslate"><span class="pre">Database.lookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.Database.search"><code class="docutils literal notranslate"><span class="pre">Database.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseElement"><code class="docutils literal notranslate"><span class="pre">DatabaseElement</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseElement.characteristics"><code class="docutils literal notranslate"><span class="pre">DatabaseElement.characteristics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseElement.common_names"><code class="docutils literal notranslate"><span class="pre">DatabaseElement.common_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseElement.database"><code class="docutils literal notranslate"><span class="pre">DatabaseElement.database</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseElement.scientific_name"><code class="docutils literal notranslate"><span class="pre">DatabaseElement.scientific_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseElementNotFound"><code class="docutils literal notranslate"><span class="pre">DatabaseElementNotFound</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseIterablePlugin"><code class="docutils literal notranslate"><span class="pre">DatabaseIterablePlugin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseIterablePlugin.iterate"><code class="docutils literal notranslate"><span class="pre">DatabaseIterablePlugin.iterate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseIterablePlugin.lookup"><code class="docutils literal notranslate"><span class="pre">DatabaseIterablePlugin.lookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabaseIterablePlugin.search"><code class="docutils literal notranslate"><span class="pre">DatabaseIterablePlugin.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.database.DatabasePlugin"><code class="docutils literal notranslate"><span class="pre">DatabasePlugin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabasePlugin.lookup"><code class="docutils literal notranslate"><span class="pre">DatabasePlugin.lookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.database.DatabasePlugin.search"><code class="docutils literal notranslate"><span class="pre">DatabasePlugin.search()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.de">permaculture.de module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.DesignEcologique"><code class="docutils literal notranslate"><span class="pre">DesignEcologique</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DesignEcologique.client"><code class="docutils literal notranslate"><span class="pre">DesignEcologique.client</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DesignEcologique.from_url"><code class="docutils literal notranslate"><span class="pre">DesignEcologique.from_url()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DesignEcologique.perenial_plants"><code class="docutils literal notranslate"><span class="pre">DesignEcologique.perenial_plants()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.DEDatabase"><code class="docutils literal notranslate"><span class="pre">DEDatabase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEDatabase.from_config"><code class="docutils literal notranslate"><span class="pre">DEDatabase.from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEDatabase.iterate"><code class="docutils literal notranslate"><span class="pre">DEDatabase.iterate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEDatabase.model"><code class="docutils literal notranslate"><span class="pre">DEDatabase.model</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.all_perenial_plants"><code class="docutils literal notranslate"><span class="pre">all_perenial_plants()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.apply_legend"><code class="docutils literal notranslate"><span class="pre">apply_legend()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.iterator"><code class="docutils literal notranslate"><span class="pre">iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.DEModel"><code class="docutils literal notranslate"><span class="pre">DEModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEModel.convert"><code class="docutils literal notranslate"><span class="pre">DEModel.convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEModel.from_url"><code class="docutils literal notranslate"><span class="pre">DEModel.from_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEModel.get_perenial_plants"><code class="docutils literal notranslate"><span class="pre">DEModel.get_perenial_plants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEModel.locales"><code class="docutils literal notranslate"><span class="pre">DEModel.locales</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEModel.web"><code class="docutils literal notranslate"><span class="pre">DEModel.web</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.de.DEWeb"><code class="docutils literal notranslate"><span class="pre">DEWeb</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEWeb.client"><code class="docutils literal notranslate"><span class="pre">DEWeb.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.de.DEWeb.perenial_plants_list"><code class="docutils literal notranslate"><span class="pre">DEWeb.perenial_plants_list()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.google">permaculture.google module</a><ul>
@@ -131,11 +179,6 @@
 <li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.google.GoogleSpreadsheet.from_url"><code class="docutils literal notranslate"><span class="pre">GoogleSpreadsheet.from_url()</span></code></a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.html">permaculture.html module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.html.parse_table"><code class="docutils literal notranslate"><span class="pre">parse_table()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.html.parse_tables"><code class="docutils literal notranslate"><span class="pre">parse_tables()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.http">permaculture.http module</a><ul>
@@ -159,20 +202,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient"><code class="docutils literal notranslate"><span class="pre">HTTPClient</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.adapter"><code class="docutils literal notranslate"><span class="pre">HTTPClient.adapter</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.connect"><code class="docutils literal notranslate"><span class="pre">HTTPClient.connect()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.delete"><code class="docutils literal notranslate"><span class="pre">HTTPClient.delete()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.get"><code class="docutils literal notranslate"><span class="pre">HTTPClient.get()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.head"><code class="docutils literal notranslate"><span class="pre">HTTPClient.head()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.headers"><code class="docutils literal notranslate"><span class="pre">HTTPClient.headers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.options"><code class="docutils literal notranslate"><span class="pre">HTTPClient.options()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.origin"><code class="docutils literal notranslate"><span class="pre">HTTPClient.origin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.patch"><code class="docutils literal notranslate"><span class="pre">HTTPClient.patch()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.post"><code class="docutils literal notranslate"><span class="pre">HTTPClient.post()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.put"><code class="docutils literal notranslate"><span class="pre">HTTPClient.put()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.request"><code class="docutils literal notranslate"><span class="pre">HTTPClient.request()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.session"><code class="docutils literal notranslate"><span class="pre">HTTPClient.session</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.with_cache_all"><code class="docutils literal notranslate"><span class="pre">HTTPClient.with_cache_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.with_adapter"><code class="docutils literal notranslate"><span class="pre">HTTPClient.with_adapter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPClient.with_cache"><code class="docutils literal notranslate"><span class="pre">HTTPClient.with_cache()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.http.HTTPEntry"><code class="docutils literal notranslate"><span class="pre">HTTPEntry</span></code></a><ul>
@@ -183,24 +215,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.http.parse_http_expiry"><code class="docutils literal notranslate"><span class="pre">parse_http_expiry()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.http.parse_http_timestamp"><code class="docutils literal notranslate"><span class="pre">parse_http_timestamp()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.iterator">permaculture.iterator module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.iterator.Iterator"><code class="docutils literal notranslate"><span class="pre">Iterator</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.Iterator.cache_dir"><code class="docutils literal notranslate"><span class="pre">Iterator.cache_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.Iterator.iterate"><code class="docutils literal notranslate"><span class="pre">Iterator.iterate()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.Iterator.load"><code class="docutils literal notranslate"><span class="pre">Iterator.load()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.Iterator.lookup"><code class="docutils literal notranslate"><span class="pre">Iterator.lookup()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.Iterator.search"><code class="docutils literal notranslate"><span class="pre">Iterator.search()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.iterator.IteratorElement"><code class="docutils literal notranslate"><span class="pre">IteratorElement</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.IteratorElement.characteristics"><code class="docutils literal notranslate"><span class="pre">IteratorElement.characteristics</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.IteratorElement.common_names"><code class="docutils literal notranslate"><span class="pre">IteratorElement.common_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.iterator.IteratorElement.scientific_name"><code class="docutils literal notranslate"><span class="pre">IteratorElement.scientific_name</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.iterator.IteratorElementNotFound"><code class="docutils literal notranslate"><span class="pre">IteratorElementNotFound</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.logger">permaculture.logger module</a><ul>
@@ -230,16 +244,77 @@
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.logger.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.pfaf">permaculture.pfaf module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.Pfaf"><code class="docutils literal notranslate"><span class="pre">Pfaf</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.Pfaf.main_database"><code class="docutils literal notranslate"><span class="pre">Pfaf.main_database()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.Pfaf.storage"><code class="docutils literal notranslate"><span class="pre">Pfaf.storage</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.Pfaf.with_cache_dir"><code class="docutils literal notranslate"><span class="pre">Pfaf.with_cache_dir()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.nc">permaculture.nc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAdapter"><code class="docutils literal notranslate"><span class="pre">NCAdapter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAdapter.send"><code class="docutils literal notranslate"><span class="pre">NCAdapter.send()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.all_plants"><code class="docutils literal notranslate"><span class="pre">all_plants()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.apply_legend"><code class="docutils literal notranslate"><span class="pre">apply_legend()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.iterator"><code class="docutils literal notranslate"><span class="pre">iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthentication"><code class="docutils literal notranslate"><span class="pre">NCAuthentication</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthentication.authenticate"><code class="docutils literal notranslate"><span class="pre">NCAuthentication.authenticate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthentication.get_payload"><code class="docutils literal notranslate"><span class="pre">NCAuthentication.get_payload()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthentication.password"><code class="docutils literal notranslate"><span class="pre">NCAuthentication.password</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthentication.session"><code class="docutils literal notranslate"><span class="pre">NCAuthentication.session</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthentication.username"><code class="docutils literal notranslate"><span class="pre">NCAuthentication.username</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCAuthenticationError"><code class="docutils literal notranslate"><span class="pre">NCAuthenticationError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCDatabase"><code class="docutils literal notranslate"><span class="pre">NCDatabase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCDatabase.from_config"><code class="docutils literal notranslate"><span class="pre">NCDatabase.from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCDatabase.lookup"><code class="docutils literal notranslate"><span class="pre">NCDatabase.lookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCDatabase.model"><code class="docutils literal notranslate"><span class="pre">NCDatabase.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCDatabase.search"><code class="docutils literal notranslate"><span class="pre">NCDatabase.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCLink"><code class="docutils literal notranslate"><span class="pre">NCLink</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCLink.identifier"><code class="docutils literal notranslate"><span class="pre">NCLink.identifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCLink.text"><code class="docutils literal notranslate"><span class="pre">NCLink.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCLink.url"><code class="docutils literal notranslate"><span class="pre">NCLink.url</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel"><code class="docutils literal notranslate"><span class="pre">NCModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.convert"><code class="docutils literal notranslate"><span class="pre">NCModel.convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.from_url"><code class="docutils literal notranslate"><span class="pre">NCModel.from_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.get_plant"><code class="docutils literal notranslate"><span class="pre">NCModel.get_plant()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.get_plant_companions"><code class="docutils literal notranslate"><span class="pre">NCModel.get_plant_companions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.get_plants"><code class="docutils literal notranslate"><span class="pre">NCModel.get_plants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.locales"><code class="docutils literal notranslate"><span class="pre">NCModel.locales</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.parse_detail"><code class="docutils literal notranslate"><span class="pre">NCModel.parse_detail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.parse_key_value"><code class="docutils literal notranslate"><span class="pre">NCModel.parse_key_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.parse_table"><code class="docutils literal notranslate"><span class="pre">NCModel.parse_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.parse_tables"><code class="docutils literal notranslate"><span class="pre">NCModel.parse_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.parse_tr"><code class="docutils literal notranslate"><span class="pre">NCModel.parse_tr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCModel.web"><code class="docutils literal notranslate"><span class="pre">NCModel.web</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.nc.NCWeb"><code class="docutils literal notranslate"><span class="pre">NCWeb</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCWeb.client"><code class="docutils literal notranslate"><span class="pre">NCWeb.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCWeb.view_complist"><code class="docutils literal notranslate"><span class="pre">NCWeb.view_complist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCWeb.view_detail"><code class="docutils literal notranslate"><span class="pre">NCWeb.view_detail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.nc.NCWeb.view_list"><code class="docutils literal notranslate"><span class="pre">NCWeb.view_list()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.pfaf">permaculture.pfaf module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFDatabase"><code class="docutils literal notranslate"><span class="pre">PFAFDatabase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFDatabase.from_config"><code class="docutils literal notranslate"><span class="pre">PFAFDatabase.from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFDatabase.iterate"><code class="docutils literal notranslate"><span class="pre">PFAFDatabase.iterate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFDatabase.model"><code class="docutils literal notranslate"><span class="pre">PFAFDatabase.model</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFFile"><code class="docutils literal notranslate"><span class="pre">PFAFFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFFile.main_database"><code class="docutils literal notranslate"><span class="pre">PFAFFile.main_database()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFFile.storage"><code class="docutils literal notranslate"><span class="pre">PFAFFile.storage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFModel"><code class="docutils literal notranslate"><span class="pre">PFAFModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFModel.all_plants"><code class="docutils literal notranslate"><span class="pre">PFAFModel.all_plants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFModel.convert"><code class="docutils literal notranslate"><span class="pre">PFAFModel.convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFModel.file"><code class="docutils literal notranslate"><span class="pre">PFAFModel.file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFModel.from_cache_dir"><code class="docutils literal notranslate"><span class="pre">PFAFModel.from_cache_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.pfaf.PFAFModel.locales"><code class="docutils literal notranslate"><span class="pre">PFAFModel.locales</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.registry">permaculture.registry module</a><ul>
@@ -296,16 +371,29 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.usda">permaculture.usda module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.usda.UsdaPlants"><code class="docutils literal notranslate"><span class="pre">UsdaPlants</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.UsdaPlants.characteristics_search"><code class="docutils literal notranslate"><span class="pre">UsdaPlants.characteristics_search()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.UsdaPlants.client"><code class="docutils literal notranslate"><span class="pre">UsdaPlants.client</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.UsdaPlants.from_url"><code class="docutils literal notranslate"><span class="pre">UsdaPlants.from_url()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.UsdaPlants.plant_characteristics"><code class="docutils literal notranslate"><span class="pre">UsdaPlants.plant_characteristics()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.UsdaPlants.plant_profile"><code class="docutils literal notranslate"><span class="pre">UsdaPlants.plant_profile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.usda.USDADatabase"><code class="docutils literal notranslate"><span class="pre">USDADatabase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDADatabase.from_config"><code class="docutils literal notranslate"><span class="pre">USDADatabase.from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDADatabase.iterate"><code class="docutils literal notranslate"><span class="pre">USDADatabase.iterate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDADatabase.model"><code class="docutils literal notranslate"><span class="pre">USDADatabase.model</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.usda.all_characteristics"><code class="docutils literal notranslate"><span class="pre">all_characteristics()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.usda.iterator"><code class="docutils literal notranslate"><span class="pre">iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel"><code class="docutils literal notranslate"><span class="pre">USDAModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.all_characteristics"><code class="docutils literal notranslate"><span class="pre">USDAModel.all_characteristics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.convert"><code class="docutils literal notranslate"><span class="pre">USDAModel.convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.from_url"><code class="docutils literal notranslate"><span class="pre">USDAModel.from_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.locales"><code class="docutils literal notranslate"><span class="pre">USDAModel.locales</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.plant_characteristics"><code class="docutils literal notranslate"><span class="pre">USDAModel.plant_characteristics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.storage"><code class="docutils literal notranslate"><span class="pre">USDAModel.storage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAModel.web"><code class="docutils literal notranslate"><span class="pre">USDAModel.web</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAWeb"><code class="docutils literal notranslate"><span class="pre">USDAWeb</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAWeb.characteristics_search"><code class="docutils literal notranslate"><span class="pre">USDAWeb.characteristics_search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAWeb.client"><code class="docutils literal notranslate"><span class="pre">USDAWeb.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAWeb.plant_characteristics"><code class="docutils literal notranslate"><span class="pre">USDAWeb.plant_characteristics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="permaculture.html#permaculture.usda.USDAWeb.plant_profile"><code class="docutils literal notranslate"><span class="pre">USDAWeb.plant_profile()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture.wikipedia">permaculture.wikipedia module</a><ul>
@@ -317,6 +405,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.wikipedia.get_companion_plants"><code class="docutils literal notranslate"><span class="pre">get_companion_plants()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.wikipedia.parse_table"><code class="docutils literal notranslate"><span class="pre">parse_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="permaculture.html#permaculture.wikipedia.parse_tables"><code class="docutils literal notranslate"><span class="pre">parse_tables()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="permaculture.html#module-permaculture">Module contents</a></li>
