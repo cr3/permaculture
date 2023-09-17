@@ -1,262 +1,271 @@
 """Unit tests for the Design Ecologique module."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
 from permaculture.database import DatabaseElement
 from permaculture.de import (
-    DE,
     DEDatabase,
-    all_perenial_plants,
-    apply_legend,
+    DEModel,
+    DEWeb,
 )
 
 from .stubs import StubRequestsResponse
 
 
-def test_de_resources_perenial_plants(unique):
+def test_de_web_perenial_plants_list(unique):
     """Perenial plants should GET and return the spreadsheet."""
     doc_id = unique("text")
     text = f"<a href='https://docs.google.com/spreadsheets/d/{doc_id}/edit'>"
     client = Mock(get=Mock(return_value=StubRequestsResponse(text=text)))
-    plants = DE(client).perenial_plants()
+    plants = DEWeb(client).perenial_plants_list()
     client.get.assert_called_once_with("/liste-de-plantes-vivaces/")
     assert plants.doc_id == doc_id
 
 
-def test_de_resources_perenial_plants_error():
+def test_de_web_perenial_plants_list_error():
     """Perenial plants should raise when spreadhseet is not found."""
     client = Mock(get=Mock(return_value=StubRequestsResponse()))
     with pytest.raises(KeyError):
-        DE(client).perenial_plants()
+        DEWeb(client).perenial_plants_list()
 
 
 @pytest.mark.parametrize(
-    "row, expected",
+    "key_value, expected",
     [
         pytest.param(
-            {"Comestible": "Fl Fr Fe N G R S JP T B"},
-            {
-                "Comestible": [
-                    "Fleur",
-                    "Fruit",
-                    "Feuille",
-                    "Noix",
-                    "Graine",
-                    "Racine",
-                    "Sève",
-                    "Jeune pousse",
-                    "Tige",
-                    "Bulbe",
-                ]
-            },
-            id="Comestible",
+            ("Comestible", "Fl Fr Fe N G R S JP T B"),
+            (
+                "edible uses",
+                [
+                    "flower",
+                    "fruit",
+                    "leaf",
+                    "nut",
+                    "seed",
+                    "root",
+                    "sap",
+                    "young shoot",
+                    "stem",
+                    "bulb",
+                ],
+            ),
+            id="edible uses",
         ),
         pytest.param(
-            {"Couleur de floraison": "Rg Rs B J O P V Br Bl"},
-            {
-                "Couleur de floraison": [
-                    "Rouge",
-                    "Rose",
-                    "Blanc",
-                    "Jaune",
-                    "Orangé",
-                    "Pourpre",
-                    "Verte",
-                    "Brun",
-                    "Bleu",
-                ]
-            },
-            id="Couleur de floraison",
+            ("Couleur de feuillage", "V Po Pa P F T J"),
+            (
+                "foliage color",
+                [
+                    "green",
+                    "purple",
+                    "variegated",
+                    "pale",
+                    "dark",
+                    "spotted",
+                    "yellow",
+                ],
+            ),
+            id="foliage color",
         ),
         pytest.param(
-            {"Couleur de feuillage": "V Po Pa P F T J"},
-            {
-                "Couleur de feuillage": [
-                    "Vert",
-                    "Pourpre",
-                    "Panaché",
-                    "Pale",
-                    "Foncé",
-                    "Tacheté",
-                    "Jaune",
-                ]
-            },
-            id="Couleur de feuillage",
+            ("Couleur de floraison", "Rg Rs B J O P V Br Bl"),
+            (
+                "flower color",
+                [
+                    "red",
+                    "pink",
+                    "white",
+                    "yellow",
+                    "orange",
+                    "purple",
+                    "green",
+                    "brown",
+                    "blue",
+                ],
+            ),
+            id="flower color",
         ),
         pytest.param(
-            {"Eau": "▁ ▅ █"},
-            {"Eau": ["Peu", "Moyen", "Beaucoup"]},
-            id="Eau",
+            ("Eau", "▁ ▅ █"),
+            ("moisture", ["dry", "moderate", "wet"]),
+            id="moisture",
         ),
         pytest.param(
-            {"Inconvénient": "E D A P Épi V B G Pe"},
-            {
-                "Inconvénient": [
-                    "Expansif",
-                    "Dispersif",
-                    "Allergène",
-                    "Poison",
-                    "Épineux",
-                    "Vigne vigoureuse",
-                    "Brûlure",
-                    "Grimpant invasif",
-                    "Persistant",
-                ]
-            },
+            ("Inconvénient", "E D A P Épi V B G Pe"),
+            (
+                "Inconvénient",
+                [
+                    "expansive",
+                    "dispersive",
+                    "allergen",
+                    "poison",
+                    "thorny",
+                    "vigorous",
+                    "burns",
+                    "invasive",
+                    "persistent",
+                ],
+            ),
             id="Inconvénient",
         ),
         pytest.param(
-            {"Intérêt automnale hivernal": "A H"},
-            {"Intérêt automnale hivernal": ["Automne", "Hivernale"]},
+            ("Intérêt automnale hivernal", "A H"),
+            ("Intérêt automnale hivernal", ["autumn", "winter"]),
             id="Intérêt automnale hivernal",
         ),
         pytest.param(
-            {"Lumière": "○ ◐ ●"},
-            {"Lumière": ["Plein soleil", "Mi-Ombre", "Ombre"]},
-            id="Lumière",
+            ("Lumière", "○ ◐ ●"),
+            ("sun", ["full sun", "partial shade", "shade"]),
+            id="sun",
         ),
         pytest.param(
-            {"Multiplication": "B M D S G St P A É T"},
-            {
-                "Multiplication": [
-                    "Bouturage",
-                    "Marcottage",
-                    "Division",
-                    "Semi",
-                    "Greffe",
-                    "Stolon",
-                    "Printemps",
-                    "Automne",
-                    "Été",
-                    "Tubercule",
-                ]
-            },
+            ("Multiplication", "B M D S G St P A É T"),
+            (
+                "Multiplication",
+                [
+                    "cuttings",
+                    "layering",
+                    "division",
+                    "seeds",
+                    "graft",
+                    "stolon",
+                    "spring",
+                    "autumn",
+                    "summer",
+                    "tuber",
+                ],
+            ),
             id="Multiplication",
         ),
         pytest.param(
-            {"Période de floraison": "P É A"},
-            {"Période de floraison": ["Printemps", "Été", "Automne"]},
-            id="Période de floraison",
+            ("Période de floraison", "P É A"),
+            ("blooming period", ["spring", "summer", "autumn"]),
+            id="blooming period",
         ),
         pytest.param(
-            {"Période de taille": "AD AF P É A T N"},
-            {
-                "Période de taille": [
-                    "Avant le débourement",
-                    "Après la floraison",
-                    "Printemps",
-                    "Été",
-                    "Automne",
-                    "en tout temps",
-                    "Ne pas tailler",
-                ]
-            },
-            id="Période de taille",
+            ("Période de taille", "AD AF P É A T N"),
+            (
+                "pruning period",
+                [
+                    "before budburst",
+                    "after flowering",
+                    "spring",
+                    "summer",
+                    "autumn",
+                    "at all times",
+                    "never prune",
+                ],
+            ),
+            id="pruning period",
         ),
         pytest.param(
-            {"Pollinisateurs": "S G V"},
-            {
-                "Pollinisateurs": [
-                    "Spécialistes",
-                    "Généralistes",
-                    "Vent",
-                ]
-            },
-            id="Pollinisateurs",
+            ("Pollinisateurs", "S G V"),
+            (
+                "pollinators",
+                [
+                    "specialists",
+                    "generalists",
+                    "wind",
+                ],
+            ),
+            id="pollinators",
         ),
         pytest.param(
-            {"Racine": "B C D F L P R S T"},
-            {
-                "Racine": [
-                    "Bulbe",
-                    "Charnu",
-                    "Drageonnante",
-                    "Faciculé",
-                    "Latérales",
-                    "Pivotante",
-                    "Rhizome",
-                    "Superficiel",
-                    "Tubercule",
-                ]
-            },
-            id="Racine",
+            ("Racine", "B C D F L P R S T"),
+            (
+                "root type",
+                [
+                    "bulb",
+                    "fleshy",
+                    "suckering",
+                    "fasciculated",
+                    "lateral",
+                    "taproot",
+                    "rhizome",
+                    "superficial",
+                    "tuber",
+                ],
+            ),
+            id="root type",
         ),
         pytest.param(
-            {"Rythme de croissance": "R M L"},
-            {"Rythme de croissance": ["Rapide", "Moyen", "Lent"]},
-            id="Rythme de croissance",
+            ("Rythme de croissance", "R M L"),
+            ("growth rate", ["fast", "medium", "slow"]),
+            id="growth rate",
         ),
         pytest.param(
-            {"Texture du sol": "░ ▒ ▓"},
-            {"Texture du sol": ["Léger", "Moyen", "Lourd"]},
-            id="Texture du sol",
+            ("Texture du sol", "░ ▒ ▓"),
+            ("soil", ["light", "medium", "heavy"]),
+            id="soil",
         ),
         pytest.param(
-            {"Utilisation écologique": "BR P Z"},
-            {
-                "Utilisation écologique": [
-                    "Bande Riveraine",
-                    "Pentes",
-                    "Zone innondable",
-                ]
-            },
-            id="Utilisation écologique",
+            ("Utilisation écologique", "BR P Z"),
+            (
+                "ecological use",
+                [
+                    "riparian strip",
+                    "slopes",
+                    "flood zone",
+                ],
+            ),
+            id="ecological use",
         ),
         pytest.param(
-            {"Vie sauvage": "N A NA"},
-            {"Vie sauvage": ["Nourriture", "Abris", "Nourriture et Abris"]},
-            id="Vie sauvage",
+            ("Vie sauvage", "N A NA"),
+            ("wildlife", ["food", "shelter", "food and shelter"]),
+            id="wildlife",
         ),
     ],
 )
-def test_apply_legend(row, expected):
-    """Applying the legend should translate a row into the expected result."""
-    result = apply_legend(row)
+def test_de_model_convert(key_value, expected):
+    """Converting a key value should also translate the key and value(s)."""
+    result = DEModel(None).convert(*key_value)
     assert result == expected
 
 
-def test_all_perenial_plants():
+def test_de_model_get_perenial_plants():
     """All perenial plants should return a dictionary of characteristics."""
     data = "TAXONOMIE\nGenre,Espèce \na,b\n"
     export = Mock(return_value=data)
-    perenial_plants = Mock(return_value=Mock(export=export))
-    de = Mock(perenial_plants=perenial_plants)
+    perenial_plants_list = Mock(return_value=Mock(export=export))
+    web = Mock(perenial_plants_list=perenial_plants_list)
 
-    plants = all_perenial_plants(de)
+    plants = list(DEModel(web).get_perenial_plants())
     assert plants == [
         {
-            "Genre": "a",
-            "Espèce": "b",
+            "genus": "a",
+            "species": "b",
         }
     ]
 
 
-@patch("permaculture.de.all_perenial_plants")
-def test_de_database_iterate(mock_all_perenial_plants):
+def test_de_database_iterate():
     """Iterating over the database should return a list of elements."""
-    mock_all_perenial_plants.return_value = [
-        {
-            "Genre": "a",
-            "Espèce": "b",
-            "Nom Anglais": "c",
-            "Nom français": "d",
-        }
-    ]
+    model = Mock(
+        get_perenial_plants=Mock(
+            return_value=[
+                {
+                    "genus": "a",
+                    "species": "b",
+                    "common name": "c",
+                }
+            ]
+        )
+    )
 
-    database = DEDatabase.from_config(Mock(cache_dir=""))
+    database = DEDatabase(model)
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(
             database="DE",
             scientific_name="a b",
-            common_names=["c", "d"],
+            common_names=["c"],
             characteristics={
-                "Genre": "a",
-                "Espèce": "b",
-                "Nom Anglais": "c",
-                "Nom français": "d",
+                "genus": "a",
+                "species": "b",
+                "common name": "c",
             },
         )
     ]

@@ -127,5 +127,5 @@ def main(argv=None):
         case _:
             args_parser.error(f"Unsupported command: {args.command}")
 
-    output, *_ = args.serializer.encode(data, "application/x-yaml")
+    output, *_ = args.serializer.encode(data)
     args.output.write(output)

@@ -1,89 +1,94 @@
 """Unit tests for the pfaf module."""
 
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
 from permaculture.database import DatabaseElement
 from permaculture.pfaf import (
-    PFAF,
     PFAFDatabase,
-    all_plants,
-    apply_legend,
+    PFAFFile,
+    PFAFModel,
 )
+from permaculture.storage import FileStorage
 
 
-def test_pfaf_main_database():
+def test_pfaf_web_main_database():
     """The main database should return the corresponding Excel worksheet."""
     path = Path(__file__).with_suffix(".xls")
     storage = Mock(key_to_path=Mock(return_value=path))
-    pfaf = PFAF(storage)
-    ws = pfaf.main_database()
+    file = PFAFFile(storage)
+    ws = file.main_database()
     assert ws.cell(0, 0).value == "Test"
 
 
-def test_pfaf_main_database_error(tmpdir):
+def test_pfaf_web_main_database_error(tmpdir):
     """The main database should raise when file not found."""
-    pfaf = PFAF.from_cache_dir(tmpdir)
+    storage = FileStorage(tmpdir)
+    file = PFAFFile(storage)
     with pytest.raises(FileNotFoundError):
-        pfaf.main_database()
+        file.main_database()
 
 
-def test_all_plants_error(tmpdir):
+def test_pfaf_model_all_plants_error(tmpdir):
     """All plants should return no plant when file not found."""
-    pfaf = PFAF.from_cache_dir(tmpdir)
-    plants = all_plants(pfaf)
+    model = PFAFModel.from_cache_dir(tmpdir)
+    plants = list(model.all_plants())
     assert plants == []
 
 
 @pytest.mark.parametrize(
-    "row, expected",
+    "key_value, expected",
     [
         pytest.param(
-            {"Deciduous/Evergreen": "DE"},
-            {
-                "Deciduous/Evergreen": [
-                    "Deciduous",
-                    "Evergreen",
-                ]
-            },
+            ("Deciduous/Evergreen", "DE"),
+            (
+                "deciduous/evergreen",
+                [
+                    "deciduous",
+                    "evergreen",
+                ],
+            ),
             id="Deciduous/Evergreen",
         ),
         pytest.param(
-            {"pH": "ANB"},
-            {"pH": ["Acid", "Neutral", "Base/Alkaline"]},
+            ("pH", "ANB"),
+            ("ph", ["acid", "neutral", "base/alkaline"]),
             id="pH",
         ),
         pytest.param(
-            {"Shade": "FSN"},
-            {"Shade": ["Full", "Semi", "None"]},
+            ("Shade", "FSN"),
+            ("shade", ["full", "semi", "none"]),
             id="Shade",
         ),
         pytest.param(
-            {"Soil": "LMH"},
-            {"Soil": ["Light(sandy)", "Medium(loam)", "Heavy"]},
+            ("Soil", "LMH"),
+            ("soil", ["light(sandy)", "medium(loam)", "heavy"]),
             id="Soil",
         ),
     ],
 )
-def test_apply_legend(row, expected):
+def test_pfaf_model_convert(key_value, expected):
     """Applying the legend should translate a row into the expected result."""
-    result = apply_legend(row)
+    result = PFAFModel(None).convert(*key_value)
     assert result == expected
 
 
-@patch("permaculture.pfaf.all_plants")
-def test_pfaf_database_iterate(mock_all_plants):
+def test_pfaf_database_iterate():
     """Iterating over the database should return a list of elements."""
-    mock_all_plants.return_value = [
-        {
-            "Latin name": "a",
-            "Common name": "b",
-        }
-    ]
+    model = Mock(
+        all_plants=Mock(
+            return_value=[
+                {
+                    "scientific name": "a",
+                    "common name": "b",
+                }
+            ]
+        )
+    )
 
-    database = PFAFDatabase.from_config(Mock(cache_dir=""))
+    database = PFAFDatabase(model)
     elements = list(database.iterate())
     assert elements == [
         DatabaseElement(
@@ -91,8 +96,8 @@ def test_pfaf_database_iterate(mock_all_plants):
             scientific_name="a",
             common_names=["b"],
             characteristics={
-                "Latin name": "a",
-                "Common name": "b",
+                "scientific name": "a",
+                "common name": "b",
             },
         )
     ]

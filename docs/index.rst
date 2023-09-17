@@ -11,6 +11,15 @@ Welcome!
    :caption: Contents:
 
 
+Databases
+---------
+
+.. toctree::
+   :maxdepth: 2
+
+   nc
+   pfaf
+
 Books
 -----
 
@@ -31,14 +40,12 @@ method, this part of the documentation is for you.
 
    modules
 
-
 Additional Notes
 ----------------
 
 .. toctree::
    :maxdepth: 2
 
-   pfaf
    contributing
    license
    changes

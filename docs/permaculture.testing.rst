@@ -20,6 +20,14 @@ permaculture.testing.logger module
    :undoc-members:
    :show-inheritance:
 
+permaculture.testing.unique module
+----------------------------------
+
+.. automodule:: permaculture.testing.unique
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

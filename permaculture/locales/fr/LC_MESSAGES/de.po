@@ -1,0 +1,383 @@
+# Permaculture.
+# Copyright (C) 2023 Marc Tardif
+# Marc Tardif <marc@interunion.ca>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.0.0\n"
+"POT-Creation-Date: 2023-09-16 08:38-0400\n"
+"PO-Revision-Date: 2023-09-16 08:38-0400\n"
+"Last-Translator: Marc Tardif <marc@interunion.ca>\n"
+"Language-Team: Marc Tardif <marc@interunion.ca>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "Comestible"
+msgid "Fl"
+msgstr "Fleur"
+
+msgctxt "Comestible"
+msgid "Fr"
+msgstr "Fruit"
+
+msgctxt "Comestible"
+msgid "Fe"
+msgstr "Feuille"
+
+msgctxt "Comestible"
+msgid "N"
+msgstr "Noix"
+
+msgctxt "Comestible"
+msgid "G"
+msgstr "Graine"
+
+msgctxt "Comestible"
+msgid "R"
+msgstr "Racine"
+
+msgctxt "Comestible"
+msgid "S"
+msgstr "Sève"
+
+msgctxt "Comestible"
+msgid "JP"
+msgstr "Jeune pousse"
+
+msgctxt "Comestible"
+msgid "T"
+msgstr "Tige"
+
+msgctxt "Comestible"
+msgid "B"
+msgstr "Bulbe"
+
+msgctxt "Couleur de floraison"
+msgid "Rg"
+msgstr "Rouge"
+
+msgctxt "Couleur de floraison"
+msgid "Rs"
+msgstr "Rose"
+
+msgctxt "Couleur de floraison"
+msgid "B"
+msgstr "Blanc"
+
+msgctxt "Couleur de floraison"
+msgid "J"
+msgstr "Jaune"
+
+msgctxt "Couleur de floraison"
+msgid "O"
+msgstr "Orangé"
+
+msgctxt "Couleur de floraison"
+msgid "P"
+msgstr "Pourpre"
+
+msgctxt "Couleur de floraison"
+msgid "V"
+msgstr "Verte"
+
+msgctxt "Couleur de floraison"
+msgid "Br"
+msgstr "Brun"
+
+msgctxt "Couleur de floraison"
+msgid "Bl"
+msgstr "Bleu"
+
+msgctxt "Couleur de feuillage"
+msgid "V"
+msgstr "Vert"
+
+msgctxt "Couleur de feuillage"
+msgid "Po"
+msgstr "Pourpre"
+
+msgctxt "Couleur de feuillage"
+msgid "Pa"
+msgstr "Panaché"
+
+msgctxt "Couleur de feuillage"
+msgid "P"
+msgstr "Pale"
+
+msgctxt "Couleur de feuillage"
+msgid "F"
+msgstr "Foncé"
+
+msgctxt "Couleur de feuillage"
+msgid "T"
+msgstr "Tacheté"
+
+msgctxt "Couleur de feuillage"
+msgid "J"
+msgstr "Jaune"
+
+msgctxt "Eau"
+msgid "▁"
+msgstr "Peu"
+
+msgctxt "Eau"
+msgid "▅"
+msgstr "Moyen"
+
+msgctxt "Eau"
+msgid "█"
+msgstr "Beaucoup"
+
+msgctxt "Forme"
+msgid "A"
+msgstr "Arbre"
+
+msgctxt "Forme"
+msgid "Ar"
+msgstr "Arbuste"
+
+msgctxt "Forme"
+msgid "H"
+msgstr "Herbacée"
+
+msgctxt "Forme"
+msgid "G"
+msgstr "Grimpante"
+
+msgctxt "Inconvénient"
+msgid "E"
+msgstr "Expansif"
+
+msgctxt "Inconvénient"
+msgid "D"
+msgstr "Dispersif"
+
+msgctxt "Inconvénient"
+msgid "A"
+msgstr "Allergène"
+
+msgctxt "Inconvénient"
+msgid "P"
+msgstr "Poison"
+
+msgctxt "Inconvénient"
+msgid "Épi"
+msgstr "Épineux"
+
+msgctxt "Inconvénient"
+msgid "V"
+msgstr "Vigne vigoureuse"
+
+msgctxt "Inconvénient"
+msgid "B"
+msgstr "Brûlure"
+
+msgctxt "Inconvénient"
+msgid "G"
+msgstr "Grimpant invasif"
+
+msgctxt "Inconvénient"
+msgid "Pe"
+msgstr "Persistant"
+
+msgctxt "Intérêt automnale hivernal"
+msgid "A"
+msgstr "Automne"
+
+msgctxt "Intérêt automnale hivernal"
+msgid "H"
+msgstr "Hivernale"
+
+msgctxt "Lumière"
+msgid "○"
+msgstr "Plein soleil"
+
+msgctxt "Lumière"
+msgid "◐"
+msgstr "Mi-Ombre"
+
+msgctxt "Lumière"
+msgid "●"
+msgstr "Ombre"
+
+msgctxt "Multiplication"
+msgid "B"
+msgstr "Bouturage"
+
+msgctxt "Multiplication"
+msgid "M"
+msgstr "Marcottage"
+
+msgctxt "Multiplication"
+msgid "D"
+msgstr "Division"
+
+msgctxt "Multiplication"
+msgid "S"
+msgstr "Semi"
+
+msgctxt "Multiplication"
+msgid "G"
+msgstr "Greffe"
+
+msgctxt "Multiplication"
+msgid "St"
+msgstr "Stolon"
+
+msgctxt "Multiplication"
+msgid "P"
+msgstr "Printemps"
+
+msgctxt "Multiplication"
+msgid "A"
+msgstr "Automne"
+
+msgctxt "Multiplication"
+msgid "É"
+msgstr "Été"
+
+msgctxt "Multiplication"
+msgid "T"
+msgstr "Tubercule"
+
+msgctxt "Période de floraison"
+msgid "P"
+msgstr "Printemps"
+
+msgctxt "Période de floraison"
+msgid "É"
+msgstr "Été"
+
+msgctxt "Période de floraison"
+msgid "A"
+msgstr "Automne"
+
+msgctxt "Période de taille"
+msgid "AD"
+msgstr "Avant le débourement"
+
+msgctxt "Période de taille"
+msgid "AF"
+msgstr "Après la floraison"
+
+msgctxt "Période de taille"
+msgid "P"
+msgstr "Printemps"
+
+msgctxt "Période de taille"
+msgid "É"
+msgstr "Été"
+
+msgctxt "Période de taille"
+msgid "A"
+msgstr "Automne"
+
+msgctxt "Période de taille"
+msgid "T"
+msgstr "en tout temps"
+
+msgctxt "Période de taille"
+msgid "N"
+msgstr "Ne pas tailler"
+
+msgctxt "Pollinisateurs"
+msgid "S"
+msgstr "Spécialistes"
+
+msgctxt "Pollinisateurs"
+msgid "G"
+msgstr "Généralistes"
+
+msgctxt "Pollinisateurs"
+msgid "V"
+msgstr "Vent"
+
+msgctxt "Racine"
+msgid "B"
+msgstr "Bulbe"
+
+msgctxt "Racine"
+msgid "C"
+msgstr "Charnu"
+
+msgctxt "Racine"
+msgid "D"
+msgstr "Drageonnante"
+
+msgctxt "Racine"
+msgid "F"
+msgstr "Faciculé"
+
+msgctxt "Racine"
+msgid "L"
+msgstr "Latérales"
+
+msgctxt "Racine"
+msgid "P"
+msgstr "Pivotante"
+
+msgctxt "Racine"
+msgid "R"
+msgstr "Rhizome"
+
+msgctxt "Racine"
+msgid "S"
+msgstr "Superficiel"
+
+msgctxt "Racine"
+msgid "T"
+msgstr "Tubercule"
+
+msgctxt "Rythme de croissance"
+msgid "R"
+msgstr "Rapide"
+
+msgctxt "Rythme de croissance"
+msgid "M"
+msgstr "Moyen"
+
+msgctxt "Rythme de croissance"
+msgid "L"
+msgstr "Lent"
+
+msgctxt "Texture du sol"
+msgid "░"
+msgstr "Léger"
+
+msgctxt "Texture du sol"
+msgid "▒"
+msgstr "Moyen"
+
+msgctxt "Texture du sol"
+msgid "▓"
+msgstr "Lourd"
+
+msgctxt "Texture du sol"
+msgid "O"
+msgstr "Aquatique"
+
+msgctxt "Utilisation écologique"
+msgid "BR"
+msgstr "Bande Riveraine"
+
+msgctxt "Utilisation écologique"
+msgid "P"
+msgstr "Pentes"
+
+msgctxt "Utilisation écologique"
+msgid "Z"
+msgstr "Zone innondable"
+
+msgctxt "Vie sauvage"
+msgid "N"
+msgstr "Nourriture"
+
+msgctxt "Vie sauvage"
+msgid "A"
+msgstr "Abris"
+
+msgctxt "Vie sauvage"
+msgid "NA"
+msgstr "Nourriture et Abris"
+

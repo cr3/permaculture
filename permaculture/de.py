@@ -3,6 +3,7 @@
 import logging
 import re
 from csv import reader
+from functools import partial
 from io import StringIO
 
 from attrs import define, field
@@ -12,24 +13,23 @@ from yarl import URL
 from permaculture.database import DatabaseElement, DatabaseIterablePlugin
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPClient
+from permaculture.locales import Locales
 
 logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
-class DE:
+class DEWeb:
     """Design Ecologique web interface."""
 
     client: HTTPClient = field()
     _cache_dir = field(default=None)
 
-    @classmethod
-    def from_url(cls, url: URL, cache_dir=None):
-        """Instantiate Design Ecologique from URL."""
-        client = HTTPClient(url).with_cache(cache_dir)
-        return cls(client, cache_dir)
+    def perenial_plants_list(self):
+        """List of perenial plants useful for permaculture in Quebec.
 
-    def perenial_plants(self):
+        :returns: Google spreadsheet with plants.
+        """
         response = self.client.get("/liste-de-plantes-vivaces/")
         soup = BeautifulSoup(response.text, "html.parser")
         element = soup.select_one("a[href*=spreadsheets]")
@@ -40,175 +40,88 @@ class DE:
         return GoogleSpreadsheet.from_url(url, self._cache_dir)
 
 
-def apply_legend(row):
-    legend = {
-        "Comestible": {
-            "Fl": "Fleur",
-            "Fr": "Fruit",
-            "Fe": "Feuille",
-            "N": "Noix",
-            "G": "Graine",
-            "R": "Racine",
-            "S": "Sève",
-            "JP": "Jeune pousse",
-            "T": "Tige",
-            "B": "Bulbe",
-        },
-        "Couleur de floraison": {
-            "Rg": "Rouge",
-            "Rs": "Rose",
-            "B": "Blanc",
-            "J": "Jaune",
-            "O": "Orangé",
-            "P": "Pourpre",
-            "V": "Verte",
-            "Br": "Brun",
-            "Bl": "Bleu",
-        },
-        "Couleur de feuillage": {
-            "V": "Vert",
-            "Po": "Pourpre",
-            "Pa": "Panaché",
-            "P": "Pale",
-            "F": "Foncé",
-            "T": "Tacheté",
-            "J": "Jaune",
-        },
-        "Eau": {
-            "▁": "Peu",
-            "▅": "Moyen",
-            "█": "Beaucoup",
-        },
-        "Forme": {
-            "A": "Arbre",
-            "Ar": "Arbuste",
-            "H": "Herbacée",
-            "G": "Grimpante",
-        },
-        "Inconvénient": {
-            "E": "Expansif",
-            "D": "Dispersif",
-            "A": "Allergène",
-            "P": "Poison",
-            "Épi": "Épineux",
-            "V": "Vigne vigoureuse",
-            "B": "Brûlure",
-            "G": "Grimpant invasif",
-            "Pe": "Persistant",
-        },
-        "Intérêt automnale hivernal": {
-            "A": "Automne",
-            "H": "Hivernale",
-        },
-        "Lumière": {
-            "○": "Plein soleil",
-            "◐": "Mi-Ombre",
-            "●": "Ombre",
-        },
-        "Multiplication": {
-            "B": "Bouturage",
-            "M": "Marcottage",
-            "D": "Division",
-            "S": "Semi",
-            "G": "Greffe",
-            "St": "Stolon",
-            "P": "Printemps",
-            "A": "Automne",
-            "É": "Été",
-            "T": "Tubercule",
-        },
-        "Période de floraison": {
-            "P": "Printemps",
-            "É": "Été",
-            "A": "Automne",
-        },
-        "Période de taille": {
-            "AD": "Avant le débourement",
-            "AF": "Après la floraison",
-            "P": "Printemps",
-            "É": "Été",
-            "A": "Automne",
-            "T": "en tout temps",
-            "N": "Ne pas tailler",
-        },
-        "Pollinisateurs": {
-            "S": "Spécialistes",
-            "G": "Généralistes",
-            "V": "Vent",
-        },
-        "Racine": {
-            "B": "Bulbe",
-            "C": "Charnu",
-            "D": "Drageonnante",
-            "F": "Faciculé",
-            "L": "Latérales",
-            "P": "Pivotante",
-            "R": "Rhizome",
-            "S": "Superficiel",
-            "T": "Tubercule",
-        },
-        "Rythme de croissance": {
-            "R": "Rapide",
-            "M": "Moyen",
-            "L": "Lent",
-        },
-        "Texture du sol": {
-            "░": "Léger",
-            "▒": "Moyen",
-            "▓": "Lourd",
-            "O": "Aquatique",
-        },
-        "Utilisation écologique": {
-            "BR": "Bande Riveraine",
-            "P": "Pentes",
-            "Z": "Zone innondable",
-        },
-        "Vie sauvage": {
-            "N": "Nourriture",
-            "A": "Abris",
-            "NA": "Nourriture et Abris",
-        },
-    }
-    for k, v in legend.items():
-        if k in row:
-            old_value = row[k]
-            new_value = [v.get(x, x) for x in re.split(r",?\s+", old_value)]
+@define(frozen=True)
+class DEModel:
+    web: DEWeb = field()
+    locales: Locales = field(factory=partial(Locales.from_domain, "de"))
+
+    @classmethod
+    def from_url(cls, url: URL, cache_dir=None):
+        """Instantiate a Design Ecologique model from URL."""
+        client = HTTPClient(url).with_cache(cache_dir)
+        web = DEWeb(client)
+        return cls(web)
+
+    def convert(self, key, value):
+        def to_range(v):
+            v = v.replace(",", ".").strip()
+            if re.match(r"\d+", v):
+                return [float(x) for x in re.split("\\s*[\u2013-]\\s*", v)]
+            else:
+                return []
+
+        def to_str(old_value):
+            return self.locales.translate(old_value, key)
+
+        def to_list(old_value):
+            new_value = [to_str(v) for v in re.split(r",?\s+", old_value)]
             if len(new_value) == 1 and new_value[0] == old_value:
-                new_value = [v.get(x, x) for x in old_value]
+                new_value = [to_str(v) for v in old_value]
 
-            row[k] = new_value
-        else:
-            logger.warning("%(key)r not found in data", {"key": k})
+            return new_value
 
-    return row
+        types = {
+            "Comestible": to_list,
+            "Couleur de feuillage": to_list,
+            "Couleur de floraison": to_list,
+            "Eau": to_list,
+            "Forme": to_list,
+            "Inconvénient": to_list,
+            "Intérêt automnale hivernal": to_list,
+            "Lumière": to_list,
+            "Multiplication": to_list,
+            "Pollinisateurs": to_list,
+            "Période de floraison": to_list,
+            "Période de taille": to_list,
+            "Racine": to_list,
+            "Rythme de croissance": to_list,
+            "Texture du sol": to_list,
+            "Utilisation écologique": to_list,
+            "Vie sauvage": to_list,
+            "Hauteur(m)": to_range,
+            "Largeur(m)": to_range,
+        }
+        new_value = types.get(key, to_str)(value)
+        return to_str(key), new_value
 
-
-def all_perenial_plants(de):
-    data = de.perenial_plants().export(0)
-    csv = reader(StringIO(data))
-    next(csv)  # Skip groups
-    header = [h.strip() for h in next(csv)]
-    rows = (dict(zip(header, plant, strict=True)) for plant in csv)
-    return [apply_legend(row) for row in rows]
+    def get_perenial_plants(self):
+        data = self.web.perenial_plants_list().export(0)
+        csv = reader(StringIO(data))
+        next(csv)  # Skip groups
+        header = [h.strip() for h in next(csv)]
+        for row in csv:
+            yield dict(
+                self.convert(k, v) for k, v in zip(header, row, strict=True)
+            )
 
 
 @define(frozen=True)
 class DEDatabase(DatabaseIterablePlugin):
-    de: DE
+    model: DEModel
 
     @classmethod
     def from_config(cls, config):
-        de = DE.from_url(
+        model = DEModel.from_url(
             "https://designecologique.ca",
             config.cache_dir,
         )
-        return cls(de)
+        return cls(model)
 
     def iterate(self):
-        for p in all_perenial_plants(self.de):
+        for p in self.model.get_perenial_plants():
             yield DatabaseElement(
                 "DE",
-                f"{p['Genre']} {p['Espèce']}",
-                [p["Nom Anglais"], p["Nom français"]],
+                f"{p['genus']} {p['species']}",
+                [p["common name"]],
                 p,
             )

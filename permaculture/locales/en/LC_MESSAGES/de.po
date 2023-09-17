@@ -1,0 +1,467 @@
+# Permaculture.
+# Copyright (C) 2023 Marc Tardif
+# Marc Tardif <marc@interunion.ca>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.0.0\n"
+"POT-Creation-Date: 2023-09-16 08:38-0400\n"
+"PO-Revision-Date: 2023-09-16 08:38-0400\n"
+"Last-Translator: Marc Tardif <marc@interunion.ca>\n"
+"Language-Team: Marc Tardif <marc@interunion.ca>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#  Accumulateur de Nutriments: '*'
+
+msgid "Comestible"
+msgstr "edible uses"
+
+msgid "Couleur de feuillage"
+msgstr "foliage color"
+
+msgid "Couleur de floraison"
+msgstr "flower color"
+
+#  Couvre-sol: '*'
+#  Cultivars intéressants: ''
+
+msgid "Eau"
+msgstr "moisture"
+
+msgid "Espèce"
+msgstr "species"
+
+msgid "Fixateur Azote"
+msgstr "nitrogen fixer"
+
+msgid "Forme"
+msgstr "shape"
+
+msgid "Genre"
+msgstr "genus"
+
+#  Haie: X
+
+msgid "Hauteur(m)"
+msgstr "height"
+
+#  Inconvénient:
+#  Intérêt automnale hivernal:
+
+msgid "Largeur(m)"
+msgstr "spread"
+
+#  Lien Information: ''
+
+msgid "Lumière"
+msgstr "sun"
+
+msgid "Medicinal"
+msgstr "medicinal"
+
+#  Multiplication:
+
+msgid "Nom Anglais"
+msgstr "common name"
+
+msgid "Nom français"
+msgstr "common name"
+
+#  Où peut-on la trouver?: ''
+
+msgid "Pollinisateurs"
+msgstr "pollinators"
+
+msgid "Période de floraison"
+msgstr "blooming period"
+
+msgid "Période de taille"
+msgstr "pruning period"
+
+msgid "Racine"
+msgstr "root type"
+
+msgid "Rythme de croissance"
+msgstr "growth rate"
+
+msgid "Texture du sol"
+msgstr "soil"
+
+msgid "Utilisation écologique"
+msgstr "ecological use"
+
+msgid "Vie sauvage"
+msgstr "wildlife"
+
+#  Zone de rusticité: '2'
+#  pH (Min-Max): 5 – 6,5
+
+msgctxt "Comestible"
+msgid "Fl"
+msgstr "flower"
+
+msgctxt "Comestible"
+msgid "Fr"
+msgstr "fruit"
+
+msgctxt "Comestible"
+msgid "Fe"
+msgstr "leaf"
+
+msgctxt "Comestible"
+msgid "N"
+msgstr "nut"
+
+msgctxt "Comestible"
+msgid "G"
+msgstr "seed"
+
+msgctxt "Comestible"
+msgid "R"
+msgstr "root"
+
+msgctxt "Comestible"
+msgid "S"
+msgstr "sap"
+
+msgctxt "Comestible"
+msgid "JP"
+msgstr "young shoot"
+
+msgctxt "Comestible"
+msgid "T"
+msgstr "stem"
+
+msgctxt "Comestible"
+msgid "B"
+msgstr "bulb"
+
+msgctxt "Couleur de feuillage"
+msgid "V"
+msgstr "green"
+
+msgctxt "Couleur de feuillage"
+msgid "Po"
+msgstr "purple"
+
+msgctxt "Couleur de feuillage"
+msgid "Pa"
+msgstr "variegated"
+
+msgctxt "Couleur de feuillage"
+msgid "P"
+msgstr "pale"
+
+msgctxt "Couleur de feuillage"
+msgid "F"
+msgstr "dark"
+
+msgctxt "Couleur de feuillage"
+msgid "T"
+msgstr "spotted"
+
+msgctxt "Couleur de feuillage"
+msgid "J"
+msgstr "yellow"
+
+msgctxt "Couleur de floraison"
+msgid "Rg"
+msgstr "red"
+
+msgctxt "Couleur de floraison"
+msgid "Rs"
+msgstr "pink"
+
+msgctxt "Couleur de floraison"
+msgid "B"
+msgstr "white"
+
+msgctxt "Couleur de floraison"
+msgid "J"
+msgstr "yellow"
+
+msgctxt "Couleur de floraison"
+msgid "O"
+msgstr "orange"
+
+msgctxt "Couleur de floraison"
+msgid "P"
+msgstr "purple"
+
+msgctxt "Couleur de floraison"
+msgid "V"
+msgstr "green"
+
+msgctxt "Couleur de floraison"
+msgid "Br"
+msgstr "brown"
+
+msgctxt "Couleur de floraison"
+msgid "Bl"
+msgstr "blue"
+
+msgctxt "Eau"
+msgid "▁"
+msgstr "dry"
+
+msgctxt "Eau"
+msgid "▅"
+msgstr "moderate"
+
+msgctxt "Eau"
+msgid "█"
+msgstr "wet"
+
+msgctxt "Forme"
+msgid "A"
+msgstr "tree"
+
+msgctxt "Forme"
+msgid "Ar"
+msgstr "shrub"
+
+msgctxt "Forme"
+msgid "H"
+msgstr "herbaceous"
+
+msgctxt "Forme"
+msgid "G"
+msgstr "vine"
+
+msgctxt "Inconvénient"
+msgid "E"
+msgstr "expansive"
+
+msgctxt "Inconvénient"
+msgid "D"
+msgstr "dispersive"
+
+msgctxt "Inconvénient"
+msgid "A"
+msgstr "allergen"
+
+msgctxt "Inconvénient"
+msgid "P"
+msgstr "poison"
+
+msgctxt "Inconvénient"
+msgid "Épi"
+msgstr "thorny"
+
+msgctxt "Inconvénient"
+msgid "V"
+msgstr "vigorous"
+
+msgctxt "Inconvénient"
+msgid "B"
+msgstr "burns"
+
+msgctxt "Inconvénient"
+msgid "G"
+msgstr "invasive"
+
+msgctxt "Inconvénient"
+msgid "Pe"
+msgstr "persistent"
+
+msgctxt "Intérêt automnale hivernal"
+msgid "A"
+msgstr "autumn"
+
+msgctxt "Intérêt automnale hivernal"
+msgid "H"
+msgstr "winter"
+
+msgctxt "Lumière"
+msgid "○"
+msgstr "full sun"
+
+msgctxt "Lumière"
+msgid "◐"
+msgstr "partial shade"
+
+msgctxt "Lumière"
+msgid "●"
+msgstr "shade"
+
+msgctxt "Multiplication"
+msgid "B"
+msgstr "cuttings"
+
+msgctxt "Multiplication"
+msgid "M"
+msgstr "layering"
+
+msgctxt "Multiplication"
+msgid "D"
+msgstr "division"
+
+msgctxt "Multiplication"
+msgid "S"
+msgstr "seeds"
+
+msgctxt "Multiplication"
+msgid "G"
+msgstr "graft"
+
+msgctxt "Multiplication"
+msgid "St"
+msgstr "stolon"
+
+msgctxt "Multiplication"
+msgid "P"
+msgstr "spring"
+
+msgctxt "Multiplication"
+msgid "A"
+msgstr "autumn"
+
+msgctxt "Multiplication"
+msgid "É"
+msgstr "summer"
+
+msgctxt "Multiplication"
+msgid "T"
+msgstr "tuber"
+
+msgctxt "Période de floraison"
+msgid "P"
+msgstr "spring"
+
+msgctxt "Période de floraison"
+msgid "É"
+msgstr "summer"
+
+msgctxt "Période de floraison"
+msgid "A"
+msgstr "autumn"
+
+msgctxt "Période de taille"
+msgid "AD"
+msgstr "before budburst"
+
+msgctxt "Période de taille"
+msgid "AF"
+msgstr "after flowering"
+
+msgctxt "Période de taille"
+msgid "P"
+msgstr "spring"
+
+msgctxt "Période de taille"
+msgid "É"
+msgstr "summer"
+
+msgctxt "Période de taille"
+msgid "A"
+msgstr "autumn"
+
+msgctxt "Période de taille"
+msgid "T"
+msgstr "at all times"
+
+msgctxt "Période de taille"
+msgid "N"
+msgstr "never prune"
+
+msgctxt "Pollinisateurs"
+msgid "S"
+msgstr "specialists"
+
+msgctxt "Pollinisateurs"
+msgid "G"
+msgstr "generalists"
+
+msgctxt "Pollinisateurs"
+msgid "V"
+msgstr "wind"
+
+msgctxt "Racine"
+msgid "B"
+msgstr "bulb"
+
+msgctxt "Racine"
+msgid "C"
+msgstr "fleshy"
+
+msgctxt "Racine"
+msgid "D"
+msgstr "suckering"
+
+msgctxt "Racine"
+msgid "F"
+msgstr "fasciculated"
+
+msgctxt "Racine"
+msgid "L"
+msgstr "lateral"
+
+msgctxt "Racine"
+msgid "P"
+msgstr "taproot"
+
+msgctxt "Racine"
+msgid "R"
+msgstr "rhizome"
+
+msgctxt "Racine"
+msgid "S"
+msgstr "superficial"
+
+msgctxt "Racine"
+msgid "T"
+msgstr "tuber"
+
+msgctxt "Rythme de croissance"
+msgid "R"
+msgstr "fast"
+
+msgctxt "Rythme de croissance"
+msgid "M"
+msgstr "medium"
+
+msgctxt "Rythme de croissance"
+msgid "L"
+msgstr "slow"
+
+msgctxt "Texture du sol"
+msgid "░"
+msgstr "light"
+
+msgctxt "Texture du sol"
+msgid "▒"
+msgstr "medium"
+
+msgctxt "Texture du sol"
+msgid "▓"
+msgstr "heavy"
+
+msgctxt "Texture du sol"
+msgid "O"
+msgstr "aquatic"
+
+msgctxt "Utilisation écologique"
+msgid "BR"
+msgstr "riparian strip"
+
+msgctxt "Utilisation écologique"
+msgid "P"
+msgstr "slopes"
+
+msgctxt "Utilisation écologique"
+msgid "Z"
+msgstr "flood zone"
+
+msgctxt "Vie sauvage"
+msgid "N"
+msgstr "food"
+
+msgctxt "Vie sauvage"
+msgid "A"
+msgstr "shelter"
+
+msgctxt "Vie sauvage"
+msgid "NA"
+msgstr "food and shelter"

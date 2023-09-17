@@ -3,13 +3,18 @@ VENV := .venv
 PYTHON := poetry run python
 TOUCH := $(PYTHON) -c 'import sys; from pathlib import Path; Path(sys.argv[1]).touch()'
 
+# Find all the .po we want to format into .mo files.
+PO_FILES := $(shell find permaculture/locales -name '*.po')
+MO_FILES := $(PO_FILES:.po=.mo)
+
+%.mo: %.po
+	poetry run scripts/msgfmt.py --output-file $@ $^
+
 poetry.lock: pyproject.toml
 	poetry lock
 
-# Build venv with both conda and python deps.
-$(VENV): environment.yml
-	@echo Installing Conda environment
-	@conda env update --prefix $@ --prune --file $^
+# Build venv with python deps.
+$(VENV): $(MO_FILES)
 	@echo Installing Poetry environment
 	@poetry install
 	@$(TOUCH) $@
@@ -43,7 +48,7 @@ docs: $(VENV)
 	@poetry run sphinx-build -W -d build/doctrees docs build/html
 
 .PHONY: build
-build:
+build: $(MO_FILES)
 	@echo Creating wheel file
 	@poetry build
 
