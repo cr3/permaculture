@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   permaculture.locales
    permaculture.testing
 
 Submodules
@@ -28,6 +29,14 @@ permaculture.command module
    :undoc-members:
    :show-inheritance:
 
+permaculture.database module
+----------------------------
+
+.. automodule:: permaculture.database
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.de module
 ----------------------
 
@@ -44,14 +53,6 @@ permaculture.google module
    :undoc-members:
    :show-inheritance:
 
-permaculture.html module
-------------------------
-
-.. automodule:: permaculture.html
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 permaculture.http module
 ------------------------
 
@@ -60,18 +61,18 @@ permaculture.http module
    :undoc-members:
    :show-inheritance:
 
-permaculture.iterator module
-----------------------------
-
-.. automodule:: permaculture.iterator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 permaculture.logger module
 --------------------------
 
 .. automodule:: permaculture.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.nc module
+----------------------
+
+.. automodule:: permaculture.nc
    :members:
    :undoc-members:
    :show-inheritance:

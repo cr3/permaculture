@@ -59,6 +59,22 @@ def test_make_config_parser_files(tmpdir):
     assert config.log_level == logging.DEBUG
 
 
+def test_main_store(tmpdir):
+    """Storing a file should create a key under the cache directory."""
+    cache_dir = tmpdir.join("cache-dir")
+    file = tmpdir.join("file").ensure()
+    main(
+        [
+            f"--cache-dir={cache_dir}",
+            "--log-level=debug",
+            "store",
+            "key",
+            str(file),
+        ]
+    )
+    assert cache_dir.join("key").exists()
+
+
 @patch("sys.stdout")
 def test_main_help(stdout):
     """The main function should output usage when asked for --help."""

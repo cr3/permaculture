@@ -25,7 +25,8 @@ class SerializerAction(SingleAction):
 
     def __init__(self, option_strings, registry=None, **kwargs):
         """Initializer serializer defaults."""
-        kwargs.setdefault("default", self.get_serializer())
+        default = kwargs.pop("default", "application/x-yaml")
+        kwargs.setdefault("default", self.get_serializer(default))
         kwargs.setdefault("metavar", self.metavar)
         kwargs.setdefault(
             "help", "serializer content-type (default application/x-yaml)"
@@ -39,7 +40,7 @@ class SerializerAction(SingleAction):
         super().__call__(parser, namespace, serializer, option_string)
 
     @classmethod
-    def get_serializer(cls, content_type="application/x-yaml"):
+    def get_serializer(cls, content_type):
         """Get a serializer with a default content-type."""
         return Serializer.load(content_type)
 

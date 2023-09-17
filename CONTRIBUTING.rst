@@ -54,7 +54,6 @@ Setting up
 -   Download and install:
 
     - `Git`_
-    - `Miniconda`_ - Check the box "Add to PATH environment variable"
 
 -   Make sure you have a `GitHub account`_.
 -   Configure git with your `username`_ and `email`_.
@@ -95,25 +94,12 @@ Setting up
         > make setup
 
 .. _git: https://git-scm.com/download/win
-.. _miniconda: https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
 .. _username: https://docs.github.com/en/github/using-git/setting-your-username-in-git
 .. _email: https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/setting-your-commit-email-address
 .. _GitHub account: https://github.com/join
 .. _Generate new token (classic): https://github.com/settings/tokens
 .. _Clone: https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#step-2-create-a-local-clone-of-your-fork
 
-
-Troubleshooting
----------------
-
--   .. code-block:: text
-
-        Solving environment: failed
-
-        ResolvePackageNotFound:
-          - python=3.11
-
-    The cache is probably corrupt - run ``conda clean -a``.
 
 Starting to code
 ----------------

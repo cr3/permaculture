@@ -199,6 +199,9 @@ def test_http_cache_with_query_string(http_cache):
 
     assert not http_cache.store(resp)
 
+    cached_resp = http_cache.handle_304(resp)
+    assert cached_resp is None
+
 
 def test_http_cache_with_query_inside_max_age(http_cache):
     """
@@ -325,7 +328,7 @@ def test_http_cache_all_retrieve_overwrite_responses(http_cache_all):
     assert not http_cache_all.retrieve(req)
 
 
-def test_http_cache_all_can_retrieve_all_responses(http_cache_all):
+def test_http_cache_all_retrieve_all_responses(http_cache_all):
     """The HTTP cache can retrieve all responses."""
     req = StubRequestsPreparedRequest()
     resp = StubRequestsResponse(200, request=req)
@@ -334,7 +337,7 @@ def test_http_cache_all_can_retrieve_all_responses(http_cache_all):
     assert http_cache_all.retrieve(req) is resp
 
 
-def test_http_cache_all_can_retrieve_304_responses(http_cache_all):
+def test_http_cache_all_handle_304(http_cache_all):
     """The HTTP cache can retrieve responses on 304."""
     req = StubRequestsPreparedRequest()
     resp = StubRequestsResponse(200, request=req)

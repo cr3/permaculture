@@ -5,6 +5,9 @@ description = "Permaculture design toolkit"
 authors = ["Marc Tardif"]
 readme = "README.rst"
 repository = "https://github.com/cr3/permaculture"
+include = [
+  "permaculture/locales/*/LC_MESSAGES/*.mo",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -46,8 +49,9 @@ sphinx-rtd-theme = "^1.2.0"
 permaculture = "permaculture.testing.fixtures"
 
 [tool.poetry.plugins."permaculture.databases"]
-"usda" = "permaculture.usda:USDAPlantsDatabase"
+"usda" = "permaculture.usda:USDADatabase"
 "de" = "permaculture.de:DEDatabase"
+"nc" = "permaculture.nc:NCDatabase"
 "pfaf" = "permaculture.pfaf:PFAFDatabase"
 
 [tool.poetry.plugins."permaculture.serializers"]

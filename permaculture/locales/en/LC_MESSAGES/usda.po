@@ -1,0 +1,132 @@
+# Permaculture.
+# Copyright (C) 2023 Marc Tardif
+# Marc Tardif <marc@interunion.ca>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.0.0\n"
+"POT-Creation-Date: 2023-09-16 08:38-0400\n"
+"PO-Revision-Date: 2023-09-16 08:38-0400\n"
+"Last-Translator: Marc Tardif <marc@interunion.ca>\n"
+"Language-Team: Marc Tardif <marc@interunion.ca>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "AcceptedId"
+msgstr "accepted id"
+
+msgid "CommonName"
+msgstr "common name"
+
+msgid "FactSheetUrls"
+msgstr "fact sheet urls"
+
+msgid "GrowthHabits"
+msgstr "growth habits"
+
+msgid "HasCharacteristics"
+msgstr "has characteristics"
+
+msgid "HasDistributionData"
+msgstr "has distribution data"
+
+msgid "HasDocumentation"
+msgstr "has documentation"
+
+msgid "HasEthnobotany"
+msgstr "has ethnobotany"
+
+msgid "HasImages"
+msgstr "has images"
+
+msgid "HasInvasiveStatuses"
+msgstr "has invasive statuses"
+
+msgid "HasLegalStatuses"
+msgstr "has legal statuses"
+
+msgid "HasNoxiousStatuses"
+msgstr "has noxious statuses"
+
+msgid "HasPollinator"
+msgstr "has pollinator"
+
+msgid "HasRelatedLinks"
+msgstr "has related links"
+
+msgid "HasSubordinateTaxa"
+msgstr "has subordinate taxa"
+
+msgid "HasSynonyms"
+msgstr "has synonyms"
+
+msgid "HasWetlandData"
+msgstr "has wetland data"
+
+msgid "HasWildlife"
+msgstr "has wildlife"
+
+msgid "ImageId"
+msgstr "image id"
+
+msgid "InvasiveStatuses"
+msgstr "invasive statuses"
+
+msgid "LegalStatuses"
+msgstr "legal statuses"
+
+msgid "MapCoordinates"
+msgstr "map coordinates"
+
+msgid "NativeStatuses"
+msgstr "native statuses"
+
+msgid "NoxiousStatuses"
+msgstr "noxious statuses"
+
+msgid "NumImages"
+msgstr "num images"
+
+msgid "OtherCommonNames"
+msgstr "other common names"
+
+msgid "PlantGuideUrls"
+msgstr "plant guide urls"
+
+msgid "PlantLocationId"
+msgstr "plant location id"
+
+msgid "PlantNotes"
+msgstr "plant notes"
+
+msgid "PlantsDistributionResults"
+msgstr "plants distribution results"
+
+msgid "ProfileImageFilename"
+msgstr "profile image filename"
+
+msgid "ProtectedStatuses"
+msgstr "protected statuses"
+
+msgid "RankId"
+msgstr "rank id"
+
+msgid "RelatedLinks"
+msgstr "related links"
+
+msgid "ScientificName"
+msgstr "scientific name"
+
+msgid "ScientificNameComponents"
+msgstr "scientific name components"
+
+msgid "ScientificSort"
+msgstr "scientific sort"
+
+msgid "SubordinateTaxa"
+msgstr "subordinate taxa"
+
+msgid "WetlandData"
+msgstr "wetland data"
+

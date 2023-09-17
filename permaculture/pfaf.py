@@ -1,24 +1,21 @@
 """Plants For A Future database."""
 
 import logging
+from functools import partial
 
 import xlrd
-from attrs import define
+from attrs import define, field
 
 from permaculture.database import DatabaseElement, DatabaseIterablePlugin
+from permaculture.locales import Locales
 from permaculture.storage import FileStorage
 
 logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
-class PFAF:
+class PFAFFile:
     storage: FileStorage
-
-    @classmethod
-    def from_cache_dir(cls, cache_dir):
-        storage = FileStorage(cache_dir)
-        return cls(storage)
 
     def main_database(self):
         path = self.storage.key_to_path("plants-for-a-future")
@@ -26,63 +23,63 @@ class PFAF:
         return wb.sheet_by_name("MAIN DATABASE")
 
 
-def apply_legend(row):
-    legend = {
-        "Deciduous/Evergreen": {
-            "D": "Deciduous",
-            "E": "Evergreen",
-        },
-        "pH": {
-            "A": "Acid",
-            "N": "Neutral",
-            "B": "Base/Alkaline",
-        },
-        "Shade": {
-            "F": "Full",
-            "S": "Semi",
-            "N": "None",
-        },
-        "Soil": {
-            "L": "Light(sandy)",
-            "M": "Medium(loam)",
-            "H": "Heavy",
-        },
-    }
-    for k, v in legend.items():
-        if k in row:
-            row[k] = [v.get(x, x) for x in row[k]]
-        else:
-            logger.warning("%(key)r not found in data", {"key": k})
+@define(frozen=True)
+class PFAFModel:
+    file: PFAFFile
+    locales: Locales = field(factory=partial(Locales.from_domain, "pfaf"))
 
-    return row
+    @classmethod
+    def from_cache_dir(cls, cache_dir):
+        storage = FileStorage(cache_dir)
+        file = PFAFFile(storage)
+        return cls(file)
 
+    def convert(self, key, value):
+        def to_list(old_value):
+            return [to_str(v) for v in old_value]
 
-def all_plants(pfaf):
-    try:
-        ws = pfaf.main_database()
-    except FileNotFoundError:
-        return []
+        def to_str(old_value):
+            return self.locales.translate(old_value, key).lower()
 
-    rows = ws.get_rows()
-    header = [h.value for h in next(rows)]
-    rows = (
-        dict(zip(header, [c.value for c in cells], strict=True))
-        for cells in rows
-    )
-    return [apply_legend(row) for row in rows]
+        types = {
+            "Deciduous/Evergreen": to_list,
+            "pH": to_list,
+            "Shade": to_list,
+            "Soil": to_list,
+        }
+        if isinstance(value, str):
+            value = types.get(key, to_str)(value)
+        return to_str(key), value
+
+    def all_plants(self):
+        try:
+            ws = self.file.main_database()
+        except FileNotFoundError:
+            return []
+
+        rows = ws.get_rows()
+        header = [h.value for h in next(rows)]
+        for row in rows:
+            yield dict(
+                self.convert(k, v.value)
+                for k, v in zip(header, row, strict=True)
+            )
 
 
 @define(frozen=True)
 class PFAFDatabase(DatabaseIterablePlugin):
-    pfaf: PFAF
+    model: PFAFModel
 
     @classmethod
     def from_config(cls, config):
-        pfaf = PFAF.from_cache_dir(config.cache_dir)
-        return cls(pfaf)
+        model = PFAFModel.from_cache_dir(config.cache_dir)
+        return cls(model)
 
     def iterate(self):
-        for p in all_plants(self.pfaf):
+        for p in self.model.all_plants():
             yield DatabaseElement(
-                "PFAF", p["Latin name"], [p["Common name"]], p
+                "PFAF",
+                p["scientific name"],
+                [p["common name"]],
+                p,
             )
