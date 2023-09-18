@@ -55,7 +55,7 @@ class DatabaseIterablePlugin(DatabasePlugin):
 
 @define(frozen=True)
 class Database:
-    _databases: dict[str, DatabasePlugin]
+    databases: dict[str, DatabasePlugin]
 
     @classmethod
     def load(cls, config=None, registry=None):
@@ -66,21 +66,22 @@ class Database:
         databases = {
             k: v.from_config(config)
             for k, v in registry.get("databases", {}).items()
+            if not config.database or config.database.lower() == k
         }
 
         return cls(databases)
 
-    def search(self, common_name: str):
-        """Search for the scientific name by common name in all databases."""
-        for database in self._databases.values():
-            yield from database.search(common_name)
-
     def lookup(self, scientific_name: str):
         """Lookup characteristics by scientific name in all databases."""
         not_found = True
-        for database in self._databases.values():
+        for database in self.databases.values():
             not_found = False
             yield from database.lookup(scientific_name)
 
         if not_found:
             raise DatabaseElementNotFound(scientific_name)
+
+    def search(self, common_name: str):
+        """Search for the scientific name by common name in all databases."""
+        for database in self.databases.values():
+            yield from database.search(common_name)
