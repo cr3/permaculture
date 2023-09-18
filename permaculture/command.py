@@ -77,6 +77,7 @@ def make_config_parser(config_files):
         default=user_cache_dir("permaculture"),
         help="cache HTTP requests to directory (default %(default)s)",
     )
+    config.add_argument("--database", help="filter on a database")
     config.add_argument(
         "--log-file",
         action=LoggerHandlerAction,
