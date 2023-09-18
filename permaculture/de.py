@@ -47,7 +47,7 @@ class DEModel:
     def from_url(cls, url: URL, cache_dir=None):
         """Instantiate a Design Ecologique model from URL."""
         session = HTTPSession(url).with_cache(cache_dir)
-        web = DEWeb(session)
+        web = DEWeb(session, cache_dir)
         return cls(web)
 
     def convert(self, key, value):
