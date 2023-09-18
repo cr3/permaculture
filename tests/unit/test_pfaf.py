@@ -7,6 +7,7 @@ import pytest
 
 from permaculture.database import DatabaseElement
 from permaculture.pfaf import (
+    PFAFConverter,
     PFAFDatabase,
     PFAFFile,
     PFAFModel,
@@ -31,58 +32,103 @@ def test_pfaf_web_main_database_error(tmpdir):
         file.main_database()
 
 
+def test_pfaf_converter_convert_ignore():
+    """Converting an ignore item should return an empty list."""
+    result = PFAFConverter().convert_ignore("key", "value")
+    assert result == []
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("key", "string"),
+            [("key", "string")],
+            id="string",
+        ),
+        pytest.param(
+            ("key", 1),
+            [("key", 1)],
+            id="int",
+        ),
+    ],
+)
+def test_pfaf_converter_convert_string(item, expected):
+    """Converting a string should not convert other types."""
+    result = PFAFConverter().convert_string(*item)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("Deciduous/Evergreen", "DE"),
+            [
+                ("deciduous/evergreen/deciduous", True),
+                ("deciduous/evergreen/evergreen", True),
+            ],
+            id="Deciduous/Evergreen",
+        ),
+        pytest.param(
+            ("Growth rate", "SMF"),
+            [
+                ("growth rate/slow", True),
+                ("growth rate/medium", True),
+                ("growth rate/fast", True),
+            ],
+            id="Growth rate",
+        ),
+        pytest.param(
+            ("Moisture", "DMWeWa"),
+            [
+                ("moisture/dry", True),
+                ("moisture/moist", True),
+                ("moisture/wet", True),
+                ("moisture/water", True),
+            ],
+            id="Moisture",
+        ),
+        pytest.param(
+            ("pH", "ANB"),
+            [
+                ("ph/acid", True),
+                ("ph/neutral", True),
+                ("ph/base/alkaline", True),
+            ],
+            id="pH",
+        ),
+        pytest.param(
+            ("Shade", "FSN"),
+            [
+                ("shade/full", True),
+                ("shade/semi", True),
+                ("shade/none", True),
+            ],
+            id="Shade",
+        ),
+        pytest.param(
+            ("Soil", "LMH"),
+            [
+                ("soil/light", True),
+                ("soil/medium", True),
+                ("soil/heavy", True),
+            ],
+            id="Soil",
+        ),
+    ],
+)
+def test_pfaf_converter_convert_item(item, expected):
+    """Converting an item should consider types."""
+    result = PFAFConverter().convert_item(*item)
+    assert result == expected
+
+
 def test_pfaf_model_all_plants_error(tmpdir):
     """All plants should return no plant when file not found."""
     model = PFAFModel.from_cache_dir(tmpdir)
     plants = list(model.all_plants())
     assert plants == []
-
-
-@pytest.mark.parametrize(
-    "key_value, expected",
-    [
-        pytest.param(
-            ("Deciduous/Evergreen", "DE"),
-            (
-                "deciduous/evergreen",
-                [
-                    "deciduous",
-                    "evergreen",
-                ],
-            ),
-            id="Deciduous/Evergreen",
-        ),
-        pytest.param(
-            ("Growth rate", "SMF"),
-            ("growth rate", ["slow", "medium", "fast"]),
-            id="Growth rate",
-        ),
-        pytest.param(
-            ("Moisture", "DMWeWa"),
-            ("moisture", ["dry", "moist", "wet", "water"]),
-            id="Moisture",
-        ),
-        pytest.param(
-            ("pH", "ANB"),
-            ("ph", ["acid", "neutral", "base/alkaline"]),
-            id="pH",
-        ),
-        pytest.param(
-            ("Shade", "FSN"),
-            ("shade", ["full", "semi", "none"]),
-            id="Shade",
-        ),
-        pytest.param(
-            ("Soil", "LMH"),
-            ("soil", ["light", "medium", "heavy"]),
-            id="Soil",
-        ),
-    ],
-)
-def test_pfaf_model_convert(key_value, expected):
-    """Applying the legend should translate a row into the expected result."""
-    result = PFAFModel(None).convert(*key_value)
-    assert result == expected
 
 
 def test_pfaf_database_iterate():

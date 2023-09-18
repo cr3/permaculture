@@ -47,7 +47,9 @@ msgstr "genus"
 msgid "Hauteur(m)"
 msgstr "height"
 
-#  Inconvénient:
+msgid "Inconvénient"
+msgstr "inconvenience"
+
 #  Intérêt automnale hivernal:
 
 msgid "Largeur(m)"
@@ -61,7 +63,8 @@ msgstr "sun"
 msgid "Medicinal"
 msgstr "medicinal"
 
-#  Multiplication:
+msgid "Multiplication"
+msgstr "multiplication"
 
 msgid "Nom Anglais"
 msgstr "common name"
@@ -95,8 +98,11 @@ msgstr "ecological use"
 msgid "Vie sauvage"
 msgstr "wildlife"
 
-#  Zone de rusticité: '2'
-#  pH (Min-Max): 5 – 6,5
+msgid "Zone de rusticité"
+msgstr "Canada hardiness"
+
+msgid "pH (Min-Max)"
+msgstr "ph"
 
 msgctxt "Comestible"
 msgid "Fl"

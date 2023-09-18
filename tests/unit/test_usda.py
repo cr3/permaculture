@@ -2,9 +2,12 @@
 
 from unittest.mock import ANY, Mock
 
+import pytest
+
 from permaculture.database import DatabaseElement
 from permaculture.storage import MemoryStorage
 from permaculture.usda import (
+    USDAConverter,
     USDADatabase,
     USDAModel,
     USDAWeb,
@@ -38,6 +41,166 @@ def test_usda_web_plant_characteristics():
     session = Mock(get=Mock(return_value=StubRequestsResponse()))
     USDAWeb(session).plant_characteristics(1234)
     session.get.assert_called_once_with("/api/PlantCharacteristics/1234")
+
+
+def test_usda_converter_convert_ignore():
+    """Converting an ignore item should return an empty list."""
+    result = USDAConverter().convert_ignore("key", "value")
+    assert result == []
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("key", "Yes"),
+            [("key", True)],
+            id="Yes",
+        ),
+        pytest.param(
+            ("key", "No"),
+            [("key", False)],
+            id="No",
+        ),
+    ],
+)
+def test_usda_converter_convert_bool(item, expected):
+    """Converting a boolean should parse Yes and No."""
+    result = USDAConverter().convert_bool(*item)
+    assert result == expected
+
+
+def test_usda_converter_convert_bool_error():
+    """Converting an unknown boolean should raise."""
+    with pytest.raises(ValueError):
+        USDAConverter().convert_bool("key", "test")
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("key", "string"),
+            [("key", "string")],
+            id="string",
+        ),
+        pytest.param(
+            ("key", 1),
+            [("key", 1)],
+            id="int",
+        ),
+    ],
+)
+def test_usda_converter_convert_string(item, expected):
+    """Converting a string should not convert other types."""
+    result = USDAConverter().convert_string(*item)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("Adapted to Coarse Textured Soils", "Yes"),
+            [("adapted to coarse textured soils", True)],
+            id="Adapted to Coarse Textured Soils",
+        ),
+        pytest.param(
+            ("Adapted to Medium Textured Soils", "Yes"),
+            [("adapted to medium textured soils", True)],
+            id="Adapted to Medium Textured Soils",
+        ),
+        pytest.param(
+            ("Adapted to Medium Textured Soils", "Yes"),
+            [("adapted to medium textured soils", True)],
+            id="Adapted to Medium Textured Soils",
+        ),
+        pytest.param(
+            ("Berry/Nut/Seed Product", "Yes"),
+            [("berry/nut/seed product", True)],
+            id="Berry/Nut/Seed Product",
+        ),
+        pytest.param(
+            ("Christmas Tree Product", "Yes"),
+            [],
+            id="Christmas Tree Product",
+        ),
+        pytest.param(
+            ("HasCharacteristics", True),
+            [],
+            id="HasCharacteristics",
+        ),
+        pytest.param(
+            ("HasDistributionData", True),
+            [],
+            id="HasDistributionData",
+        ),
+        pytest.param(
+            ("HasDocumentation", True),
+            [],
+            id="HasDocumentation",
+        ),
+        pytest.param(
+            ("HasEthnobotany", True),
+            [],
+            id="HasEthnobotany",
+        ),
+        pytest.param(
+            ("HasImages", True),
+            [],
+            id="HasImages",
+        ),
+        pytest.param(
+            ("HasInvasiveStatuses", True),
+            [],
+            id="HasInvasiveStatuses",
+        ),
+        pytest.param(
+            ("HasLegalStatuses", True),
+            [],
+            id="HasLegalStatuses",
+        ),
+        pytest.param(
+            ("HasNoxiousStatuses", True),
+            [],
+            id="HasNoxiousStatuses",
+        ),
+        pytest.param(
+            ("HasPollinator", True),
+            [],
+            id="HasPollinator",
+        ),
+        pytest.param(
+            ("HasRelatedLinks", True),
+            [],
+            id="HasRelatedLinks",
+        ),
+        pytest.param(
+            ("HasSubordinateTaxa", True),
+            [],
+            id="HasSubordinateTaxa",
+        ),
+        pytest.param(
+            ("HasSynonyms", True),
+            [],
+            id="HasSynonyms",
+        ),
+        pytest.param(
+            ("HasWetlandData", True),
+            [],
+            id="HasWetlandData",
+        ),
+        pytest.param(
+            ("HasWildlife", True),
+            [],
+            id="HasWildlife",
+        ),
+    ],
+)
+def test_usda_converter_convert_item(item, expected):
+    """Converting an item should consider types."""
+    result = USDAConverter().convert_item(*item)
+    assert result == expected
 
 
 def test_usda_model_all_characteristics():

@@ -11,6 +11,7 @@ from permaculture.database import DatabaseElement
 from permaculture.nc import (
     NCAuthentication,
     NCAuthenticationError,
+    NCConverter,
     NCDatabase,
     NCLink,
     NCModel,
@@ -112,6 +113,58 @@ def test_nc_web_view_list(unique):
         },
     )
     assert result == "test"
+
+
+def test_nc_converter_convert_ignore():
+    """Converting an ignore item should return an empty list."""
+    result = NCConverter().convert_ignore("key", "value")
+    assert result == []
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("Height", "1 inches - 2 inches"),
+            [
+                ("height/min", 1),
+                ("height/max", 2),
+            ],
+            id="Height",
+        ),
+    ],
+)
+def test_nc_converter_convert_range(item, expected):
+    """Converting a range should support single and double values."""
+    result = NCConverter().convert_range(*item)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("Soil Type", "Sandy, Loamy"),
+            [
+                ("soil type/sandy", True),
+                ("soil type/loamy", True),
+            ],
+            id="Soil Type",
+        ),
+        pytest.param(
+            ("Sun", "Full Sun, Partial Shade"),
+            [
+                ("sun/full sun", True),
+                ("sun/partial shade", True),
+            ],
+            id="Sun",
+        ),
+    ],
+)
+def test_nc_convert_convert_item(item, expected):
+    """Converting an item should consider types."""
+    result = NCConverter().convert_item(*item)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -217,39 +270,6 @@ def test_nc_model_parse_detail(text, expected):
     """Parsing detail should return a dictionary."""
     model = NCModel(None)
     result = model.parse_detail(text)
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    "key_value, expected",
-    [
-        pytest.param(
-            ("Soil Type", "Sandy, Loamy"),
-            (
-                "soil type",
-                [
-                    "sandy",
-                    "loamy",
-                ],
-            ),
-            id="Soil Type",
-        ),
-        pytest.param(
-            ("Sun", "Full Sun, Partial Shade"),
-            (
-                "sun",
-                [
-                    "full sun",
-                    "partial shade",
-                ],
-            ),
-            id="Sun",
-        ),
-    ],
-)
-def test_nc_model_convert(key_value, expected):
-    """Converting a key value should also translate the key and value(s)."""
-    result = NCModel(None).convert(*key_value)
     assert result == expected
 
 

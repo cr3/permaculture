@@ -25,48 +25,6 @@ msgstr "fact sheet urls"
 msgid "GrowthHabits"
 msgstr "growth habits"
 
-msgid "HasCharacteristics"
-msgstr "has characteristics"
-
-msgid "HasDistributionData"
-msgstr "has distribution data"
-
-msgid "HasDocumentation"
-msgstr "has documentation"
-
-msgid "HasEthnobotany"
-msgstr "has ethnobotany"
-
-msgid "HasImages"
-msgstr "has images"
-
-msgid "HasInvasiveStatuses"
-msgstr "has invasive statuses"
-
-msgid "HasLegalStatuses"
-msgstr "has legal statuses"
-
-msgid "HasNoxiousStatuses"
-msgstr "has noxious statuses"
-
-msgid "HasPollinator"
-msgstr "has pollinator"
-
-msgid "HasRelatedLinks"
-msgstr "has related links"
-
-msgid "HasSubordinateTaxa"
-msgstr "has subordinate taxa"
-
-msgid "HasSynonyms"
-msgstr "has synonyms"
-
-msgid "HasWetlandData"
-msgstr "has wetland data"
-
-msgid "HasWildlife"
-msgstr "has wildlife"
-
 msgid "ImageId"
 msgstr "image id"
 
@@ -103,8 +61,41 @@ msgstr "plant notes"
 msgid "PlantsDistributionResults"
 msgstr "plants distribution results"
 
+msgid "Precipitation, Maximum"
+msgstr "precipitation/max"
+
+msgid "Precipitation, Minimum"
+msgstr "precipitation/min"
+
 msgid "ProfileImageFilename"
 msgstr "profile image filename"
+
+msgid "Propagated by Bare Root"
+msgstr "propagation/bare foot"
+
+msgid "Propagated by Bulb"
+msgstr "propagation/bulb"
+
+msgid "Propagated by Container"
+msgstr "propagation/container"
+
+msgid "Propagated by Corm"
+msgstr "propagation/corm"
+
+msgid "Propagated by Cuttings"
+msgstr "propagation/cuttings"
+
+msgid "Propagated by Seed"
+msgstr "propagation/seed"
+
+msgid "Propagated by Sod"
+msgstr "propagation/sod"
+
+msgid "Propagated by Sprigs"
+msgstr "propagation/sprigs"
+
+msgid "Propagated by Tubers"
+msgstr "propagation/tubers"
 
 msgid "ProtectedStatuses"
 msgstr "protected statuses"
@@ -130,3 +121,8 @@ msgstr "subordinate taxa"
 msgid "WetlandData"
 msgstr "wetland data"
 
+msgid "pH, Maximum"
+msgstr "ph/max"
+
+msgid "pH, Minimum"
+msgstr "ph/min"

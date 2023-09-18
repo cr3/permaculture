@@ -6,6 +6,7 @@ import pytest
 
 from permaculture.database import DatabaseElement
 from permaculture.de import (
+    DEConverter,
     DEDatabase,
     DEModel,
     DEWeb,
@@ -31,197 +32,311 @@ def test_de_web_perenial_plants_list_error():
         DEWeb(session).perenial_plants_list()
 
 
+def test_de_converter_convert_ignore():
+    """Converting an ignore item should return an empty list."""
+    result = DEConverter().convert_ignore("key", "value")
+    assert result == []
+
+
 @pytest.mark.parametrize(
-    "key_value, expected",
+    "item, expected",
     [
         pytest.param(
+            ("key", "0,6 - 1,2"),
+            [
+                ("key/min", 0.6),
+                ("key/max", 1.2),
+            ],
+            id="dash",
+        ),
+        pytest.param(
+            ("key", "0,6 \u2013 1,2"),
+            [
+                ("key/min", 0.6),
+                ("key/max", 1.2),
+            ],
+            id="endash",
+        ),
+        pytest.param(
+            ("key", "0,1"),
+            [
+                ("key/min", 0.1),
+                ("key/max", 0.1),
+            ],
+            id="single value",
+        ),
+    ],
+)
+def test_de_converter_convert_range(item, expected):
+    """Converting a range should support single and double values."""
+    result = DEConverter().convert_range(*item)
+    assert result == expected
+
+
+def test_de_converter_convert_range_error():
+    """Converting a range with three or more values should raise."""
+    with pytest.raises(ValueError):
+        DEConverter().convert_range("key", "1 2 3")
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("key", "value"),
+            [("key", "value")],
+            id="string",
+        ),
+        pytest.param(
+            ("key", "X"),
+            [("key", True)],
+            id="X",
+        ),
+    ],
+)
+def test_de_converter_convert_strijng(item, expected):
+    """Converting a string should return the string or True."""
+    result = DEConverter().convert_string(*item)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("Accumulateur de Nutriments", "*"),
+            [],
+            id="nutriments",
+        ),
+        pytest.param(
             ("Comestible", "Fl Fr Fe N G R S JP T B"),
-            (
-                "edible uses",
-                [
-                    "flower",
-                    "fruit",
-                    "leaf",
-                    "nut",
-                    "seed",
-                    "root",
-                    "sap",
-                    "young shoot",
-                    "stem",
-                    "bulb",
-                ],
-            ),
+            [
+                ("edible uses/flower", True),
+                ("edible uses/fruit", True),
+                ("edible uses/leaf", True),
+                ("edible uses/nut", True),
+                ("edible uses/seed", True),
+                ("edible uses/root", True),
+                ("edible uses/sap", True),
+                ("edible uses/young shoot", True),
+                ("edible uses/stem", True),
+                ("edible uses/bulb", True),
+            ],
             id="edible uses",
         ),
         pytest.param(
             ("Couleur de feuillage", "V Po Pa P F T J"),
-            (
-                "foliage color",
-                [
-                    "green",
-                    "purple",
-                    "variegated",
-                    "pale",
-                    "dark",
-                    "spotted",
-                    "yellow",
-                ],
-            ),
+            [
+                ("foliage color/green", True),
+                ("foliage color/purple", True),
+                ("foliage color/variegated", True),
+                ("foliage color/pale", True),
+                ("foliage color/dark", True),
+                ("foliage color/spotted", True),
+                ("foliage color/yellow", True),
+            ],
             id="foliage color",
         ),
         pytest.param(
             ("Couleur de floraison", "Rg Rs B J O P V Br Bl"),
-            (
-                "flower color",
-                [
-                    "red",
-                    "pink",
-                    "white",
-                    "yellow",
-                    "orange",
-                    "purple",
-                    "green",
-                    "brown",
-                    "blue",
-                ],
-            ),
+            [
+                ("flower color/red", True),
+                ("flower color/pink", True),
+                ("flower color/white", True),
+                ("flower color/yellow", True),
+                ("flower color/orange", True),
+                ("flower color/purple", True),
+                ("flower color/green", True),
+                ("flower color/brown", True),
+                ("flower color/blue", True),
+            ],
             id="flower color",
         ),
         pytest.param(
+            ("Couvre-sol", "*"),
+            [],
+            id="ground cover",
+        ),
+        pytest.param(
+            ("Cultivars intéressants", "*"),
+            [],
+            id="cultivars",
+        ),
+        pytest.param(
             ("Eau", "▁ ▅ █"),
-            ("moisture", ["dry", "moderate", "wet"]),
+            [
+                ("moisture/dry", True),
+                ("moisture/moderate", True),
+                ("moisture/wet", True),
+            ],
             id="moisture",
         ),
         pytest.param(
+            ("Haie", "*"),
+            [],
+            id="hedge",
+        ),
+        pytest.param(
+            ("Hauteur(m)", "0,6 \u2013 1,2"),
+            [
+                ("height/min", 0.6),
+                ("height/max", 1.2),
+            ],
+            id="height with endash",
+        ),
+        pytest.param(
             ("Inconvénient", "E D A P Épi V B G Pe"),
-            (
-                "inconvénient",
-                [
-                    "expansive",
-                    "dispersive",
-                    "allergen",
-                    "poison",
-                    "thorny",
-                    "vigorous",
-                    "burns",
-                    "invasive",
-                    "persistent",
-                ],
-            ),
-            id="Inconvénient",
+            [
+                ("inconvenience/expansive", True),
+                ("inconvenience/dispersive", True),
+                ("inconvenience/allergen", True),
+                ("inconvenience/poison", True),
+                ("inconvenience/thorny", True),
+                ("inconvenience/vigorous", True),
+                ("inconvenience/burns", True),
+                ("inconvenience/invasive", True),
+                ("inconvenience/persistent", True),
+            ],
+            id="inconvenience",
         ),
         pytest.param(
             ("Intérêt automnale hivernal", "A H"),
-            ("intérêt automnale hivernal", ["autumn", "winter"]),
-            id="Intérêt automnale hivernal",
+            [],
+            id="interest",
+        ),
+        pytest.param(
+            ("Largeur(m)", "1,0"),
+            [
+                ("spread/min", 1.0),
+                ("spread/max", 1.0),
+            ],
+            id="spread with only minimum",
+        ),
+        pytest.param(
+            ("Lien Information", ""),
+            [],
+            id="information",
         ),
         pytest.param(
             ("Lumière", "○ ◐ ●"),
-            ("sun", ["full sun", "partial shade", "shade"]),
+            [
+                ("sun/full sun", True),
+                ("sun/partial shade", True),
+                ("sun/shade", True),
+            ],
             id="sun",
         ),
         pytest.param(
             ("Multiplication", "B M D S G St P A É T"),
-            (
-                "multiplication",
-                [
-                    "cuttings",
-                    "layering",
-                    "division",
-                    "seeds",
-                    "graft",
-                    "stolon",
-                    "spring",
-                    "autumn",
-                    "summer",
-                    "tuber",
-                ],
-            ),
+            [
+                ("multiplication/cuttings", True),
+                ("multiplication/layering", True),
+                ("multiplication/division", True),
+                ("multiplication/seeds", True),
+                ("multiplication/graft", True),
+                ("multiplication/stolon", True),
+                ("multiplication/spring", True),
+                ("multiplication/autumn", True),
+                ("multiplication/summer", True),
+                ("multiplication/tuber", True),
+            ],
             id="Multiplication",
         ),
         pytest.param(
             ("Période de floraison", "P É A"),
-            ("blooming period", ["spring", "summer", "autumn"]),
+            [
+                ("blooming period/spring", True),
+                ("blooming period/summer", True),
+                ("blooming period/autumn", True),
+            ],
             id="blooming period",
         ),
         pytest.param(
             ("Période de taille", "AD AF P É A T N"),
-            (
-                "pruning period",
-                [
-                    "before budburst",
-                    "after flowering",
-                    "spring",
-                    "summer",
-                    "autumn",
-                    "at all times",
-                    "never prune",
-                ],
-            ),
+            [
+                ("pruning period/before budburst", True),
+                ("pruning period/after flowering", True),
+                ("pruning period/spring", True),
+                ("pruning period/summer", True),
+                ("pruning period/autumn", True),
+                ("pruning period/at all times", True),
+                ("pruning period/never prune", True),
+            ],
             id="pruning period",
         ),
         pytest.param(
             ("Pollinisateurs", "S G V"),
-            (
-                "pollinators",
-                [
-                    "specialists",
-                    "generalists",
-                    "wind",
-                ],
-            ),
+            [
+                ("pollinators/specialists", True),
+                ("pollinators/generalists", True),
+                ("pollinators/wind", True),
+            ],
             id="pollinators",
         ),
         pytest.param(
             ("Racine", "B C D F L P R S T"),
-            (
-                "root type",
-                [
-                    "bulb",
-                    "fleshy",
-                    "suckering",
-                    "fasciculated",
-                    "lateral",
-                    "taproot",
-                    "rhizome",
-                    "superficial",
-                    "tuber",
-                ],
-            ),
+            [
+                ("root type/bulb", True),
+                ("root type/fleshy", True),
+                ("root type/suckering", True),
+                ("root type/fasciculated", True),
+                ("root type/lateral", True),
+                ("root type/taproot", True),
+                ("root type/rhizome", True),
+                ("root type/superficial", True),
+                ("root type/tuber", True),
+            ],
             id="root type",
         ),
         pytest.param(
             ("Rythme de croissance", "R M L"),
-            ("growth rate", ["fast", "medium", "slow"]),
+            [
+                ("growth rate/fast", True),
+                ("growth rate/medium", True),
+                ("growth rate/slow", True),
+            ],
             id="growth rate",
         ),
         pytest.param(
             ("Texture du sol", "░ ▒ ▓"),
-            ("soil", ["light", "medium", "heavy"]),
+            [
+                ("soil/light", True),
+                ("soil/medium", True),
+                ("soil/heavy", True),
+            ],
             id="soil",
         ),
         pytest.param(
             ("Utilisation écologique", "BR P Z"),
-            (
-                "ecological use",
-                [
-                    "riparian strip",
-                    "slopes",
-                    "flood zone",
-                ],
-            ),
+            [
+                ("ecological use/riparian strip", True),
+                ("ecological use/slopes", True),
+                ("ecological use/flood zone", True),
+            ],
             id="ecological use",
         ),
         pytest.param(
             ("Vie sauvage", "N A NA"),
-            ("wildlife", ["food", "shelter", "food and shelter"]),
+            [
+                ("wildlife/food", True),
+                ("wildlife/shelter", True),
+                ("wildlife/food and shelter", True),
+            ],
             id="wildlife",
+        ),
+        pytest.param(
+            ("pH (Min-Max)", "6 - 7"),
+            [
+                ("ph/min", 6.0),
+                ("ph/max", 7.0),
+            ],
+            id="ph with dash",
         ),
     ],
 )
-def test_de_model_convert(key_value, expected):
-    """Converting a key value should also translate the key and value(s)."""
-    result = DEModel(None).convert(*key_value)
+def test_de_converter_convert_item(item, expected):
+    """Converting an item should consider types."""
+    result = DEConverter().convert_item(*item)
     assert result == expected
 
 
