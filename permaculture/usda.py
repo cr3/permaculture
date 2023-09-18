@@ -1,5 +1,6 @@
 """USDA Plants database."""
 
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from itertools import chain
@@ -69,12 +70,116 @@ class USDAWeb:
 
 
 @define(frozen=True)
+class USDAConverter:
+    locales: Locales = field(factory=partial(Locales.from_domain, "usda"))
+
+    def translate(self, message, context=None):
+        """Convenience function to translate from locales."""
+        return self.locales.translate(message, context).lower()
+
+    def convert_ignore(self, *_):
+        return []
+
+    def convert_bool(self, key, value):
+        if value == "Yes":
+            return [(self.translate(key), True)]
+        elif value == "No":
+            return [(self.translate(key), False)]
+        else:
+            raise ValueError(f"Unknown boolean: {value}")
+
+    def convert_float(self, key, value):
+        return [(self.translate(key), float(value))]
+
+    def convert_int(self, key, value):
+        return [(self.translate(key), int(value))]
+
+    def convert_string(self, key, value):
+        return [(self.translate(key), value)]
+
+    def convert_item(self, key, value):
+        dispatchers = defaultdict(
+            lambda: self.convert_string,
+            {
+                "Adapted to Coarse Textured Soils": self.convert_bool,
+                "Adapted to Fine Textured Soils": self.convert_bool,
+                "Adapted to Medium Textured Soils": self.convert_bool,
+                "Berry/Nut/Seed Product": self.convert_bool,
+                "Christmas Tree Product": self.convert_ignore,
+                "Cold Stratification Required": self.convert_bool,
+                "Coppice Potential": self.convert_bool,
+                "Fall Conspicuous": self.convert_bool,
+                "Fire Resistant": self.convert_bool,
+                "Flower Conspicuous": self.convert_bool,
+                "Fodder Product": self.convert_bool,
+                "Frost Free Days, Minimum": self.convert_int,
+                "Fruit/Seed Conspicuous": self.convert_bool,
+                "Fruit/Seed Persistence": self.convert_bool,
+                "HasCharacteristics": self.convert_ignore,
+                "HasDistributionData": self.convert_ignore,
+                "HasDocumentation": self.convert_ignore,
+                "HasEthnobotany": self.convert_ignore,
+                "HasImages": self.convert_ignore,
+                "HasInvasiveStatuses": self.convert_ignore,
+                "HasLegalStatuses": self.convert_ignore,
+                "HasNoxiousStatuses": self.convert_ignore,
+                "HasPollinator": self.convert_ignore,
+                "HasRelatedLinks": self.convert_ignore,
+                "HasSubordinateTaxa": self.convert_ignore,
+                "HasSynonyms": self.convert_ignore,
+                "HasWetlandData": self.convert_ignore,
+                "HasWildlife": self.convert_ignore,
+                "Height at 20 Years, Maximum (feet)": self.convert_int,
+                "Height, Mature (feet)": self.convert_float,
+                "Known Allelopath": self.convert_bool,
+                "Leaf Retention": self.convert_bool,
+                "Low Growing Grass": self.convert_bool,
+                "Lumber Product": self.convert_bool,
+                "Naval Store Product": self.convert_bool,
+                "Nursery Stock Product": self.convert_bool,
+                "Palatable Human": self.convert_bool,
+                "Planting Density per Acre, Maximum": self.convert_int,
+                "Planting Density per Acre, Minimum": self.convert_int,
+                "Post Product": self.convert_bool,
+                "Precipitation, Maximum": self.convert_int,
+                "Precipitation, Minimum": self.convert_int,
+                "Propagated by Bare Root": self.convert_bool,
+                "Propagated by Bulb": self.convert_bool,
+                "Propagated by Container": self.convert_bool,
+                "Propagated by Corm": self.convert_bool,
+                "Propagated by Cuttings": self.convert_bool,
+                "Propagated by Seed": self.convert_bool,
+                "Propagated by Sod": self.convert_bool,
+                "Propagated by Sprigs": self.convert_bool,
+                "Propagated by Tubers": self.convert_bool,
+                "Pulpwood Product": self.convert_bool,
+                "Resprout Ability": self.convert_bool,
+                "Root Depth, Minimum (inches)": self.convert_int,
+                "Seed per Pound": self.convert_int,
+                "Small Grain": self.convert_bool,
+                "Temperature, Minimum (°F)": self.convert_int,
+                "Veneer Product": self.convert_bool,
+                "pH, Maximum": self.convert_float,
+                "pH, Minimum": self.convert_float,
+            },
+        )
+        return dispatchers[key](key, value)
+
+    def convert(self, data):
+        return dict(
+            chain.from_iterable(
+                self.convert_item(k, v) for k, v in data.items()
+            )
+        )
+
+
+@define(frozen=True)
 class USDAModel:
     """USDA model."""
 
     web: USDAWeb
     storage: Storage
-    locales: Locales = field(factory=partial(Locales.from_domain, "usda"))
+    converter: USDAConverter = field(factory=USDAConverter)
 
     @classmethod
     def from_url(cls, url: URL, cache_dir=None):
@@ -84,83 +189,20 @@ class USDAModel:
         web = USDAWeb(session)
         return cls(web, storage)
 
-    def convert(self, key, value):
-        def to_bool(old_value):
-            if old_value == "Yes":
-                return True
-            elif old_value == "No":
-                return False
-            else:
-                raise ValueError(f"Unknown boolean: {old_value}")
-
-        def to_str(old_value):
-            return self.locales.translate(old_value, key).lower()
-
-        types = {
-            "Adapted to Coarse Textured Soils": to_bool,
-            "Adapted to Fine Textured Soils": to_bool,
-            "Adapted to Medium Textured Soils": to_bool,
-            "Berry/Nut/Seed Product": to_bool,
-            "Christmas Tree Product": to_bool,
-            "Cold Stratification Required": to_bool,
-            "Coppice Potential": to_bool,
-            "Fall Conspicuous": to_bool,
-            "Fire Resistant": to_bool,
-            "Flower Conspicuous": to_bool,
-            "Fodder Product": to_bool,
-            "Frost Free Days, Minimum": int,
-            "Fruit/Seed Conspicuous": to_bool,
-            "Fruit/Seed Persistence": to_bool,
-            "Height at 20 Years, Maximum (feet)": int,
-            "Height, Mature (feet)": float,
-            "Known Allelopath": to_bool,
-            "Leaf Retention": to_bool,
-            "Low Growing Grass": to_bool,
-            "Lumber Product": to_bool,
-            "Naval Store Product": to_bool,
-            "Nursery Stock Product": to_bool,
-            "Palatable Human": to_bool,
-            "Planting Density per Acre, Maximum": int,
-            "Planting Density per Acre, Minimum": int,
-            "Post Product": to_bool,
-            "Precipitation, Maximum": int,
-            "Precipitation, Minimum": int,
-            "Propagated by Bare Root": to_bool,
-            "Propagated by Bulb": to_bool,
-            "Propagated by Container": to_bool,
-            "Propagated by Corm": to_bool,
-            "Propagated by Cuttings": to_bool,
-            "Propagated by Seed": to_bool,
-            "Propagated by Sod": to_bool,
-            "Propagated by Sprigs": to_bool,
-            "Propagated by Tubers": to_bool,
-            "Pulpwood Product": to_bool,
-            "Resprout Ability": to_bool,
-            "Root Depth, Minimum (inches)": int,
-            "Seed per Pound": int,
-            "Small Grain": to_bool,
-            "Temperature, Minimum (°F)": int,
-            "Veneer Product": to_bool,
-            "pH, Maximum": float,
-            "pH, Minimum": float,
-        }
-        if isinstance(value, str):
-            value = types.get(key, to_str)(value)
-        return to_str(key), value
-
     def plant_characteristics(self, plant):
         """Return the characteristics for a single plant."""
-        return dict(
-            self.convert(k, v)
-            for k, v in chain(
-                plant.items(),
-                (
+        return self.converter.convert(
+            dict(
+                chain(
+                    plant.items(),
                     (
-                        c["PlantCharacteristicName"],
-                        c["PlantCharacteristicValue"],
-                    )
-                    for c in self.web.plant_characteristics(plant["Id"])
-                ),
+                        (
+                            c["PlantCharacteristicName"],
+                            c["PlantCharacteristicValue"],
+                        )
+                        for c in self.web.plant_characteristics(plant["Id"])
+                    ),
+                )
             )
         )
 

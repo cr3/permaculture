@@ -3,7 +3,9 @@
 import logging
 import re
 import string
+from collections import defaultdict
 from functools import partial
+from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -14,6 +16,7 @@ from permaculture.database import DatabaseElement, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage, MemoryStorage
+from permaculture.unit import inches
 
 logger = logging.getLogger(__name__)
 
@@ -114,9 +117,74 @@ class NCWeb:
 
 
 @define(frozen=True)
+class NCConverter:
+    locales: Locales = field(factory=partial(Locales.from_domain, "nc"))
+
+    def translate(self, message, context=None):
+        """Convenience function to translate from locales."""
+        return self.locales.translate(message, context).lower()
+
+    def convert_ignore(self, *_):
+        return []
+
+    def convert_float(self, key, value, unit=1.0):
+        # TODO: match unit inside this regex.
+        new_value = re.match(r"([0-9.]+)", value).group(1)
+        return [(self.translate(key), float(new_value) * unit)]
+
+    def convert_list(self, key, value):
+        new_value = [self.translate(v, key) for v in re.split(r",\s+", value)]
+
+        k = self.translate(key)
+        return [(f"{k}/{v}", True) for v in new_value]
+
+    def convert_range(self, key, value, unit=1.0):
+        k = self.translate(key)
+        n = [float(i) * unit for i in re.findall(r"[0-9.]+", value)]
+        match len(n):
+            case 2:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
+            case 1:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
+            case 0:
+                return []
+            case _:
+                raise ValueError(f"Unsupported range: {value}")
+
+    def convert_string(self, key, value):
+        if isinstance(value, str):
+            value = self.translate(value)
+        return [(self.translate(key), value)]
+
+    def convert_item(self, key, value):
+        dispatchers = defaultdict(
+            lambda: self.convert_string,
+            {
+                "Height": partial(self.convert_range, unit=inches),
+                "Minimum Root Depth": partial(self.convert_float, unit=inches),
+                "Notes": self.convert_ignore,
+                "Reference": self.convert_ignore,
+                "Soil Type": self.convert_list,
+                "Soil pH": self.convert_range,
+                "Spread": partial(self.convert_range, unit=inches),
+                "Sun": self.convert_list,
+                "USDA Hardiness Zones": self.convert_range,
+            },
+        )
+        return dispatchers[key](key, value)
+
+    def convert(self, data):
+        return dict(
+            chain.from_iterable(
+                self.convert_item(k, v) for k, v in data.items()
+            )
+        )
+
+
+@define(frozen=True)
 class NCModel:
     web: NCWeb
-    locales: Locales = field(factory=partial(Locales.from_domain, "nc"))
+    converter: NCConverter = field(factory=NCConverter)
 
     @classmethod
     def from_url(cls, url: URL, username: str, password: str, cache_dir=None):
@@ -188,32 +256,10 @@ class NCModel:
 
         return detail
 
-    def convert(self, key, value):
-        def to_str(old_value):
-            return self.locales.translate(old_value, key).lower()
-
-        def to_list(old_value):
-            return [to_str(v) for v in re.split(r",\s+", old_value)]
-
-        types = {
-            "Soil Type": to_list,
-            "Sun": to_list,
-        }
-        if isinstance(value, str):
-            value = types.get(key, to_str)(value)
-        return to_str(key), value
-
     def get_plant(self, Id):
         detail = self.web.view_detail(Id)
-        ignore = {
-            "Notes",
-            "Reference",
-        }
-        return dict(
-            self.convert(k, v)
-            for k, v in self.parse_detail(detail).items()
-            if k not in ignore
-        )
+        data = self.parse_detail(detail)
+        return self.converter.convert(data)
 
     def get_plants(self, sci_name="", sort_name=""):
         try:
@@ -225,7 +271,7 @@ class NCModel:
             return
 
         for table in self.parse_tables(plant_list):
-            yield dict(self.convert(k, v) for k, v in table.items())
+            yield self.converter.convert(table)
 
 
 @define(frozen=True)
@@ -259,7 +305,7 @@ class NCDatabase(DatabasePlugin):
         # Workaround crappy search in the web interface.
         name = scientific_name.split()[0]
         for plant in self.model.get_plants(sci_name=name):
-            if re.match(scientific_name, plant["scientific name"], re.I):
+            if re.match(f"{scientific_name}$", plant["scientific name"], re.I):
                 detail = self.model.get_plant(plant["plant name"].identifier)
 
                 yield DatabaseElement(

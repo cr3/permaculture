@@ -1,9 +1,11 @@
 """Design Ecologique database."""
 
 import re
+from collections import defaultdict
 from csv import reader
 from functools import partial
 from io import StringIO
+from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -39,9 +41,87 @@ class DEWeb:
 
 
 @define(frozen=True)
+class DEConverter:
+    locales: Locales = field(factory=partial(Locales.from_domain, "de"))
+
+    def convert_ignore(self, *_):
+        return []
+
+    def convert_list(self, key, value):
+        translate = self.locales.translate
+        new_value = [translate(v, key) for v in re.split(r",?\s+", value)]
+        if len(new_value) == 1 and new_value[0] == value:
+            new_value = [translate(v, key) for v in value]
+
+        k = translate(key)
+        return [(f"{k}/{v}", True) for v in new_value]
+
+    def convert_range(self, key, value):
+        k = self.locales.translate(key)
+        n = [float(i) for i in re.findall(r"[0-9.]+", value.replace(",", "."))]
+        match len(n):
+            case 2:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
+            case 1:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
+            case 0:
+                return []
+            case _:
+                raise ValueError(f"Unsupported range: {value}")
+
+    def convert_string(self, key, value):
+        translate = self.locales.translate
+        if value == "X":
+            value = True
+        return [(translate(key), translate(value, key))]
+
+    def convert_item(self, key, value):
+        dispatchers = defaultdict(
+            lambda: self.convert_string,
+            {
+                "Accumulateur de Nutriments": self.convert_ignore,
+                "Comestible": self.convert_list,
+                "Couleur de feuillage": self.convert_list,
+                "Couleur de floraison": self.convert_list,
+                "Couvre-sol": self.convert_ignore,
+                "Cultivars intéressants": self.convert_ignore,
+                "Eau": self.convert_list,
+                "Forme": self.convert_list,
+                "Haie": self.convert_ignore,
+                "Hauteur(m)": self.convert_range,
+                "Inconvénient": self.convert_list,
+                "Intérêt automnale hivernal": self.convert_ignore,
+                "Largeur(m)": self.convert_range,
+                "Lien Information": self.convert_ignore,
+                "Lumière": self.convert_list,
+                "Multiplication": self.convert_list,
+                "Notes": self.convert_ignore,
+                "Où peut-on la trouver?": self.convert_ignore,
+                "Pollinisateurs": self.convert_list,
+                "Période de floraison": self.convert_list,
+                "Période de taille": self.convert_list,
+                "Racine": self.convert_list,
+                "Rythme de croissance": self.convert_list,
+                "Texture du sol": self.convert_list,
+                "Utilisation écologique": self.convert_list,
+                "Vie sauvage": self.convert_list,
+                "pH (Min-Max)": self.convert_range,
+            },
+        )
+        return dispatchers[key](key, value)
+
+    def convert(self, data):
+        return dict(
+            chain.from_iterable(
+                self.convert_item(k, v) for k, v in data.items()
+            )
+        )
+
+
+@define(frozen=True)
 class DEModel:
     web: DEWeb = field()
-    locales: Locales = field(factory=partial(Locales.from_domain, "de"))
+    converter: DEConverter = field(factory=DEConverter)
 
     @classmethod
     def from_url(cls, url: URL, cache_dir=None):
@@ -50,66 +130,13 @@ class DEModel:
         web = DEWeb(session, cache_dir)
         return cls(web)
 
-    def convert(self, key, value):
-        def to_range(v):
-            v = v.replace(",", ".").strip()
-            if re.match(r"\d+", v):
-                return [float(x) for x in re.split("\\s*[\u2013-]\\s*", v)]
-            else:
-                return []
-
-        def to_str(old_value):
-            return self.locales.translate(old_value, key).lower()
-
-        def to_list(old_value):
-            new_value = [to_str(v) for v in re.split(r",?\s+", old_value)]
-            if len(new_value) == 1 and new_value[0] == old_value:
-                new_value = [to_str(v) for v in old_value]
-
-            return new_value
-
-        types = {
-            "Comestible": to_list,
-            "Couleur de feuillage": to_list,
-            "Couleur de floraison": to_list,
-            "Eau": to_list,
-            "Forme": to_list,
-            "Inconvénient": to_list,
-            "Intérêt automnale hivernal": to_list,
-            "Lumière": to_list,
-            "Multiplication": to_list,
-            "Pollinisateurs": to_list,
-            "Période de floraison": to_list,
-            "Période de taille": to_list,
-            "Racine": to_list,
-            "Rythme de croissance": to_list,
-            "Texture du sol": to_list,
-            "Utilisation écologique": to_list,
-            "Vie sauvage": to_list,
-            "Hauteur(m)": to_range,
-            "Largeur(m)": to_range,
-        }
-        new_value = types.get(key, to_str)(value)
-        return to_str(key), new_value
-
     def get_perenial_plants(self):
         data = self.web.perenial_plants_list().export(0)
         csv = reader(StringIO(data))
         next(csv)  # Skip groups
         header = [h.strip() for h in next(csv)]
-        ignore = {
-            "Accumulateur de Nutriments",
-            "Cultivars intéressants",
-            "Lien Information",
-            "Notes",
-            "Où peut-on la trouver?",
-        }
         for row in csv:
-            yield dict(
-                self.convert(k, v)
-                for k, v in zip(header, row, strict=True)
-                if k not in ignore
-            )
+            yield self.converter.convert(dict(zip(header, row, strict=True)))
 
 
 @define(frozen=True)

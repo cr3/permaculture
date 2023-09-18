@@ -13,5 +13,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Minimum Root Depth"
+msgstr "root depth/min"
+
 msgid "Soil Moisture"
 msgstr "moisture"
+
+msgid "Soil pH"
+msgstr "ph"
+
+msgid "USDA Hardiness Zone"
+msgstr "USDA hardiness"

@@ -2,7 +2,9 @@
 
 import logging
 import re
+from collections import defaultdict
 from functools import partial
+from itertools import chain
 
 import xlrd
 from attrs import define, field
@@ -25,34 +27,65 @@ class PFAFFile:
 
 
 @define(frozen=True)
+class PFAFConverter:
+    locales: Locales = field(factory=partial(Locales.from_domain, "pfaf"))
+
+    def translate(self, message, context=None):
+        """Convenience function to translate from locales."""
+        return self.locales.translate(message, context).lower()
+
+    def convert_ignore(self, *_):
+        return []
+
+    def convert_list(self, key, value):
+        k = self.translate(key)
+        new_value = [
+            self.translate(v, key) for v in re.findall("[A-Z][^A-Z]*", value)
+        ]
+        return [(f"{k}/{v}", True) for v in new_value]
+
+    def convert_string(self, key, value):
+        return [(self.translate(key), value)]
+
+    def convert_item(self, key, value):
+        dispatchers = defaultdict(
+            lambda: self.convert_string,
+            {
+                "Author": self.convert_ignore,
+                "Cultivation details": self.convert_ignore,
+                "Deciduous/Evergreen": self.convert_list,
+                "Edible uses": self.convert_ignore,
+                "Growth rate": self.convert_list,
+                "Known hazards": self.convert_ignore,
+                "Medicinal": self.convert_ignore,
+                "Moisture": self.convert_list,
+                "Propagation": self.convert_ignore,
+                "Shade": self.convert_list,
+                "Soil": self.convert_list,
+                "Uses notes": self.convert_ignore,
+                "pH": self.convert_list,
+            },
+        )
+        return dispatchers[key](key, value)
+
+    def convert(self, data):
+        return dict(
+            chain.from_iterable(
+                self.convert_item(k, v) for k, v in data.items()
+            )
+        )
+
+
+@define(frozen=True)
 class PFAFModel:
     file: PFAFFile
-    locales: Locales = field(factory=partial(Locales.from_domain, "pfaf"))
+    converter: PFAFConverter = field(factory=PFAFConverter)
 
     @classmethod
     def from_cache_dir(cls, cache_dir):
         storage = FileStorage(cache_dir)
         file = PFAFFile(storage)
         return cls(file)
-
-    def convert(self, key, value):
-        def to_list(old_value):
-            return [to_str(v) for v in re.findall("[A-Z][^A-Z]*", old_value)]
-
-        def to_str(old_value):
-            return self.locales.translate(old_value, key).lower()
-
-        types = {
-            "Deciduous/Evergreen": to_list,
-            "Growth rate": to_list,
-            "Moisture": to_list,
-            "Shade": to_list,
-            "Soil": to_list,
-            "pH": to_list,
-        }
-        if isinstance(value, str):
-            value = types.get(key, to_str)(value)
-        return to_str(key), value
 
     def all_plants(self):
         try:
@@ -65,20 +98,9 @@ class PFAFModel:
 
         rows = ws.get_rows()
         header = [h.value for h in next(rows)]
-        ignore = {
-            "Author",
-            "Cultivation details",
-            "Edible uses",
-            "Known hazards",
-            "Medicinal",
-            "Propagation",
-            "Uses notes",
-        }
         for row in rows:
-            yield dict(
-                self.convert(k, v.value)
-                for k, v in zip(header, row, strict=True)
-                if k not in ignore
+            yield self.converter.convert(
+                {k: v.value for k, v in zip(header, row, strict=True)}
             )
 
 
