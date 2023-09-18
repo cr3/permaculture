@@ -67,7 +67,7 @@ msgid "Nom Anglais"
 msgstr "common name"
 
 msgid "Nom français"
-msgstr "common name"
+msgstr "french name"
 
 #  Où peut-on la trouver?: ''
 

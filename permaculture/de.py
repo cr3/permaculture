@@ -59,7 +59,7 @@ class DEModel:
                 return []
 
         def to_str(old_value):
-            return self.locales.translate(old_value, key)
+            return self.locales.translate(old_value, key).lower()
 
         def to_list(old_value):
             new_value = [to_str(v) for v in re.split(r",?\s+", old_value)]
@@ -120,6 +120,6 @@ class DEDatabase(DatabaseIterablePlugin):
             yield DatabaseElement(
                 "DE",
                 f"{p['genus']} {p['species']}",
-                [p["common name"]],
+                [p["common name"], p["french name"]],
                 p,
             )
