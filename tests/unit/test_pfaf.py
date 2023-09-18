@@ -53,6 +53,16 @@ def test_pfaf_model_all_plants_error(tmpdir):
             id="Deciduous/Evergreen",
         ),
         pytest.param(
+            ("Growth rate", "SMF"),
+            ("growth rate", ["slow", "medium", "fast"]),
+            id="Growth rate",
+        ),
+        pytest.param(
+            ("Moisture", "DMWeWa"),
+            ("moisture", ["dry", "moist", "wet", "water"]),
+            id="Moisture",
+        ),
+        pytest.param(
             ("pH", "ANB"),
             ("ph", ["acid", "neutral", "base/alkaline"]),
             id="pH",
@@ -64,7 +74,7 @@ def test_pfaf_model_all_plants_error(tmpdir):
         ),
         pytest.param(
             ("Soil", "LMH"),
-            ("soil", ["light(sandy)", "medium(loam)", "heavy"]),
+            ("soil", ["light", "medium", "heavy"]),
             id="Soil",
         ),
     ],

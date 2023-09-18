@@ -205,8 +205,14 @@ class NCModel:
 
     def get_plant(self, Id):
         detail = self.web.view_detail(Id)
+        ignore = {
+            "Notes",
+            "Reference",
+        }
         return dict(
-            self.convert(k, v) for k, v in self.parse_detail(detail).items()
+            self.convert(k, v)
+            for k, v in self.parse_detail(detail).items()
+            if k not in ignore
         )
 
     def get_plants(self, sci_name="", sort_name=""):
