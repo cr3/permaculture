@@ -8,21 +8,22 @@ from itertools import count
 import pandas as pd
 from attrs import define
 from bs4 import BeautifulSoup
+from requests import Session
 
-from permaculture.http import HTTPClient
+from permaculture.http import HTTPSession
 
 
 @define(frozen=True)
 class Wikipedia:
     """Wikipedia API."""
 
-    client: HTTPClient
+    session: Session
 
     @classmethod
     def from_url(cls, url, cache_dir=None):
         """Instantiate Wikipedia from URL."""
-        client = HTTPClient(url).with_cache(cache_dir)
-        return cls(client)
+        session = HTTPSession(url).with_cache(cache_dir)
+        return cls(session)
 
     def get(self, action="query", **kwargs):
         params = {
@@ -31,7 +32,7 @@ class Wikipedia:
             "action": action,
             **kwargs,
         }
-        return self.client.get("", params=params).json()
+        return self.session.get("", params=params).json()
 
     def get_text(self, page):
         data = self.get("parse", prop="text", page=page)

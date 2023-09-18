@@ -1,5 +1,6 @@
 """Natural Capital website."""
 
+import logging
 import re
 import string
 from functools import partial
@@ -10,9 +11,11 @@ from requests import Session
 from yarl import URL
 
 from permaculture.database import DatabaseElement, DatabasePlugin
-from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPClient
+from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage, MemoryStorage
+
+logger = logging.getLogger(__name__)
 
 
 class NCAuthenticationError(Exception):
@@ -42,7 +45,9 @@ class NCAuthentication:
         payload = self.get_payload(request)
         response = self.session.post(request.url, data=payload)
         if not response.cookies:
-            raise NCAuthenticationError()
+            raise NCAuthenticationError(
+                f"Failed authenticating to {request.url}"
+            )
 
         request.prepare_cookies(response.cookies)
         request.headers["X-Cache-All"] = "overwrite"
@@ -68,11 +73,11 @@ class NCAdapter(HTTPCacheAdapter):
 
 @define(frozen=True)
 class NCWeb:
-    client: HTTPClient = field()
+    session: Session = field()
 
     def view_complist(self, start):
         """View companion list."""
-        response = self.client.get(
+        response = self.session.get(
             "/plant-database/plant-companions-list",
             params={
                 "vw": "complist",
@@ -83,7 +88,7 @@ class NCWeb:
 
     def view_detail(self, Id):
         """View plant detail."""
-        response = self.client.post(
+        response = self.session.post(
             "/plant-database/new-the-plant-list",
             params={
                 "vw": "detail",
@@ -94,7 +99,7 @@ class NCWeb:
 
     def view_list(self, sci_name="", sort_name=""):
         """View plant list."""
-        response = self.client.post(
+        response = self.session.post(
             "/plant-database/new-the-plant-list",
             params={
                 "vw": "list",
@@ -120,8 +125,8 @@ class NCModel:
         cache = HTTPCacheAll(storage)
         authentication = NCAuthentication(username, password)
         adapter = NCAdapter(authentication, cache=cache)
-        client = HTTPClient(url).with_adapter(adapter)
-        web = NCWeb(client)
+        session = HTTPSession(url).with_adapter(adapter)
+        web = NCWeb(session)
         return cls(web)
 
     def parse_tr(self, row):
@@ -205,7 +210,14 @@ class NCModel:
         )
 
     def get_plants(self, sci_name="", sort_name=""):
-        plant_list = self.web.view_list(sci_name, sort_name)
+        try:
+            plant_list = self.web.view_list(sci_name, sort_name)
+        except NCAuthenticationError as error:
+            logger.debug(
+                "Skipping Nature Capital: %(error)s", {"error": error}
+            )
+            return
+
         for table in self.parse_tables(plant_list):
             yield dict(self.convert(k, v) for k, v in table.items())
 

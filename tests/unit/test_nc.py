@@ -71,9 +71,9 @@ def test_nc_authentication_authenticate_with_cookies(unique):
 
 def test_nc_web_view_complist():
     """Viewing the companion list should GET with the start letter."""
-    client = Mock(get=Mock(return_value=StubRequestsResponse()))
-    NCWeb(client).view_complist("A")
-    client.get.assert_called_once_with(
+    session = Mock(get=Mock(return_value=StubRequestsResponse()))
+    NCWeb(session).view_complist("A")
+    session.get.assert_called_once_with(
         "/plant-database/plant-companions-list",
         params={
             "vw": "complist",
@@ -84,9 +84,9 @@ def test_nc_web_view_complist():
 
 def test_nc_web_view_detail():
     """Viewing the detail for a plant should POST with the identifier."""
-    client = Mock(post=Mock(return_value=StubRequestsResponse()))
-    NCWeb(client).view_detail("i")
-    client.post.assert_called_once_with(
+    session = Mock(post=Mock(return_value=StubRequestsResponse()))
+    NCWeb(session).view_detail("i")
+    session.post.assert_called_once_with(
         "/plant-database/new-the-plant-list",
         params={
             "vw": "detail",
@@ -98,9 +98,9 @@ def test_nc_web_view_detail():
 def test_nc_web_view_list(unique):
     """Viewing the list of plants should POST with the plant names."""
     sci_name, sort_name = unique("text"), unique("text")
-    client = Mock(post=Mock(return_value=StubRequestsResponse(text="test")))
-    result = NCWeb(client).view_list(sci_name, sort_name)
-    client.post.assert_called_once_with(
+    session = Mock(post=Mock(return_value=StubRequestsResponse(text="test")))
+    result = NCWeb(session).view_list(sci_name, sort_name)
+    session.post.assert_called_once_with(
         "/plant-database/new-the-plant-list",
         params={
             "vw": "list",

@@ -250,8 +250,8 @@ class HTTPCacheAdapter(HTTPAdapter):
         return resp
 
 
-class HTTPClient(Session):
-    """An HTTP client with origin."""
+class HTTPSession(Session):
+    """An HTTP session with origin."""
 
     def __init__(self, origin, **kwargs):
         super().__init__(**kwargs)

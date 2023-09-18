@@ -54,7 +54,10 @@ class PFAFModel:
     def all_plants(self):
         try:
             ws = self.file.main_database()
-        except FileNotFoundError:
+        except FileNotFoundError as error:
+            logger.debug(
+                "Skipping Plants For A Future: %(error)s", {"error": error}
+            )
             return []
 
         rows = ws.get_rows()

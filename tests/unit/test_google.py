@@ -20,9 +20,9 @@ def test_google_spreadsheet_from_url(unique):
 def test_google_spreadsheet_export(unique):
     """Exporting should GET with gid and format params."""
     doc_id, gid, fmt = unique("text"), unique("text"), unique("text")
-    client = Mock(post=Mock(return_value=StubRequestsResponse()))
-    GoogleSpreadsheet(client, doc_id).export(gid, fmt)
-    client.get.assert_called_once_with(
+    session = Mock(post=Mock(return_value=StubRequestsResponse()))
+    GoogleSpreadsheet(session, doc_id).export(gid, fmt)
+    session.get.assert_called_once_with(
         f"/spreadsheets/d/{doc_id}/export",
         params={"gid": gid, "format": fmt},
     )

@@ -13,8 +13,8 @@ from permaculture.http import (
     HTTPCache,
     HTTPCacheAdapter,
     HTTPCacheAll,
-    HTTPClient,
     HTTPEntry,
+    HTTPSession,
     parse_http_expiry,
     parse_http_timestamp,
 )
@@ -359,17 +359,17 @@ def test_http_cache_adapter_log_keys(logger_handler):
 
 
 @pytest.mark.parametrize("method", HTTP_METHODS)
-def test_http_client_request(method):
-    """The HTTP client request should append the path to the base URL."""
+def test_http_session_request(method):
+    """The HTTP session request should append the path to the base URL."""
     with patch.object(Session, "request") as mock_request:
-        client = HTTPClient("http://www.test.com")
-        client.request(method, "/a")
+        session = HTTPSession("http://www.test.com")
+        session.request(method, "/a")
         mock_request.assert_called_once_with(method, "http://www.test.com/a")
 
 
-def test_http_client_get():
-    """The HTTP client should map methods to request."""
-    with patch.object(HTTPClient, "request") as mock_request:
-        client = HTTPClient("http://www.test.com")
-        client.get("/a")
+def test_http_session_get():
+    """The HTTP session should map methods to request."""
+    with patch.object(HTTPSession, "request") as mock_request:
+        session = HTTPSession("http://www.test.com")
+        session.get("/a")
         mock_request.assert_called_once_with("GET", "/a", allow_redirects=True)
