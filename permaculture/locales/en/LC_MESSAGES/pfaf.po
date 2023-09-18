@@ -33,6 +33,34 @@ msgctxt "Deciduous/Evergreen"
 msgid "E"
 msgstr "evergreen"
 
+msgctxt "Growth rate"
+msgid "S"
+msgstr "slow"
+
+msgctxt "Growth rate"
+msgid "M"
+msgstr "medium"
+
+msgctxt "Growth rate"
+msgid "F"
+msgstr "fast"
+
+msgctxt "Moisture"
+msgid "D"
+msgstr "dry"
+
+msgctxt "Moisture"
+msgid "M"
+msgstr "moist"
+
+msgctxt "Moisture"
+msgid "We"
+msgstr "wet"
+
+msgctxt "Moisture"
+msgid "Wa"
+msgstr "water"
+
 msgctxt "pH"
 msgid "A"
 msgstr "acid"
@@ -59,11 +87,11 @@ msgstr "none"
 
 msgctxt "Soil"
 msgid "L"
-msgstr "light(sandy)"
+msgstr "light"
 
 msgctxt "Soil"
 msgid "M"
-msgstr "medium(loam)"
+msgstr "medium"
 
 msgctxt "Soil"
 msgid "H"

@@ -95,7 +95,7 @@ def test_de_web_perenial_plants_list_error():
         pytest.param(
             ("Inconvénient", "E D A P Épi V B G Pe"),
             (
-                "Inconvénient",
+                "inconvénient",
                 [
                     "expansive",
                     "dispersive",
@@ -112,7 +112,7 @@ def test_de_web_perenial_plants_list_error():
         ),
         pytest.param(
             ("Intérêt automnale hivernal", "A H"),
-            ("Intérêt automnale hivernal", ["autumn", "winter"]),
+            ("intérêt automnale hivernal", ["autumn", "winter"]),
             id="Intérêt automnale hivernal",
         ),
         pytest.param(
@@ -123,7 +123,7 @@ def test_de_web_perenial_plants_list_error():
         pytest.param(
             ("Multiplication", "B M D S G St P A É T"),
             (
-                "Multiplication",
+                "multiplication",
                 [
                     "cuttings",
                     "layering",
@@ -250,6 +250,7 @@ def test_de_database_iterate():
                     "genus": "a",
                     "species": "b",
                     "common name": "c",
+                    "french name": "d",
                 }
             ]
         )
@@ -261,11 +262,12 @@ def test_de_database_iterate():
         DatabaseElement(
             database="DE",
             scientific_name="a b",
-            common_names=["c"],
+            common_names=["c", "d"],
             characteristics={
                 "genus": "a",
                 "species": "b",
                 "common name": "c",
+                "french name": "d",
             },
         )
     ]

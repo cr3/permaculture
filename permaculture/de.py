@@ -97,9 +97,18 @@ class DEModel:
         csv = reader(StringIO(data))
         next(csv)  # Skip groups
         header = [h.strip() for h in next(csv)]
+        ignore = {
+            "Accumulateur de Nutriments",
+            "Cultivars intéressants",
+            "Lien Information",
+            "Notes",
+            "Où peut-on la trouver?",
+        }
         for row in csv:
             yield dict(
-                self.convert(k, v) for k, v in zip(header, row, strict=True)
+                self.convert(k, v)
+                for k, v in zip(header, row, strict=True)
+                if k not in ignore
             )
 
 
