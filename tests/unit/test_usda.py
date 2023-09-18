@@ -15,9 +15,9 @@ from .stubs import StubRequestsResponse
 
 def test_usda_web_characteristics_search():
     """CharacteristicsSearch should POST a JSON payload."""
-    client = Mock(post=Mock(return_value=StubRequestsResponse()))
-    USDAWeb(client).characteristics_search()
-    client.post.assert_called_once_with(
+    session = Mock(post=Mock(return_value=StubRequestsResponse()))
+    USDAWeb(session).characteristics_search()
+    session.post.assert_called_once_with(
         "/api/CharacteristicsSearch",
         json=ANY,
     )
@@ -25,9 +25,9 @@ def test_usda_web_characteristics_search():
 
 def test_usda_web_plant_profile():
     """PlantProfile should GET with the symbol query param."""
-    client = Mock(get=Mock(return_value=StubRequestsResponse()))
-    USDAWeb(client).plant_profile("test")
-    client.get.assert_called_once_with(
+    session = Mock(get=Mock(return_value=StubRequestsResponse()))
+    USDAWeb(session).plant_profile("test")
+    session.get.assert_called_once_with(
         "/api/PlantProfile",
         params={"symbol": "test"},
     )
@@ -35,9 +35,9 @@ def test_usda_web_plant_profile():
 
 def test_usda_web_plant_characteristics():
     """PlantCharacteristics should GET with the id in the URL."""
-    client = Mock(get=Mock(return_value=StubRequestsResponse()))
-    USDAWeb(client).plant_characteristics(1234)
-    client.get.assert_called_once_with("/api/PlantCharacteristics/1234")
+    session = Mock(get=Mock(return_value=StubRequestsResponse()))
+    USDAWeb(session).plant_characteristics(1234)
+    session.get.assert_called_once_with("/api/PlantCharacteristics/1234")
 
 
 def test_usda_model_all_characteristics():

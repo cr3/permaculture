@@ -1,6 +1,5 @@
 """Design Ecologique database."""
 
-import logging
 import re
 from csv import reader
 from functools import partial
@@ -8,21 +7,20 @@ from io import StringIO
 
 from attrs import define, field
 from bs4 import BeautifulSoup
+from requests import Session
 from yarl import URL
 
 from permaculture.database import DatabaseElement, DatabaseIterablePlugin
 from permaculture.google import GoogleSpreadsheet
-from permaculture.http import HTTPClient
+from permaculture.http import HTTPSession
 from permaculture.locales import Locales
-
-logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
 class DEWeb:
     """Design Ecologique web interface."""
 
-    client: HTTPClient = field()
+    session: Session = field()
     _cache_dir = field(default=None)
 
     def perenial_plants_list(self):
@@ -30,7 +28,7 @@ class DEWeb:
 
         :returns: Google spreadsheet with plants.
         """
-        response = self.client.get("/liste-de-plantes-vivaces/")
+        response = self.session.get("/liste-de-plantes-vivaces/")
         soup = BeautifulSoup(response.text, "html.parser")
         element = soup.select_one("a[href*=spreadsheets]")
         if not element:
@@ -48,8 +46,8 @@ class DEModel:
     @classmethod
     def from_url(cls, url: URL, cache_dir=None):
         """Instantiate a Design Ecologique model from URL."""
-        client = HTTPClient(url).with_cache(cache_dir)
-        web = DEWeb(client)
+        session = HTTPSession(url).with_cache(cache_dir)
+        web = DEWeb(session)
         return cls(web)
 
     def convert(self, key, value):

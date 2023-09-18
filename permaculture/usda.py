@@ -5,10 +5,11 @@ from functools import partial
 from itertools import chain
 
 from attrs import define, field
+from requests import Session
 from yarl import URL
 
 from permaculture.database import DatabaseElement, DatabaseIterablePlugin
-from permaculture.http import HTTPClient
+from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage, MemoryStorage, Storage
 
@@ -17,7 +18,7 @@ from permaculture.storage import FileStorage, MemoryStorage, Storage
 class USDAWeb:
     """USDA web interface."""
 
-    client: HTTPClient
+    session: Session
 
     def characteristics_search(self) -> bytes:
         """Search characteristics."""
@@ -49,19 +50,21 @@ class USDAWeb:
             "TaxonSearchCriteria": None,
             "MasterId": -1,
         }
-        response = self.client.post("/api/CharacteristicsSearch", json=payload)
+        response = self.session.post(
+            "/api/CharacteristicsSearch", json=payload
+        )
         return response.json()
 
     def plant_profile(self, symbol):
         """Plant profile for a symbol."""
-        response = self.client.get(
+        response = self.session.get(
             "/api/PlantProfile", params={"symbol": symbol}
         )
         return response.json()
 
     def plant_characteristics(self, Id):
         """Plant characteristics for an identifier."""
-        response = self.client.get(f"/api/PlantCharacteristics/{Id}")
+        response = self.session.get(f"/api/PlantCharacteristics/{Id}")
         return response.json()
 
 
@@ -77,8 +80,8 @@ class USDAModel:
     def from_url(cls, url: URL, cache_dir=None):
         """Instantiate USDA Plants from URL."""
         storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
-        client = HTTPClient(url).with_cache(cache_dir)
-        web = USDAWeb(client)
+        session = HTTPSession(url).with_cache(cache_dir)
+        web = USDAWeb(session)
         return cls(web, storage)
 
     def convert(self, key, value):

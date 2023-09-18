@@ -18,17 +18,17 @@ def test_de_web_perenial_plants_list(unique):
     """Perenial plants should GET and return the spreadsheet."""
     doc_id = unique("text")
     text = f"<a href='https://docs.google.com/spreadsheets/d/{doc_id}/edit'>"
-    client = Mock(get=Mock(return_value=StubRequestsResponse(text=text)))
-    plants = DEWeb(client).perenial_plants_list()
-    client.get.assert_called_once_with("/liste-de-plantes-vivaces/")
+    session = Mock(get=Mock(return_value=StubRequestsResponse(text=text)))
+    plants = DEWeb(session).perenial_plants_list()
+    session.get.assert_called_once_with("/liste-de-plantes-vivaces/")
     assert plants.doc_id == doc_id
 
 
 def test_de_web_perenial_plants_list_error():
     """Perenial plants should raise when spreadhseet is not found."""
-    client = Mock(get=Mock(return_value=StubRequestsResponse()))
+    session = Mock(get=Mock(return_value=StubRequestsResponse()))
     with pytest.raises(KeyError):
-        DEWeb(client).perenial_plants_list()
+        DEWeb(session).perenial_plants_list()
 
 
 @pytest.mark.parametrize(
