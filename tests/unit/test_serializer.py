@@ -179,9 +179,9 @@ def test_octet_stream_serializer():
 
 def test_text_csv_serializer():
     """The text/csv content type should encode a list of lists."""
-    payload = text_csv_serializer.encode([LIST_TEST])
+    payload = text_csv_serializer.encode([{"a": 1}])
     assert isinstance(payload, bytes)
-    assert text_csv_serializer.decode(payload) == [LIST_TEST]
+    assert text_csv_serializer.decode(payload) == [{"a": 1}]
 
 
 def test_text_plain_serializer():
