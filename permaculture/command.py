@@ -3,10 +3,16 @@
 import sys
 from argparse import ArgumentParser, FileType
 from collections import defaultdict
+from functools import reduce
 
 from appdirs import user_cache_dir
 from configargparse import ArgParser
 
+from permaculture.data import (
+    merge,
+    merge_numbers,
+    merge_strings,
+)
 from permaculture.database import Database
 from permaculture.logger import (
     LoggerHandlerAction,
@@ -99,22 +105,6 @@ def make_config_parser(config_files):
     return config
 
 
-def merge_characteristics(x, y):
-    """Merge the characteristics of one dict into another dict.
-
-    If both dicts have different values for the same key, they are
-    combined into a list.
-    """
-    for key, y_value in y.items():
-        if x_value := x.get(key):
-            if x_value != y_value:
-                x_value = x_value if type(x_value) is list else [x_value]
-                y_value = y_value if type(y_value) is list else [y_value]
-                x[key] = list(set(x_value).union(y_value))
-        else:
-            x[key] = y_value
-
-
 def main(argv=None):
     """Entry point to the permaculture command."""
     config_parser = make_config_parser(["~/.permaculture", ".permaculture"])
@@ -128,9 +118,8 @@ def main(argv=None):
 
     match args.command:
         case "lookup":
-            data = {}
-            for element in database.lookup(args.name):
-                merge_characteristics(data, element.characteristics)
+            datas = (e.characteristics for e in database.lookup(args.name))
+            data = merge_numbers(merge_strings(reduce(merge, datas, {})))
         case "search":
             data = defaultdict(set)
             for element in database.search(args.name):

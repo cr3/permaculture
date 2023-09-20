@@ -154,8 +154,8 @@ def test_nc_converter_convert_range(item, expected):
         pytest.param(
             ("Sun", "Full Sun, Partial Shade"),
             [
-                ("sun/full sun", True),
-                ("sun/partial shade", True),
+                ("sun/full", True),
+                ("sun/partial", True),
             ],
             id="Sun",
         ),

@@ -25,6 +25,12 @@ msgstr "fact sheet urls"
 msgid "GrowthHabits"
 msgstr "growth habits"
 
+msgid "Height at 20 Years, Maximum (feet)"
+msgstr "height"
+
+msgid "Height, Mature (feet)"
+msgstr "height"
+
 msgid "ImageId"
 msgstr "image id"
 
@@ -57,6 +63,12 @@ msgstr "plant location id"
 
 msgid "PlantNotes"
 msgstr "plant notes"
+
+msgid "Planting Density per Acre, Maximum"
+msgstr "density/max"
+
+msgid "Planting Density per Acre, Minimum"
+msgstr "density/min"
 
 msgid "PlantsDistributionResults"
 msgstr "plants distribution results"

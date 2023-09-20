@@ -16,6 +16,8 @@ from permaculture.tokenizer import tokenize
         pytest.param("foo  bar", "foo bar", id="space between"),
         pytest.param("foo x bar", "foo bar", id="single letter"),
         pytest.param("FOO", "foo", id="lower case"),
+        pytest.param("-a-b-", "ab", id="dash"),
+        pytest.param(".a.b.", "ab", id="dot"),
     ],
 )
 def test_tokenize(words, expected):

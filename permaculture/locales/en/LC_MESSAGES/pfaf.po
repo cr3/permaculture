@@ -19,11 +19,14 @@ msgstr "edibility rating"
 msgid "FrostTender"
 msgstr "frost tender"
 
+msgid "Latin name"
+msgstr "scientific name"
+
 msgid "MedicinalRating"
 msgstr "medicinal rating"
 
-msgid "Latin name"
-msgstr "scientific name"
+msgid "UK Hardiness"
+msgstr "hardiness/uk"
 
 msgctxt "Deciduous/Evergreen"
 msgid "D"

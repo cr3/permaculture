@@ -29,6 +29,14 @@ permaculture.command module
    :undoc-members:
    :show-inheritance:
 
+permaculture.data module
+------------------------
+
+.. automodule:: permaculture.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.database module
 ----------------------------
 
@@ -113,6 +121,14 @@ permaculture.tokenizer module
 -----------------------------
 
 .. automodule:: permaculture.tokenizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.unit module
+------------------------
+
+.. automodule:: permaculture.unit
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,7 +1,6 @@
 """Design Ecologique database."""
 
 import re
-from collections import defaultdict
 from csv import reader
 from functools import partial
 from io import StringIO
@@ -44,20 +43,23 @@ class DEWeb:
 class DEConverter:
     locales: Locales = field(factory=partial(Locales.from_domain, "de"))
 
+    def translate(self, message, context=None):
+        """Convenience function to translate from locales."""
+        return self.locales.translate(message, context).lower()
+
     def convert_ignore(self, *_):
         return []
 
     def convert_list(self, key, value):
-        translate = self.locales.translate
-        new_value = [translate(v, key) for v in re.split(r",?\s+", value)]
+        new_value = [self.translate(v, key) for v in re.split(r",?\s+", value)]
         if len(new_value) == 1 and new_value[0] == value:
-            new_value = [translate(v, key) for v in value]
+            new_value = [self.translate(v, key) for v in value]
 
-        k = translate(key)
+        k = self.translate(key)
         return [(f"{k}/{v}", True) for v in new_value]
 
     def convert_range(self, key, value):
-        k = self.locales.translate(key)
+        k = self.translate(key)
         n = [float(i) for i in re.findall(r"[0-9.]+", value.replace(",", "."))]
         match len(n):
             case 2:
@@ -70,45 +72,40 @@ class DEConverter:
                 raise ValueError(f"Unsupported range: {value}")
 
     def convert_string(self, key, value):
-        translate = self.locales.translate
-        if value == "X":
-            value = True
-        return [(translate(key), translate(value, key))]
+        value = True if value == "X" else self.translate(value, key)
+        return [(self.translate(key), value)]
 
     def convert_item(self, key, value):
-        dispatchers = defaultdict(
-            lambda: self.convert_string,
-            {
-                "Accumulateur de Nutriments": self.convert_ignore,
-                "Comestible": self.convert_list,
-                "Couleur de feuillage": self.convert_list,
-                "Couleur de floraison": self.convert_list,
-                "Couvre-sol": self.convert_ignore,
-                "Cultivars intéressants": self.convert_ignore,
-                "Eau": self.convert_list,
-                "Forme": self.convert_list,
-                "Haie": self.convert_ignore,
-                "Hauteur(m)": self.convert_range,
-                "Inconvénient": self.convert_list,
-                "Intérêt automnale hivernal": self.convert_ignore,
-                "Largeur(m)": self.convert_range,
-                "Lien Information": self.convert_ignore,
-                "Lumière": self.convert_list,
-                "Multiplication": self.convert_list,
-                "Notes": self.convert_ignore,
-                "Où peut-on la trouver?": self.convert_ignore,
-                "Pollinisateurs": self.convert_list,
-                "Période de floraison": self.convert_list,
-                "Période de taille": self.convert_list,
-                "Racine": self.convert_list,
-                "Rythme de croissance": self.convert_list,
-                "Texture du sol": self.convert_list,
-                "Utilisation écologique": self.convert_list,
-                "Vie sauvage": self.convert_list,
-                "pH (Min-Max)": self.convert_range,
-            },
-        )
-        return dispatchers[key](key, value)
+        dispatchers = {
+            "Accumulateur de Nutriments": self.convert_ignore,
+            "Comestible": self.convert_list,
+            "Couleur de feuillage": self.convert_list,
+            "Couleur de floraison": self.convert_list,
+            "Couvre-sol": self.convert_ignore,
+            "Cultivars intéressants": self.convert_ignore,
+            "Eau": self.convert_list,
+            "Forme": self.convert_list,
+            "Haie": self.convert_ignore,
+            "Hauteur(m)": self.convert_range,
+            "Inconvénient": self.convert_list,
+            "Intérêt automnale hivernal": self.convert_ignore,
+            "Largeur(m)": self.convert_range,
+            "Lien Information": self.convert_ignore,
+            "Lumière": self.convert_list,
+            "Multiplication": self.convert_list,
+            "Notes": self.convert_ignore,
+            "Où peut-on la trouver?": self.convert_ignore,
+            "Pollinisateurs": self.convert_list,
+            "Période de floraison": self.convert_list,
+            "Période de taille": self.convert_list,
+            "Racine": self.convert_list,
+            "Rythme de croissance": self.convert_list,
+            "Texture du sol": self.convert_list,
+            "Utilisation écologique": self.convert_list,
+            "Vie sauvage": self.convert_list,
+            "pH (Min-Max)": self.convert_range,
+        }
+        return dispatchers.get(key, self.convert_string)(key, value)
 
     def convert(self, data):
         return dict(

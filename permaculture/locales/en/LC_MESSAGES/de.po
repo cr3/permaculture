@@ -99,7 +99,7 @@ msgid "Vie sauvage"
 msgstr "wildlife"
 
 msgid "Zone de rusticité"
-msgstr "Canada hardiness"
+msgstr "hardiness/canada"
 
 msgid "pH (Min-Max)"
 msgstr "ph"
