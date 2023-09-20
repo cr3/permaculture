@@ -3,7 +3,6 @@
 import logging
 import re
 import string
-from collections import defaultdict
 from functools import partial
 from itertools import chain
 
@@ -133,9 +132,8 @@ class NCConverter:
         return [(self.translate(key), float(new_value) * unit)]
 
     def convert_list(self, key, value):
-        new_value = [self.translate(v, key) for v in re.split(r",\s+", value)]
-
         k = self.translate(key)
+        new_value = [self.translate(v, key) for v in re.split(r",\s+", value)]
         return [(f"{k}/{v}", True) for v in new_value]
 
     def convert_range(self, key, value, unit=1.0):
@@ -157,21 +155,18 @@ class NCConverter:
         return [(self.translate(key), value)]
 
     def convert_item(self, key, value):
-        dispatchers = defaultdict(
-            lambda: self.convert_string,
-            {
-                "Height": partial(self.convert_range, unit=inches),
-                "Minimum Root Depth": partial(self.convert_float, unit=inches),
-                "Notes": self.convert_ignore,
-                "Reference": self.convert_ignore,
-                "Soil Type": self.convert_list,
-                "Soil pH": self.convert_range,
-                "Spread": partial(self.convert_range, unit=inches),
-                "Sun": self.convert_list,
-                "USDA Hardiness Zones": self.convert_range,
-            },
-        )
-        return dispatchers[key](key, value)
+        dispatchers = {
+            "Height": partial(self.convert_range, unit=inches),
+            "Minimum Root Depth": partial(self.convert_float, unit=inches),
+            "Notes": self.convert_ignore,
+            "Reference": self.convert_ignore,
+            "Soil Type": self.convert_list,
+            "Soil pH": self.convert_range,
+            "Spread": partial(self.convert_range, unit=inches),
+            "Sun": self.convert_list,
+            "USDA Hardiness Zones": self.convert_range,
+        }
+        return dispatchers.get(key, self.convert_string)(key, value)
 
     def convert(self, data):
         return dict(

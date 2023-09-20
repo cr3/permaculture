@@ -2,7 +2,6 @@
 
 import logging
 import re
-from collections import defaultdict
 from functools import partial
 from itertools import chain
 
@@ -45,28 +44,29 @@ class PFAFConverter:
         return [(f"{k}/{v}", True) for v in new_value]
 
     def convert_string(self, key, value):
+        if isinstance(value, str):
+            value = self.translate(value, key)
         return [(self.translate(key), value)]
 
     def convert_item(self, key, value):
-        dispatchers = defaultdict(
-            lambda: self.convert_string,
-            {
-                "Author": self.convert_ignore,
-                "Cultivation details": self.convert_ignore,
-                "Deciduous/Evergreen": self.convert_list,
-                "Edible uses": self.convert_ignore,
-                "Growth rate": self.convert_list,
-                "Known hazards": self.convert_ignore,
-                "Medicinal": self.convert_ignore,
-                "Moisture": self.convert_list,
-                "Propagation": self.convert_ignore,
-                "Shade": self.convert_list,
-                "Soil": self.convert_list,
-                "Uses notes": self.convert_ignore,
-                "pH": self.convert_list,
-            },
-        )
-        return dispatchers[key](key, value)
+        dispatchers = {
+            "Author": self.convert_ignore,
+            "Cultivation details": self.convert_ignore,
+            "Deciduous/Evergreen": self.convert_list,
+            "Drought": self.convert_ignore,
+            "Edible uses": self.convert_ignore,
+            "Growth rate": self.convert_list,
+            "Known hazards": self.convert_ignore,
+            "Medicinal": self.convert_ignore,
+            "Moisture": self.convert_list,
+            "Propagation": self.convert_ignore,
+            "Range": self.convert_ignore,
+            "Shade": self.convert_list,
+            "Soil": self.convert_list,
+            "Uses notes": self.convert_ignore,
+            "pH": self.convert_list,
+        }
+        return dispatchers.get(key, self.convert_string)(key, value)
 
     def convert(self, data):
         return dict(

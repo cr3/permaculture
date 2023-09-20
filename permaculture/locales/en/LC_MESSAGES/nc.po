@@ -22,5 +22,17 @@ msgstr "moisture"
 msgid "Soil pH"
 msgstr "ph"
 
-msgid "USDA Hardiness Zone"
-msgstr "USDA hardiness"
+msgid "USDA Hardiness Zones"
+msgstr "hardiness/usda"
+
+msgctxt "Sun"
+msgid "Full Sun"
+msgstr "full"
+
+msgctxt "Sun"
+msgid "Partial Shade"
+msgstr "partial"
+
+msgctxt "Sun"
+msgid "Shade"
+msgstr "shade"

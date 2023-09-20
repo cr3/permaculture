@@ -1,6 +1,5 @@
 """USDA Plants database."""
 
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from itertools import chain
@@ -13,6 +12,7 @@ from permaculture.database import DatabaseElement, DatabaseIterablePlugin
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage, MemoryStorage, Storage
+from permaculture.tokenizer import tokenize
 
 
 @define(frozen=True)
@@ -94,76 +94,84 @@ class USDAConverter:
     def convert_int(self, key, value):
         return [(self.translate(key), int(value))]
 
+    def convert_range(self, key, value):
+        k = self.translate(key)
+        v = float(value)
+        return [(f"{k}/min", v), (f"{k}/max", v)]
+
     def convert_string(self, key, value):
+        if isinstance(value, str):
+            value = self.translate(value, key)
         return [(self.translate(key), value)]
 
+    def convert_token(self, key, value):
+        return [(self.translate(key), tokenize(value))]
+
     def convert_item(self, key, value):
-        dispatchers = defaultdict(
-            lambda: self.convert_string,
-            {
-                "Adapted to Coarse Textured Soils": self.convert_bool,
-                "Adapted to Fine Textured Soils": self.convert_bool,
-                "Adapted to Medium Textured Soils": self.convert_bool,
-                "Berry/Nut/Seed Product": self.convert_bool,
-                "Christmas Tree Product": self.convert_ignore,
-                "Cold Stratification Required": self.convert_bool,
-                "Coppice Potential": self.convert_bool,
-                "Fall Conspicuous": self.convert_bool,
-                "Fire Resistant": self.convert_bool,
-                "Flower Conspicuous": self.convert_bool,
-                "Fodder Product": self.convert_bool,
-                "Frost Free Days, Minimum": self.convert_int,
-                "Fruit/Seed Conspicuous": self.convert_bool,
-                "Fruit/Seed Persistence": self.convert_bool,
-                "HasCharacteristics": self.convert_ignore,
-                "HasDistributionData": self.convert_ignore,
-                "HasDocumentation": self.convert_ignore,
-                "HasEthnobotany": self.convert_ignore,
-                "HasImages": self.convert_ignore,
-                "HasInvasiveStatuses": self.convert_ignore,
-                "HasLegalStatuses": self.convert_ignore,
-                "HasNoxiousStatuses": self.convert_ignore,
-                "HasPollinator": self.convert_ignore,
-                "HasRelatedLinks": self.convert_ignore,
-                "HasSubordinateTaxa": self.convert_ignore,
-                "HasSynonyms": self.convert_ignore,
-                "HasWetlandData": self.convert_ignore,
-                "HasWildlife": self.convert_ignore,
-                "Height at 20 Years, Maximum (feet)": self.convert_int,
-                "Height, Mature (feet)": self.convert_float,
-                "Known Allelopath": self.convert_bool,
-                "Leaf Retention": self.convert_bool,
-                "Low Growing Grass": self.convert_bool,
-                "Lumber Product": self.convert_bool,
-                "Naval Store Product": self.convert_bool,
-                "Nursery Stock Product": self.convert_bool,
-                "Palatable Human": self.convert_bool,
-                "Planting Density per Acre, Maximum": self.convert_int,
-                "Planting Density per Acre, Minimum": self.convert_int,
-                "Post Product": self.convert_bool,
-                "Precipitation, Maximum": self.convert_int,
-                "Precipitation, Minimum": self.convert_int,
-                "Propagated by Bare Root": self.convert_bool,
-                "Propagated by Bulb": self.convert_bool,
-                "Propagated by Container": self.convert_bool,
-                "Propagated by Corm": self.convert_bool,
-                "Propagated by Cuttings": self.convert_bool,
-                "Propagated by Seed": self.convert_bool,
-                "Propagated by Sod": self.convert_bool,
-                "Propagated by Sprigs": self.convert_bool,
-                "Propagated by Tubers": self.convert_bool,
-                "Pulpwood Product": self.convert_bool,
-                "Resprout Ability": self.convert_bool,
-                "Root Depth, Minimum (inches)": self.convert_int,
-                "Seed per Pound": self.convert_int,
-                "Small Grain": self.convert_bool,
-                "Temperature, Minimum (°F)": self.convert_int,
-                "Veneer Product": self.convert_bool,
-                "pH, Maximum": self.convert_float,
-                "pH, Minimum": self.convert_float,
-            },
-        )
-        return dispatchers[key](key, value)
+        dispatchers = {
+            "Adapted to Coarse Textured Soils": self.convert_bool,
+            "Adapted to Fine Textured Soils": self.convert_bool,
+            "Adapted to Medium Textured Soils": self.convert_bool,
+            "Berry/Nut/Seed Product": self.convert_bool,
+            "Christmas Tree Product": self.convert_ignore,
+            "Cold Stratification Required": self.convert_bool,
+            "Coppice Potential": self.convert_bool,
+            "Fall Conspicuous": self.convert_bool,
+            "Fire Resistant": self.convert_bool,
+            "Flower Conspicuous": self.convert_bool,
+            "Fodder Product": self.convert_bool,
+            "Frost Free Days, Minimum": self.convert_int,
+            "Fruit/Seed Conspicuous": self.convert_bool,
+            "Fruit/Seed Persistence": self.convert_bool,
+            "HasCharacteristics": self.convert_ignore,
+            "HasDistributionData": self.convert_ignore,
+            "HasDocumentation": self.convert_ignore,
+            "HasEthnobotany": self.convert_ignore,
+            "HasImages": self.convert_ignore,
+            "HasInvasiveStatuses": self.convert_ignore,
+            "HasLegalStatuses": self.convert_ignore,
+            "HasNoxiousStatuses": self.convert_ignore,
+            "HasPollinator": self.convert_ignore,
+            "HasRelatedLinks": self.convert_ignore,
+            "HasSubordinateTaxa": self.convert_ignore,
+            "HasSynonyms": self.convert_ignore,
+            "HasWetlandData": self.convert_ignore,
+            "HasWildlife": self.convert_ignore,
+            "Height at 20 Years, Maximum (feet)": self.convert_ignore,
+            "Height, Mature (feet)": self.convert_range,
+            "Known Allelopath": self.convert_bool,
+            "Leaf Retention": self.convert_bool,
+            "Low Growing Grass": self.convert_bool,
+            "Lumber Product": self.convert_bool,
+            "Naval Store Product": self.convert_bool,
+            "Nursery Stock Product": self.convert_bool,
+            "Palatable Human": self.convert_bool,
+            "Planting Density per Acre, Maximum": self.convert_int,
+            "Planting Density per Acre, Minimum": self.convert_int,
+            "Post Product": self.convert_bool,
+            "Precipitation, Maximum": self.convert_int,
+            "Precipitation, Minimum": self.convert_int,
+            "Propagated by Bare Root": self.convert_bool,
+            "Propagated by Bulb": self.convert_bool,
+            "Propagated by Container": self.convert_bool,
+            "Propagated by Corm": self.convert_bool,
+            "Propagated by Cuttings": self.convert_bool,
+            "Propagated by Seed": self.convert_bool,
+            "Propagated by Sod": self.convert_bool,
+            "Propagated by Sprigs": self.convert_bool,
+            "Propagated by Tubers": self.convert_bool,
+            "Pulpwood Product": self.convert_bool,
+            "Resprout Ability": self.convert_bool,
+            "Root Depth, Minimum (inches)": self.convert_int,
+            "ScientificName": self.convert_token,
+            "Seed per Pound": self.convert_int,
+            "Small Grain": self.convert_bool,
+            "Temperature, Minimum (°F)": self.convert_int,
+            "Veneer Product": self.convert_bool,
+            "pH, Maximum": self.convert_float,
+            "pH, Minimum": self.convert_float,
+        }
+        return dispatchers.get(key, self.convert_string)(key, value)
 
     def convert(self, data):
         return dict(
