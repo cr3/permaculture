@@ -167,15 +167,19 @@ This serializer doesn't do anything.
 
 
 def _text_csv_serializer_encode(data, encoding="utf-8"):
+    if not isinstance(data, list):
+        data = [data]
+
     f = StringIO()
-    writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+    writer = csv.DictWriter(f, data[0].keys(), quoting=csv.QUOTE_NONNUMERIC)
+    writer.writeheader()
     writer.writerows(data)
     return f.getvalue().encode(encoding)
 
 
 def _text_csv_serializer_decode(payload, encoding="utf-8"):
     f = StringIO(payload.decode(encoding))
-    reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
+    reader = csv.DictReader(f, quoting=csv.QUOTE_NONNUMERIC)
     return list(reader)
 
 
