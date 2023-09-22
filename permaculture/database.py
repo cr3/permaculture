@@ -25,6 +25,10 @@ class DatabaseElement:
 
 @define(frozen=True)
 class DatabasePlugin(ABC):
+    def companions(self, compatible: bool) -> Iterator[DatabaseElement]:
+        """Plant companions list."""
+        yield from []
+
     @abstractmethod
     def search(self, common_name: str) -> Iterator[DatabaseElement]:
         """Search for the scientific name by common name."""
@@ -48,8 +52,9 @@ class DatabaseIterablePlugin(DatabasePlugin):
                 yield element
 
     def lookup(self, scientific_name: str) -> Iterator[DatabaseElement]:
+        token = tokenize(scientific_name)
         for element in self.iterate():
-            if re.match(scientific_name, element.scientific_name, re.I):
+            if re.match(token, element.scientific_name, re.I):
                 yield element
 
 
@@ -70,6 +75,11 @@ class Database:
         }
 
         return cls(databases)
+
+    def companions(self, compatible=True):
+        """Plant companions list."""
+        for database in self.databases.values():
+            yield from database.companions(compatible)
 
     def lookup(self, scientific_name: str):
         """Lookup characteristics by scientific name in all databases."""

@@ -69,7 +69,7 @@ class DEConverter:
             case 0:
                 return []
             case _:
-                raise ValueError(f"Unsupported range: {value}")
+                raise ValueError(f"Unsupported range: {value!r}")
 
     def convert_string(self, key, value):
         value = True if value == "X" else self.translate(value, key)

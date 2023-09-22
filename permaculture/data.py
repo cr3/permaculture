@@ -87,20 +87,20 @@ def visit(data, f):
     """Visit each key/value within nested data with the given function."""
 
     def _visit(d):
-        for key, value in d:
+        for key, value in d.items():
             if isinstance(value, Mapping):
-                yield from _visit(value.items())
+                yield key, dict(_visit(value))
             else:
                 yield key, f(key, value, d)
 
-    return dict(_visit(data.items()))
+    return dict(_visit(data))
 
 
 merge_strings = partial(
     visit,
-    f=lambda _k, v, _d: (
-        {k: True for k in v}
-        if isinstance(v, list) and all(isinstance(k, str) for k in v)
+    f=lambda k, v, _d: (
+        {i: True for i in v}
+        if isinstance(v, list) and all(isinstance(i, str) for i in v)
         else v
     ),
 )

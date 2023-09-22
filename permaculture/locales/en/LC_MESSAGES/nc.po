@@ -16,6 +16,9 @@ msgstr ""
 msgid "Minimum Root Depth"
 msgstr "root depth/min"
 
+msgid "Related Plant"
+msgstr "related"
+
 msgid "Soil Moisture"
 msgstr "moisture"
 

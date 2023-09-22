@@ -2,16 +2,17 @@
 
 import sys
 from argparse import ArgumentParser, FileType
-from collections import defaultdict
 from functools import reduce
 
 from appdirs import user_cache_dir
 from configargparse import ArgParser
 
 from permaculture.data import (
+    flatten,
     merge,
     merge_numbers,
     merge_strings,
+    unflatten,
 )
 from permaculture.database import Database
 from permaculture.logger import (
@@ -27,6 +28,11 @@ def make_args_parser():
     """Make a parser for command-line arguments only."""
     args_parser = ArgumentParser()
     args_parser.add_argument(
+        "--flatten",
+        action="store_true",
+        help="flatten output",
+    )
+    args_parser.add_argument(
         "--output",
         type=FileType("wb"),
         default=sys.stdout.buffer,
@@ -39,6 +45,10 @@ def make_args_parser():
     command = args_parser.add_subparsers(
         dest="command",
         help="permaculture command",
+    )
+    command.add_parser(
+        "companions",
+        help="plant companions list",
     )
     lookup = command.add_parser(
         "lookup",
@@ -83,7 +93,10 @@ def make_config_parser(config_files):
         default=user_cache_dir("permaculture"),
         help="cache HTTP requests to directory (default %(default)s)",
     )
-    config.add_argument("--database", help="filter on a database")
+    config.add_argument(
+        "--database",
+        help="filter on a database",
+    )
     config.add_argument(
         "--log-file",
         action=LoggerHandlerAction,
@@ -117,14 +130,21 @@ def main(argv=None):
     database = Database.load(config)
 
     match args.command:
+        case "companions":
+            datas = [
+                {e.scientific_name: e.common_names}
+                for e in database.companions()
+            ]
+            data = reduce(merge, datas, {})
         case "lookup":
             datas = (e.characteristics for e in database.lookup(args.name))
             data = merge_numbers(merge_strings(reduce(merge, datas, {})))
         case "search":
-            data = defaultdict(set)
-            for element in database.search(args.name):
-                data[element.scientific_name].update(element.common_names)
-            data = {k: sorted(v) for k, v in data.items()}
+            datas = [
+                {e.scientific_name: e.common_names}
+                for e in database.search(args.name)
+            ]
+            data = reduce(merge, datas, {})
         case "store":
             storage = FileStorage(config.cache_dir, "application/octet-stream")
             storage[args.key] = args.file.read()
@@ -132,5 +152,6 @@ def main(argv=None):
         case _:
             args_parser.error(f"Unsupported command: {args.command}")
 
+    data = flatten(data) if args.flatten else unflatten(data)
     output, *_ = args.serializer.encode(data)
     args.output.write(output)

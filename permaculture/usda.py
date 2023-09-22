@@ -86,7 +86,7 @@ class USDAConverter:
         elif value == "No":
             return [(self.translate(key), False)]
         else:
-            raise ValueError(f"Unknown boolean: {value}")
+            raise ValueError(f"Unknown boolean: {value!r}")
 
     def convert_float(self, key, value):
         return [(self.translate(key), float(value))]

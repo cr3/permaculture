@@ -282,11 +282,11 @@ msgstr "winter"
 
 msgctxt "Lumière"
 msgid "○"
-msgstr "full sun"
+msgstr "full"
 
 msgctxt "Lumière"
 msgid "◐"
-msgstr "partial shade"
+msgstr "partial"
 
 msgctxt "Lumière"
 msgid "●"

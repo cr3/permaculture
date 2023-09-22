@@ -159,6 +159,11 @@ def test_nc_converter_convert_range(item, expected):
             ],
             id="Sun",
         ),
+        pytest.param(
+            ("Height", "12 inches - 36-40 inches"),
+            [("height/min", 0.30479999999999996), ("height/max", 0.9144)],
+            id="Height",
+        ),
     ],
 )
 def test_nc_convert_convert_item(item, expected):
@@ -215,10 +220,10 @@ def test_nc_convert_convert_item(item, expected):
         ),
     ],
 )
-def test_nc_model_parse_tables(text, expected):
-    """Parsing tables should return a list of dictionaries."""
+def test_nc_model_parse_plant_list(text, expected):
+    """Parsing a plant list should return a list of dictionaries."""
     model = NCModel(None)
-    result = list(model.parse_tables(text))
+    result = list(model.parse_plant_list(text))
     assert result == expected
 
 
@@ -273,76 +278,190 @@ def test_nc_model_parse_detail(text, expected):
     assert result == expected
 
 
-def test_nc_model_get_plant_companions():
-    """Getting plant companions should call each letter."""
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        pytest.param(
+            dedent("""\
+            <table width="100%">
+              <tr>
+                <td class="plantList">Plant</td>
+                <td class="plantList">Related Plant</td>
+              </tr>
+        """),
+            [],
+            id="no plants",
+        ),
+        pytest.param(
+            dedent("""\
+            <table width="100%">
+              <tr>
+                <td class="plantList">Plant</td>
+                <td class="plantList">Related Plant</td>
+              </tr>
+              <tr>
+                <td>a</td>
+                <td><a href="http://example.com/?id=0"></a></td>
+              </tr>
+            </table>
+        """),
+            [
+                {
+                    "plant": "a",
+                    "related": None,
+                },
+            ],
+            id="one plant, no related",
+        ),
+        pytest.param(
+            dedent("""\
+            <table width="100%">
+              <tr>
+                <td class="plantList">Plant</td>
+                <td class="plantList">Related Plant</td>
+              </tr>
+              <tr>
+                <td>a</td>
+                <td><a href="http://example.com/?id=1">b</a></td>
+              </tr>
+            </table>
+        """),
+            [
+                {
+                    "plant": "a",
+                    "related": NCLink("b", "http://example.com/?id=1"),
+                },
+            ],
+            id="one plant, one related",
+        ),
+        pytest.param(
+            dedent("""\
+            <table width="100%">
+              <tr>
+                <td class="plantList">Plant</td>
+                <td class="plantList">Related Plant</td>
+              </tr>
+              <tr>
+                <td>a</td>
+                <td><a href="http://example.com/?id=1">b</a></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><a href="http://example.com/?id=2">c</a></td>
+              </tr>
+            </table>
+        """),
+            [
+                {
+                    "plant": "a",
+                    "related": NCLink("b", "http://example.com/?id=1"),
+                },
+                {
+                    "plant": "a",
+                    "related": NCLink("c", "http://example.com/?id=2"),
+                },
+            ],
+            id="one plant, two related",
+        ),
+    ],
+)
+def test_nc_model_get_plant_companions(text, expected):
+    """Getting plant companions should return the expected plants."""
     with patch.object(NCWeb, "view_complist") as mock_complist:
-        mock_complist.return_value = "<table width='100%'><tr></tr></table>"
+        mock_complist.return_value = text
         web = NCWeb(None)
         model = NCModel(web)
-        list(model.get_plant_companions())
+        companions = list(model.get_plant_companions(None))
+
+        assert companions == expected
+
+
+def test_nc_model_get_all_plant_companions():
+    """Getting all plant companions should call each letter."""
+    with patch.object(NCWeb, "view_complist") as mock_complist:
+        mock_complist.return_value = dedent("""\
+            <table width="100%">
+              <tr></tr>
+            </table>
+        """)
+        web = NCWeb(None)
+        model = NCModel(web)
+        list(model.get_all_plant_companions())
 
         assert mock_complist.call_args_list == [
             call(letter) for letter in string.ascii_uppercase
         ]
 
 
-def test_nc_database_lookup():
+def test_nc_database_lookup(unique):
     """Looking up a scientific name should return a list of elements."""
+    scientific_name, common_name = unique("token"), unique("text")
     model = Mock(
         get_plants=Mock(
             return_value=[
                 {
-                    "scientific name": "a",
-                    "plant name": NCLink("b", "http://example.com/?id="),
+                    "scientific name": scientific_name,
+                    "plant name": NCLink(
+                        common_name, "http://example.com/?id=0"
+                    ),
                 }
             ]
         ),
         get_plant=Mock(
-            return_value={"scientific name": "a", "common name": "b"}
+            return_value={
+                "scientific name": scientific_name,
+                "common name": common_name,
+            }
         ),
     )
 
     database = NCDatabase(model)
-    elements = list(database.lookup("a"))
+    elements = list(database.lookup(scientific_name))
     assert elements == [
         DatabaseElement(
             database="NC",
-            scientific_name="a",
-            common_names=["b"],
+            scientific_name=scientific_name,
+            common_names=[common_name],
             characteristics={
-                "scientific name": "a",
-                "common name": "b",
+                "scientific name": scientific_name,
+                "common name": common_name,
             },
         )
     ]
 
 
-def test_nc_database_search():
+def test_nc_database_search(unique):
     """Searching for a common name should return a list of elements."""
+    scientific_name, common_name = unique("token"), unique("text")
     model = Mock(
         get_plants=Mock(
             return_value=[
                 {
-                    "scientific name": "a",
-                    "plant name": NCLink("b", "http://example.com/?id="),
+                    "scientific name": scientific_name,
+                    "plant name": NCLink(
+                        common_name, "http://example.com/?id=0"
+                    ),
                 }
             ]
         ),
         get_plant=Mock(
-            return_value={"scientific name": "a", "common name": "b"}
+            return_value={
+                "scientific name": scientific_name,
+                "common name": common_name,
+            }
         ),
     )
 
     database = NCDatabase(model)
-    elements = list(database.search("b"))
+    elements = list(database.search(common_name))
     assert elements == [
         DatabaseElement(
             database="NC",
-            scientific_name="a",
-            common_names=["b"],
+            scientific_name=scientific_name,
+            common_names=[common_name],
             characteristics={
-                "scientific name": "a",
-                "common name": "b",
+                "scientific name": scientific_name,
+                "common name": common_name,
             },
         )
     ]
