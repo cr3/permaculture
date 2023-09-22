@@ -203,8 +203,9 @@ def test_usda_converter_convert_item(item, expected):
     assert result == expected
 
 
-def test_usda_model_all_characteristics():
+def test_usda_model_all_characteristics(unique):
     """All characteristics should return the general characteristics."""
+    scientific_name, common_name = unique("token"), unique("text")
     web = Mock(
         plant_characteristics=Mock(return_value={}),
         characteristics_search=Mock(
@@ -212,8 +213,8 @@ def test_usda_model_all_characteristics():
                 "PlantResults": [
                     {
                         "Id": "1",
-                        "ScientificName": "a",
-                        "CommonName": "b",
+                        "ScientificName": scientific_name,
+                        "CommonName": common_name,
                     }
                 ],
             }
@@ -224,21 +225,22 @@ def test_usda_model_all_characteristics():
     assert characteristics == [
         {
             "id": "1",
-            "scientific name": "a",
-            "common name": "b",
+            "scientific name": scientific_name,
+            "common name": common_name,
         }
     ]
 
 
-def test_usda_database_iterate():
+def test_usda_database_iterate(unique):
     """Iterating over the database should return a list of elements."""
+    scientific_name, common_name = unique("token"), unique("text")
     model = Mock(
         all_characteristics=Mock(
             return_value=[
                 {
                     "id": "1",
-                    "scientific name": "a",
-                    "common name": "b",
+                    "scientific name": scientific_name,
+                    "common name": common_name,
                 }
             ]
         )
@@ -249,12 +251,12 @@ def test_usda_database_iterate():
     assert elements == [
         DatabaseElement(
             database="USDA",
-            scientific_name="a",
-            common_names=["b"],
+            scientific_name=scientific_name,
+            common_names=[common_name],
             characteristics={
                 "id": "1",
-                "scientific name": "a",
-                "common name": "b",
+                "scientific name": scientific_name,
+                "common name": common_name,
             },
         )
     ]

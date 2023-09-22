@@ -162,13 +162,19 @@ def _test_merge_error(x, y):
             {"a": 1},
             lambda k, v, d: v + 1,
             {"a": 2},
-            id="int",
+            id="dict",
         ),
         pytest.param(
             {"a": [1, 2, 3]},
             lambda k, v, d: sum(v),
             {"a": 6},
-            id="sum",
+            id="dict > list",
+        ),
+        pytest.param(
+            {"a": {"b": 1}},
+            lambda k, v, d: v + 1 if isinstance(v, int) else v,
+            {"a": {"b": 2}},
+            id="dict > dict",
         ),
     ],
 )
@@ -190,11 +196,6 @@ def test_visit(data, f, visited):
             {"a": [1, 2, 3]},
             {"a": 2},
             id="ints",
-        ),
-        pytest.param(
-            {"a": [1, 2, 3]},
-            {"a": 2},
-            id="numbers",
         ),
     ],
 )

@@ -2,6 +2,8 @@
 
 from http.cookiejar import Cookie, CookieJar
 
+from permaculture.tokenizer import tokenize
+
 
 def unique_cookie(unique):
     """Generate a unique cookie."""
@@ -51,3 +53,8 @@ def unique_cookies(unique, count=1):
         cookie_jar.set_cookie(cookie)
 
     return cookie_jar
+
+
+def unique_token(unique):
+    """Generate a unique token."""
+    return tokenize(unique("text"))

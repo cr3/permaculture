@@ -3,8 +3,8 @@
 import logging
 import re
 import string
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -126,10 +126,22 @@ class NCConverter:
     def convert_ignore(self, *_):
         return []
 
+    def convert_bool(self, key, value):
+        if value == "Yes":
+            return [(self.translate(key), True)]
+        elif value == "No":
+            return [(self.translate(key), False)]
+        else:
+            raise ValueError
+            return [(self.translate(key), None)]
+
     def convert_float(self, key, value, unit=1.0):
         # TODO: match unit inside this regex.
-        new_value = re.match(r"([0-9.]+)", value).group(1)
-        return [(self.translate(key), float(new_value) * unit)]
+        if m := re.match(r"([0-9.]+)", value):
+            new_value = float(m.group(1)) * unit
+        else:
+            new_value = None
+        return [(self.translate(key), new_value)]
 
     def convert_list(self, key, value):
         k = self.translate(key)
@@ -138,16 +150,16 @@ class NCConverter:
 
     def convert_range(self, key, value, unit=1.0):
         k = self.translate(key)
-        n = [float(i) * unit for i in re.findall(r"[0-9.]+", value)]
+        n = [
+            float(i) * unit for i in re.findall(r"[0-9]+(?:\.[0-9]+)?", value)
+        ]
         match len(n):
-            case 2:
-                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
-            case 1:
-                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
             case 0:
                 return []
+            case 1:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
             case _:
-                raise ValueError(f"Unsupported range: {value}")
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
 
     def convert_string(self, key, value):
         if isinstance(value, str):
@@ -156,10 +168,11 @@ class NCConverter:
 
     def convert_item(self, key, value):
         dispatchers = {
+            "Bacteria-Fungal Ratio": self.convert_float,
+            "Compatible": self.convert_bool,
             "Height": partial(self.convert_range, unit=inches),
             "Minimum Root Depth": partial(self.convert_float, unit=inches),
             "Notes": self.convert_ignore,
-            "Reference": self.convert_ignore,
             "Soil Type": self.convert_list,
             "Soil pH": self.convert_range,
             "Spread": partial(self.convert_range, unit=inches),
@@ -170,9 +183,7 @@ class NCConverter:
 
     def convert(self, data):
         return dict(
-            chain.from_iterable(
-                self.convert_item(k, v) for k, v in data.items()
-            )
+            item for k, v in data.items() for item in self.convert_item(k, v)
         )
 
 
@@ -203,34 +214,51 @@ class NCModel:
                 yield text
 
     def parse_table(self, table):
+        """Parse a table with a header into a list of dictionaries."""
         header, *trs = table.find_all("tr")
         keys = [td.get_text().strip() for td in header.find_all("td")]
         for tr in trs:
             values = self.parse_tr(tr)
             yield dict(zip(keys, values, strict=True))
 
-    def parse_tables(self, text):
-        """Parse a table with header into a list of dictionaries."""
+    def parse_plant_list(self, text):
+        """Parse a plant list consisting of an HTML table of plants."""
         soup = BeautifulSoup(text, "html.parser")
-        tables = soup.find_all("table", attrs={"width": "100%"})
+        tables = soup.select("table[width='100%']")
         for table in tables:
             if table.find("td", attrs={"class": "plantList"}):
                 yield from self.parse_table(table)
 
-    def get_plant_companions(self):
+    def get_plant_companions(self, letter):
+        """Get plant companions for a single letter."""
+        last_plant = None
+        for plant in self.parse_plant_list(self.web.view_complist(letter)):
+            if not plant["Plant"]:
+                plant["Plant"] = last_plant["Plant"]
+            else:
+                last_plant = plant
+
+            if not plant["Related Plant"].Id:
+                plant["Related Plant"] = None
+
+            yield self.converter.convert(plant)
+
+    def get_all_plant_companions(self):
+        """Get plant companions for all letters."""
         for letter in string.ascii_uppercase:
-            companions_list = self.web.view_complist(letter)
-            yield from self.parse_tables(companions_list)
+            yield from self.get_plant_companions(letter)
 
     def parse_key_value(self, key_value):
+        """Parse a bold key and roman value."""
         prefix = key_value.find("b").text
         key = prefix.strip(": ")
         value = key_value.text.removeprefix(prefix).strip()
         return key, value
 
     def parse_detail(self, text):
+        """Parse a plant detail consisting of an HTML table and paragraphs."""
         soup = BeautifulSoup(text, "html.parser")
-        tables = soup.find_all("table", attrs={"width": "100%"})
+        tables = soup.select("table[width='100%']:not([class*=list])")
         detail = {}
         for table in tables:
             for tr in table.find_all("tr"):
@@ -265,7 +293,7 @@ class NCModel:
             )
             return
 
-        for table in self.parse_tables(plant_list):
+        for table in self.parse_plant_list(plant_list):
             yield self.converter.convert(table)
 
 
@@ -275,8 +303,8 @@ class NCLink:
     url: URL = field(converter=URL)
 
     @property
-    def identifier(self):
-        return self.url.query["id"]
+    def Id(self):
+        return int(self.url.query["id"])
 
     def __str__(self):
         return self.text
@@ -296,12 +324,33 @@ class NCDatabase(DatabasePlugin):
         )
         return cls(model)
 
+    def companions(self, compatible):
+        def get_element(companion):
+            plant = self.model.get_plant(companion["plant"].Id)
+            related = self.model.get_plant(companion["related"].Id)
+            return DatabaseElement(
+                "NC",
+                plant["scientific name"],
+                [related["scientific name"]],
+                {},
+            )
+
+        with ThreadPoolExecutor() as executor:
+            yield from executor.map(
+                get_element,
+                (
+                    c
+                    for c in self.model.get_all_plant_companions()
+                    if c["related"] and c["compatible"] == compatible
+                ),
+            )
+
     def lookup(self, scientific_name):
         # Workaround crappy search in the web interface.
         name = scientific_name.split()[0]
         for plant in self.model.get_plants(sci_name=name):
             if re.match(f"{scientific_name}$", plant["scientific name"], re.I):
-                detail = self.model.get_plant(plant["plant name"].identifier)
+                detail = self.model.get_plant(plant["plant name"].Id)
 
                 yield DatabaseElement(
                     "NC",
@@ -315,7 +364,7 @@ class NCDatabase(DatabasePlugin):
         name = common_name.split()[0]
         for plant in self.model.get_plants(sort_name=name):
             if re.match(common_name, plant["plant name"].text, re.I):
-                detail = self.model.get_plant(plant["plant name"].identifier)
+                detail = self.model.get_plant(plant["plant name"].Id)
 
                 yield DatabaseElement(
                     "NC",

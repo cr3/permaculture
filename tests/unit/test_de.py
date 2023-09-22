@@ -220,8 +220,8 @@ def test_de_converter_convert_strijng(item, expected):
         pytest.param(
             ("Lumière", "○ ◐ ●"),
             [
-                ("sun/full sun", True),
-                ("sun/partial shade", True),
+                ("sun/full", True),
+                ("sun/partial", True),
                 ("sun/shade", True),
             ],
             id="sun",
