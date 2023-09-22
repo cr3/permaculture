@@ -14,7 +14,7 @@ from yarl import URL
 from permaculture.database import DatabaseElement, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
-from permaculture.storage import FileStorage, MemoryStorage
+from permaculture.storage import null_storage
 from permaculture.unit import inches
 
 logger = logging.getLogger(__name__)
@@ -193,9 +193,10 @@ class NCModel:
     converter: NCConverter = field(factory=NCConverter)
 
     @classmethod
-    def from_url(cls, url: URL, username: str, password: str, cache_dir=None):
+    def from_url(
+        cls, url: URL, username: str, password: str, storage=null_storage
+    ):
         """Instantiate a Natural Capital model from URL."""
-        storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
         cache = HTTPCacheAll(storage)
         authentication = NCAuthentication(username, password)
         adapter = NCAdapter(authentication, cache=cache)
@@ -320,7 +321,7 @@ class NCDatabase(DatabasePlugin):
             "https://permacultureplantdata.com",
             config.nc_username,
             config.nc_password,
-            config.cache_dir,
+            config.storage,
         )
         return cls(model)
 

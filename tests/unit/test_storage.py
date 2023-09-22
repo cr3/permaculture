@@ -9,8 +9,8 @@ from hamcrest import assert_that, has_properties, is_
 from permaculture.storage import (
     FileStorage,
     MemoryStorage,
-    NullStorage,
     StorageAction,
+    null_storage,
 )
 
 
@@ -115,35 +115,30 @@ def test_file_storage_setitem(key, tmpdir):
 
 def test_null_storage_getitem(key):
     """Getting an existing key should always return the default."""
-    storage = NullStorage()
-    storage[key] = True
-    assert not storage.get(key, False)
+    null_storage[key] = True
+    assert not null_storage.get(key, False)
 
 
 def test_null_storage_setitem(key):
     """Getting an existing key should always return the default."""
-    storage = NullStorage()
-    storage[key] = True
-    assert not storage.get(key, False)
+    null_storage[key] = True
+    assert not null_storage.get(key, False)
 
 
 def test_null_storage_delitem(key):
     """Deleting a key should always raise."""
-    storage = NullStorage()
-    storage[key] = True
+    null_storage[key] = True
     with pytest.raises(KeyError):
-        del storage[key]
+        del null_storage[key]
 
 
 def test_null_storage_iter(key):
     """Iterating over a null storage should return an empty list."""
-    storage = NullStorage()
-    storage[key] = True
-    assert not list(storage)
+    null_storage[key] = True
+    assert not list(null_storage)
 
 
 def test_null_storage_length(key):
     """The length of a null storage should always be 0."""
-    storage = NullStorage()
-    storage[key] = True
-    assert len(storage) == 0
+    null_storage[key] = True
+    assert len(null_storage) == 0

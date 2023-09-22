@@ -11,7 +11,7 @@ from yarl import URL
 from permaculture.database import DatabaseElement, DatabaseIterablePlugin
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
-from permaculture.storage import FileStorage, MemoryStorage, Storage
+from permaculture.storage import Storage, null_storage
 from permaculture.tokenizer import tokenize
 
 
@@ -190,10 +190,9 @@ class USDAModel:
     converter: USDAConverter = field(factory=USDAConverter)
 
     @classmethod
-    def from_url(cls, url: URL, cache_dir=None):
+    def from_url(cls, url: URL, storage=null_storage):
         """Instantiate USDA Plants from URL."""
-        storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
-        session = HTTPSession(url).with_cache(cache_dir)
+        session = HTTPSession(url).with_cache(storage)
         web = USDAWeb(session)
         return cls(web, storage)
 
@@ -238,7 +237,7 @@ class USDADatabase(DatabaseIterablePlugin):
     def from_config(cls, config):
         model = USDAModel.from_url(
             "https://plantsservices.sc.egov.usda.gov",
-            config.cache_dir,
+            config.storage,
         )
         return cls(model)
 

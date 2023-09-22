@@ -51,8 +51,8 @@ MemoryStorage: Storage = dict
 class FileStorage(Storage):
     """File storage.
 
-    :param path: Base path to storage directory.
-    :param serializer: Serializer, defaults to `json_serializer`
+    :param base_dir: Base directory for storing files.
+    :param serializer: Serializer, defaults to `application/x-pickle`.
     """
 
     base_dir: Path = field(converter=Path)
@@ -103,7 +103,7 @@ class FileStorage(Storage):
 
 
 @define(frozen=True)
-class NullStorage(Storage):
+class _NullStorage(Storage):
     """Null storage.
 
     This storage stores a value and always retrieves the default value.
@@ -126,3 +126,6 @@ class NullStorage(Storage):
     def __len__(self):
         """Return 0."""
         return 0
+
+
+null_storage = _NullStorage()

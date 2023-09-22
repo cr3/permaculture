@@ -60,19 +60,19 @@ def test_make_config_parser_files(tmpdir):
 
 
 def test_main_store(tmpdir):
-    """Storing a file should create a key under the cache directory."""
-    cache_dir = tmpdir.join("cache-dir")
+    """Storing a file should create a key under the storage directory."""
+    storage = tmpdir.join("storage")
     file = tmpdir.join("file").ensure()
     main(
         [
-            f"--cache-dir={cache_dir}",
+            f"--storage={storage}",
             "--log-level=debug",
             "store",
             "key",
             str(file),
         ]
     )
-    assert cache_dir.join("key").exists()
+    assert storage.join("key").exists()
 
 
 @patch("sys.stdout")

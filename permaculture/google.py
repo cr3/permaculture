@@ -7,6 +7,7 @@ from requests import Session
 from yarl import URL
 
 from permaculture.http import HTTPSession
+from permaculture.storage import null_storage
 
 
 @define(frozen=True)
@@ -17,8 +18,8 @@ class GoogleSpreadsheet:
     doc_id: str
 
     @classmethod
-    def from_url(cls, url: URL, cache_dir=None):
-        session = HTTPSession(url.origin()).with_cache(cache_dir)
+    def from_url(cls, url: URL, storage=null_storage):
+        session = HTTPSession(url.origin()).with_cache(storage)
         doc_id = Path(url.path).parent.name
         return cls(session, doc_id)
 

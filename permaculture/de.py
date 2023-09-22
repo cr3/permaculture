@@ -15,6 +15,7 @@ from permaculture.database import DatabaseElement, DatabaseIterablePlugin
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
+from permaculture.storage import Storage, null_storage
 
 
 @define(frozen=True)
@@ -22,7 +23,7 @@ class DEWeb:
     """Design Ecologique web interface."""
 
     session: Session = field()
-    _cache_dir = field(default=None)
+    storage: Storage = field(default=null_storage)
 
     def perenial_plants_list(self):
         """List of perenial plants useful for permaculture in Quebec.
@@ -36,7 +37,7 @@ class DEWeb:
             raise KeyError("Link to Google spreadsheets not found")
 
         url = URL(element["href"])
-        return GoogleSpreadsheet.from_url(url, self._cache_dir)
+        return GoogleSpreadsheet.from_url(url, self.storage)
 
 
 @define(frozen=True)
@@ -121,10 +122,10 @@ class DEModel:
     converter: DEConverter = field(factory=DEConverter)
 
     @classmethod
-    def from_url(cls, url: URL, cache_dir=None):
+    def from_url(cls, url: URL, storage=null_storage):
         """Instantiate a Design Ecologique model from URL."""
-        session = HTTPSession(url).with_cache(cache_dir)
-        web = DEWeb(session, cache_dir)
+        session = HTTPSession(url).with_cache(storage)
+        web = DEWeb(session, storage)
         return cls(web)
 
     def get_perenial_plants(self):
@@ -144,7 +145,7 @@ class DEDatabase(DatabaseIterablePlugin):
     def from_config(cls, config):
         model = DEModel.from_url(
             "https://designecologique.ca",
-            config.cache_dir,
+            config.storage,
         )
         return cls(model)
 
