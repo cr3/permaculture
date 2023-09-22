@@ -46,7 +46,7 @@ def serializer(request):
     return Serializer.load(request.param, {})
 
 
-def test_action_default():
+def test_serializer_action_default():
     """A SerializerAction should default to application/x-yaml."""
     parser = ArgumentParser()
     parser.add_argument("--serializer", action=SerializerAction)
@@ -62,7 +62,7 @@ def test_action_default():
     )
 
 
-def test_action_custom():
+def test_serializer_action_custom():
     """A SerializerAction should use the content-type given as argument."""
     parser = ArgumentParser()
     parser.add_argument("--serializer", action=SerializerAction)
@@ -76,14 +76,14 @@ def test_action_custom():
     )
 
 
-def test_load_not_found():
+def test_serializer_load_not_found():
     """Loading with an unknown content type should raise an exception."""
     content_type = "test"
     with pytest.raises(SerializerNotFound):
         Serializer.load(content_type)
 
 
-def test_encode_optimized_bytes():
+def test_serializer_encode_optimized_bytes():
     """Encoding bytes with optimization should return an octet stream."""
     serializer = Serializer.load()
     _, content_type, charset = serializer.encode(BYTES_TEST, optimize=True)
@@ -91,7 +91,7 @@ def test_encode_optimized_bytes():
     assert charset == "binary"
 
 
-def test_encode_optimized_string():
+def test_serializer_encode_optimized_string():
     """Encoding a string with optimization should return plain text."""
     serializer = Serializer.load()
     _, content_type, charset = serializer.encode(STRING_TEST, optimize=True)
@@ -99,7 +99,7 @@ def test_encode_optimized_string():
     assert charset == "utf-8"
 
 
-def test_encode_optimized_other():
+def test_serializer_encode_optimized_other():
     """Encoding other data with optimization should use the default."""
     content_type = "test"
     registry = registry_add(
@@ -111,8 +111,8 @@ def test_encode_optimized_other():
     assert content_type == serializer.encode(LIST_TEST, optimize=True)[1]
 
 
-def test_serialize_content_type():
-    """Serializing a given content type should override the default."""
+def test_serializer_encode_content_type():
+    """Encoding with a given content type should override the default."""
     registry = registry_add(
         "serializers",
         "application/octet-stream",
@@ -131,6 +131,38 @@ def test_serialize_content_type():
     assert content_type == "application/octet-stream"
     data = serializer.decode(None, content_type="application/octet-stream")
     assert data is None
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(
+            INT_TEST,
+            id="int",
+        ),
+        pytest.param(
+            FLOAT_TEST,
+            id="float",
+        ),
+        pytest.param(
+            STRING_TEST,
+            id="string",
+        ),
+        pytest.param(
+            LIST_TEST,
+            id="list",
+        ),
+        pytest.param(
+            DICT_TEST,
+            id="dict",
+        ),
+    ],
+)
+def test_serializer_encode_decode(data, serializer):
+    """Encoding data and decoding the returned payload should be the same."""
+    payload, _, _ = serializer.encode(data)
+    assert isinstance(payload, bytes)
+    assert serializer.decode(payload) == data
 
 
 def test_serializer_encode_error(serializer):
@@ -213,35 +245,3 @@ def test_www_form_serializer(data):
     payload = www_form_serializer.encode(data)
     assert isinstance(payload, bytes)
     assert www_form_serializer.decode(payload) == data
-
-
-@pytest.mark.parametrize(
-    "data",
-    [
-        pytest.param(
-            INT_TEST,
-            id="int",
-        ),
-        pytest.param(
-            FLOAT_TEST,
-            id="float",
-        ),
-        pytest.param(
-            STRING_TEST,
-            id="string",
-        ),
-        pytest.param(
-            LIST_TEST,
-            id="list",
-        ),
-        pytest.param(
-            DICT_TEST,
-            id="dict",
-        ),
-    ],
-)
-def test_encode_decode(data, serializer):
-    """Encoding data and decoding the returned payload should be the same."""
-    payload, _, _ = serializer.encode(data)
-    assert isinstance(payload, bytes)
-    assert serializer.decode(payload) == data

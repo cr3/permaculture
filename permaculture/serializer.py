@@ -29,7 +29,7 @@ class SerializerAction(SingleAction):
         kwargs.setdefault("default", self.get_serializer(default))
         kwargs.setdefault("metavar", self.metavar)
         kwargs.setdefault(
-            "help", "serializer content-type (default application/x-yaml)"
+            "help", f"serializer content-type (default {default})"
         )
         super().__init__(option_strings, **kwargs)
 

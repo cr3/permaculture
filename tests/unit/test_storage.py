@@ -1,8 +1,17 @@
 """Unit tests for the storage module."""
 
-import pytest
+from argparse import ArgumentParser
+from pathlib import Path
 
-from permaculture.storage import FileStorage, MemoryStorage, NullStorage
+import pytest
+from hamcrest import assert_that, has_properties, is_
+
+from permaculture.storage import (
+    FileStorage,
+    MemoryStorage,
+    NullStorage,
+    StorageAction,
+)
 
 
 @pytest.fixture(
@@ -31,6 +40,30 @@ def real_storage(request, tmpdir):
 def key(request):
     """Produce a key to test the storage."""
     return request.param
+
+
+def test_storage_action_default():
+    """A SerializerAction should default to memory."""
+    parser = ArgumentParser()
+    parser.add_argument("--storage", action=StorageAction)
+    result = parser.parse_args([])
+
+    assert_that(
+        result,
+        has_properties(storage=is_(MemoryStorage)),
+    )
+
+
+def test_storage_action_custom():
+    """A StorageAction should use the path given as argument."""
+    parser = ArgumentParser()
+    parser.add_argument("--storage", action=StorageAction)
+    result = parser.parse_args(["--storage", "/path"])
+
+    assert_that(
+        result,
+        has_properties(storage=has_properties(base_dir=Path("/path"))),
+    )
 
 
 def test_real_storage_getitem_non_existing(key, real_storage):
