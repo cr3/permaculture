@@ -5,6 +5,7 @@ from argparse import ArgumentParser, FileType
 from functools import reduce
 
 from appdirs import user_cache_dir
+from attrs import evolve
 from configargparse import ArgParser
 
 from permaculture.data import (
@@ -21,7 +22,7 @@ from permaculture.logger import (
     setup_logger,
 )
 from permaculture.serializer import SerializerAction
-from permaculture.storage import FileStorage
+from permaculture.storage import StorageAction
 
 
 def make_args_parser():
@@ -89,11 +90,6 @@ def make_config_parser(config_files):
         default_config_files=config_files,
     )
     config.add_argument(
-        "--cache-dir",
-        default=user_cache_dir("permaculture"),
-        help="cache HTTP requests to directory (default %(default)s)",
-    )
-    config.add_argument(
         "--database",
         help="filter on a database",
     )
@@ -104,6 +100,11 @@ def make_config_parser(config_files):
     config.add_argument(
         "--log-level",
         action=LoggerLevelAction,
+    )
+    config.add_argument(
+        "--storage",
+        action=StorageAction,
+        default=user_cache_dir("permaculture"),
     )
     nc = config.add_argument_group(
         "nc",
@@ -146,7 +147,10 @@ def main(argv=None):
             ]
             data = reduce(merge, datas, {})
         case "store":
-            storage = FileStorage(config.cache_dir, "application/octet-stream")
+            storage = evolve(
+                config.storage,
+                serializer="application/octet-stream",
+            )
             storage[args.key] = args.file.read()
             return
         case _:

@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from requests import Session
 
 from permaculture.http import HTTPSession
+from permaculture.storage import null_storage
 
 
 @define(frozen=True)
@@ -20,9 +21,9 @@ class Wikipedia:
     session: Session
 
     @classmethod
-    def from_url(cls, url, cache_dir=None):
+    def from_url(cls, url, storage=null_storage):
         """Instantiate Wikipedia from URL."""
-        session = HTTPSession(url).with_cache(cache_dir)
+        session = HTTPSession(url).with_cache(storage)
         return cls(session)
 
     def get(self, action="query", **kwargs):

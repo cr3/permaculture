@@ -10,7 +10,11 @@ from requests import Response, Session
 from requests.adapters import HTTPAdapter
 
 from permaculture.serializer import json_serializer
-from permaculture.storage import FileStorage, MemoryStorage, Storage
+from permaculture.storage import (
+    MemoryStorage,
+    Storage,
+    null_storage,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -257,8 +261,7 @@ class HTTPSession(Session):
         super().__init__(**kwargs)
         self.origin = origin
 
-    def with_cache(self, cache_dir=None, cache_cls=HTTPCacheAll):
-        storage = FileStorage(cache_dir) if cache_dir else MemoryStorage()
+    def with_cache(self, storage=null_storage, cache_cls=HTTPCacheAll):
         cache = cache_cls(storage)
         adapter = HTTPCacheAdapter(cache)
         return self.with_adapter(adapter)

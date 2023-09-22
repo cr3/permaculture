@@ -15,6 +15,12 @@ from permaculture.pfaf import (
 from permaculture.storage import FileStorage
 
 
+@pytest.fixture
+def storage(tmpdir):
+    """File storage needed for the plants database."""
+    return FileStorage(tmpdir)
+
+
 def test_pfaf_web_main_database():
     """The main database should return the corresponding Excel worksheet."""
     path = Path(__file__).with_suffix(".xls")
@@ -24,9 +30,8 @@ def test_pfaf_web_main_database():
     assert ws.cell(0, 0).value == "Test"
 
 
-def test_pfaf_web_main_database_error(tmpdir):
+def test_pfaf_web_main_database_error(storage):
     """The main database should raise when file not found."""
-    storage = FileStorage(tmpdir)
     file = PFAFFile(storage)
     with pytest.raises(FileNotFoundError):
         file.main_database()
@@ -124,9 +129,9 @@ def test_pfaf_converter_convert_item(item, expected):
     assert result == expected
 
 
-def test_pfaf_model_all_plants_error(tmpdir):
+def test_pfaf_model_all_plants_error(storage):
     """All plants should return no plant when file not found."""
-    model = PFAFModel.from_cache_dir(tmpdir)
+    model = PFAFModel.from_storage(storage)
     plants = list(model.all_plants())
     assert plants == []
 

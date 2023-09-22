@@ -82,8 +82,7 @@ class PFAFModel:
     converter: PFAFConverter = field(factory=PFAFConverter)
 
     @classmethod
-    def from_cache_dir(cls, cache_dir):
-        storage = FileStorage(cache_dir)
+    def from_storage(cls, storage):
         file = PFAFFile(storage)
         return cls(file)
 
@@ -110,7 +109,7 @@ class PFAFDatabase(DatabaseIterablePlugin):
 
     @classmethod
     def from_config(cls, config):
-        model = PFAFModel.from_cache_dir(config.cache_dir)
+        model = PFAFModel.from_storage(config.storage)
         return cls(model)
 
     def iterate(self):
