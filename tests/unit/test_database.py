@@ -5,6 +5,13 @@ from unittest.mock import Mock
 from permaculture.database import Database
 
 
+def test_database_plant_with_database(unique):
+    plant = unique("plant")
+    assert "database" not in plant
+    plant = plant.with_database("a")
+    assert plant["database"] == "a"
+
+
 def test_database_load_all():
     """Loading should instantiate all databases by default."""
     config = Mock(database=None)
@@ -33,25 +40,29 @@ def test_database_load_one():
     assert "b" not in database.databases
 
 
-def test_database_lookup():
+def test_database_lookup(unique):
     """Looking up should iterate over all databases in the registry."""
+    a, b = unique("plant"), unique("plant")
     database = Database(
         databases={
-            "a": Mock(lookup=Mock(return_value=[1])),
-            "b": Mock(lookup=Mock(return_value=[2])),
+            "a": Mock(lookup=Mock(return_value=[a])),
+            "b": Mock(lookup=Mock(return_value=[b])),
         },
     )
     result = list(database.lookup(None))
-    assert result == [1, 2]
+    assert result == [a, b]
+    assert a["database"] == "a"
+    assert b["database"] == "b"
 
 
-def test_database_search():
+def test_database_search(unique):
     """Searching should iterate over all databases in the registry."""
+    a, b = unique("plant"), unique("plant")
     database = Database(
         databases={
-            "a": Mock(search=Mock(return_value=[1])),
-            "b": Mock(search=Mock(return_value=[2])),
+            "a": Mock(search=Mock(return_value=[a])),
+            "b": Mock(search=Mock(return_value=[b])),
         },
     )
     result = list(database.search(None))
-    assert result == [1, 2]
+    assert result == [a, b]

@@ -16,8 +16,7 @@ FLOAT_RE = r"([+-]?\d+(?:\.\d*)?)"
 class Converter(ABC):
     @property
     @abstractmethod
-    def locales(self) -> Locales:
-        ...
+    def locales(self) -> Locales: ...
 
     def translate(self, message, context=None):
         """Convenience function to translate from locales."""

@@ -3,6 +3,7 @@
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
+from operator import methodcaller
 
 from attrs import define
 
@@ -21,10 +22,12 @@ class DatabasePlant(dict):
 
     @property
     def common_names(self):
-        if name := self["common name"]:
-            return [name]
-        else:
-            return []
+        return [self["common name"]] if self.get("common name") else []
+
+    def with_database(self, name):
+        """Add the database name to this plant."""
+        self["database"] = name
+        return self
 
 
 @define(frozen=True)
@@ -58,7 +61,7 @@ class DatabaseIterablePlugin(DatabasePlugin):
     def lookup(self, scientific_name: str) -> Iterator[DatabasePlant]:
         token = tokenize(scientific_name)
         for plant in self.iterate():
-            if re.match(f"{token}$", plant.scientific_name, re.I):
+            if plant.scientific_name == token:
                 yield plant
 
 
@@ -88,9 +91,12 @@ class Database:
     def lookup(self, scientific_name: str):
         """Lookup characteristics by scientific name in all databases."""
         not_found = True
-        for database in self.databases.values():
+        for name, database in self.databases.items():
             not_found = False
-            yield from database.lookup(scientific_name)
+            yield from map(
+                methodcaller("with_database", name),
+                database.lookup(scientific_name),
+            )
 
         if not_found:
             raise DatabasePlantNotFound(scientific_name)
