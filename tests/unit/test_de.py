@@ -4,15 +4,29 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.database import DatabaseElement
 from permaculture.de import (
     DEConverter,
     DEDatabase,
     DEModel,
+    DEPlant,
     DEWeb,
 )
 
 from .stubs import StubRequestsResponse
+
+
+def test_de_plant():
+    """Perenial plants should GET and return the spreadsheet."""
+    plant = DEPlant(
+        {
+            "genus": "a",
+            "species": "b",
+            "common name": "c",
+            "french name": "d",
+        }
+    )
+    assert plant.scientific_name == "a b"
+    assert plant.common_names == ["c", "d"]
 
 
 def test_de_web_perenial_plants_list(unique):
@@ -374,15 +388,10 @@ def test_de_database_iterate():
     database = DEDatabase(model)
     elements = list(database.iterate())
     assert elements == [
-        DatabaseElement(
-            database="DE",
-            scientific_name="a b",
-            common_names=["c", "d"],
-            characteristics={
-                "genus": "a",
-                "species": "b",
-                "common name": "c",
-                "french name": "d",
-            },
-        )
+        {
+            "genus": "a",
+            "species": "b",
+            "common name": "c",
+            "french name": "d",
+        },
     ]

@@ -5,7 +5,6 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.database import DatabaseElement
 from permaculture.pfaf import (
     PFAFConverter,
     PFAFDatabase,
@@ -152,13 +151,8 @@ def test_pfaf_database_iterate():
     database = PFAFDatabase(model)
     elements = list(database.iterate())
     assert elements == [
-        DatabaseElement(
-            database="PFAF",
-            scientific_name="a",
-            common_names=["b"],
-            characteristics={
-                "scientific name": "a",
-                "common name": "b",
-            },
-        )
+        {
+            "scientific name": "a",
+            "common name": "b",
+        },
     ]

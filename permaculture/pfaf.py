@@ -8,7 +8,7 @@ from itertools import chain
 import xlrd
 from attrs import define, field
 
-from permaculture.database import DatabaseElement, DatabaseIterablePlugin
+from permaculture.database import DatabaseIterablePlugin, DatabasePlant
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage
 
@@ -113,10 +113,4 @@ class PFAFDatabase(DatabaseIterablePlugin):
         return cls(model)
 
     def iterate(self):
-        for p in self.model.all_plants():
-            yield DatabaseElement(
-                "PFAF",
-                p["scientific name"],
-                [p["common name"]],
-                p,
-            )
+        return map(DatabasePlant, self.model.all_plants())
