@@ -4,7 +4,6 @@ from unittest.mock import ANY, Mock
 
 import pytest
 
-from permaculture.database import DatabaseElement
 from permaculture.storage import MemoryStorage
 from permaculture.usda import (
     USDAConverter,
@@ -249,14 +248,9 @@ def test_usda_database_iterate(unique):
     database = USDADatabase(model)
     elements = list(database.iterate())
     assert elements == [
-        DatabaseElement(
-            database="USDA",
-            scientific_name=scientific_name,
-            common_names=[common_name],
-            characteristics={
-                "id": "1",
-                "scientific name": scientific_name,
-                "common name": common_name,
-            },
-        )
+        {
+            "id": "1",
+            "scientific name": scientific_name,
+            "common name": common_name,
+        },
     ]

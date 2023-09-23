@@ -139,7 +139,10 @@ class SerializerPlugin:
 
 json_serializer = SerializerPlugin(
     lambda data: json.dumps(
-        data, sort_keys=True, indent=2, ensure_ascii=False
+        data,
+        sort_keys=True,
+        indent=2,
+        ensure_ascii=False,
     ).encode("utf-8"),
     lambda payload: json.loads(payload.decode("utf-8")),
     "utf-8",
@@ -208,7 +211,11 @@ www_form_serializer = SerializerPlugin(
 """Serializer for application/x-www-form-urlencoded."""
 
 yaml_serializer = SerializerPlugin(
-    lambda data: yaml.safe_dump(data, allow_unicode=True).encode("utf-8"),
+    lambda data: yaml.safe_dump(
+        data,
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8"),
     lambda payload: yaml.safe_load(payload.decode("utf-8")),
     "utf-8",
 )

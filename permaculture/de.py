@@ -11,11 +11,21 @@ from bs4 import BeautifulSoup
 from requests import Session
 from yarl import URL
 
-from permaculture.database import DatabaseElement, DatabaseIterablePlugin
+from permaculture.database import DatabaseIterablePlugin, DatabasePlant
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
+
+
+class DEPlant(DatabasePlant):
+    @property
+    def scientific_name(self):
+        return f"{self['genus']} {self['species']}"
+
+    @property
+    def common_names(self):
+        return list(filter(None, [self["common name"], self["french name"]]))
 
 
 @define(frozen=True)
@@ -150,10 +160,4 @@ class DEDatabase(DatabaseIterablePlugin):
         return cls(model)
 
     def iterate(self):
-        for p in self.model.get_perenial_plants():
-            yield DatabaseElement(
-                "DE",
-                f"{p['genus']} {p['species']}",
-                [p["common name"], p["french name"]],
-                p,
-            )
+        return map(DEPlant, self.model.get_perenial_plants())

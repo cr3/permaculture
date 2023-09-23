@@ -132,19 +132,19 @@ def main(argv=None):
 
     match args.command:
         case "companions":
-            datas = [
-                {e.scientific_name: e.common_names}
-                for e in database.companions()
-            ]
+            datas = (
+                {plant.scientific_name: related.scientific_name}
+                for plant, related in database.companions()
+            )
             data = reduce(merge, datas, {})
         case "lookup":
-            datas = (e.characteristics for e in database.lookup(args.name))
+            datas = database.lookup(args.name)
             data = merge_numbers(merge_strings(reduce(merge, datas, {})))
         case "search":
-            datas = [
-                {e.scientific_name: e.common_names}
-                for e in database.search(args.name)
-            ]
+            datas = (
+                {plant.scientific_name: plant.common_names}
+                for plant in database.search(args.name)
+            )
             data = reduce(merge, datas, {})
         case "store":
             storage = evolve(

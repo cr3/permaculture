@@ -3,59 +3,63 @@
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from typing import Any
 
-from attrs import define, field
+from attrs import define
 
 from permaculture.registry import registry_load
 from permaculture.tokenizer import tokenize
 
 
-class DatabaseElementNotFound(Exception):
+class DatabasePlantNotFound(Exception):
     """Raised when a database element is not found."""
 
 
-@define(frozen=True)
-class DatabaseElement:
-    database: str = field()
-    scientific_name: str = field(converter=tokenize)
-    common_names: list[str] = field(converter=lambda x: list(filter(None, x)))
-    characteristics: dict[str, Any] = field()
+class DatabasePlant(dict):
+    @property
+    def scientific_name(self):
+        return self["scientific name"]
+
+    @property
+    def common_names(self):
+        if name := self["common name"]:
+            return [name]
+        else:
+            return []
 
 
 @define(frozen=True)
 class DatabasePlugin(ABC):
-    def companions(self, compatible: bool) -> Iterator[DatabaseElement]:
+    def companions(self, compatible: bool) -> Iterator[DatabasePlant]:
         """Plant companions list."""
         yield from []
 
     @abstractmethod
-    def search(self, common_name: str) -> Iterator[DatabaseElement]:
+    def search(self, common_name: str) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name."""
 
     @abstractmethod
-    def lookup(self, scientific_name: str) -> Iterator[DatabaseElement]:
+    def lookup(self, scientific_name: str) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific name."""
 
 
 class DatabaseIterablePlugin(DatabasePlugin):
     @abstractmethod
-    def iterate(self) -> Iterator[DatabaseElement]:
+    def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over all plants."""
 
-    def search(self, common_name: str) -> Iterator[DatabaseElement]:
-        for element in self.iterate():
+    def search(self, common_name: str) -> Iterator[DatabasePlant]:
+        for plant in self.iterate():
             if any(
                 re.search(common_name, tokenize(n), re.I)
-                for n in element.common_names
+                for n in plant.common_names
             ):
-                yield element
+                yield plant
 
-    def lookup(self, scientific_name: str) -> Iterator[DatabaseElement]:
+    def lookup(self, scientific_name: str) -> Iterator[DatabasePlant]:
         token = tokenize(scientific_name)
-        for element in self.iterate():
-            if re.match(token, element.scientific_name, re.I):
-                yield element
+        for plant in self.iterate():
+            if re.match(f"{token}$", plant.scientific_name, re.I):
+                yield plant
 
 
 @define(frozen=True)
@@ -89,7 +93,7 @@ class Database:
             yield from database.lookup(scientific_name)
 
         if not_found:
-            raise DatabaseElementNotFound(scientific_name)
+            raise DatabasePlantNotFound(scientific_name)
 
     def search(self, common_name: str):
         """Search for the scientific name by common name in all databases."""

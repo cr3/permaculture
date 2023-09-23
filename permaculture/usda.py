@@ -8,7 +8,7 @@ from attrs import define, field
 from requests import Session
 from yarl import URL
 
-from permaculture.database import DatabaseElement, DatabaseIterablePlugin
+from permaculture.database import DatabaseIterablePlugin, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
@@ -242,10 +242,4 @@ class USDADatabase(DatabaseIterablePlugin):
         return cls(model)
 
     def iterate(self):
-        for c in self.model.all_characteristics():
-            yield DatabaseElement(
-                "USDA",
-                c["scientific name"],
-                [c["common name"]],
-                c,
-            )
+        return map(DatabasePlant, self.model.all_characteristics())

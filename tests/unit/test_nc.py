@@ -7,7 +7,6 @@ from unittest.mock import Mock, call, patch
 import pytest
 from yarl import URL
 
-from permaculture.database import DatabaseElement
 from permaculture.nc import (
     NCAuthentication,
     NCAuthenticationError,
@@ -418,15 +417,10 @@ def test_nc_database_lookup(unique):
     database = NCDatabase(model)
     elements = list(database.lookup(scientific_name))
     assert elements == [
-        DatabaseElement(
-            database="NC",
-            scientific_name=scientific_name,
-            common_names=[common_name],
-            characteristics={
-                "scientific name": scientific_name,
-                "common name": common_name,
-            },
-        )
+        {
+            "scientific name": scientific_name,
+            "common name": common_name,
+        },
     ]
 
 
@@ -455,13 +449,8 @@ def test_nc_database_search(unique):
     database = NCDatabase(model)
     elements = list(database.search(common_name))
     assert elements == [
-        DatabaseElement(
-            database="NC",
-            scientific_name=scientific_name,
-            common_names=[common_name],
-            characteristics={
-                "scientific name": scientific_name,
-                "common name": common_name,
-            },
-        )
+        {
+            "scientific name": scientific_name,
+            "common name": common_name,
+        },
     ]

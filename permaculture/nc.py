@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from requests import Session
 from yarl import URL
 
-from permaculture.database import DatabaseElement, DatabasePlugin
+from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import null_storage
@@ -329,12 +329,7 @@ class NCDatabase(DatabasePlugin):
         def get_element(companion):
             plant = self.model.get_plant(companion["plant"].Id)
             related = self.model.get_plant(companion["related"].Id)
-            return DatabaseElement(
-                "NC",
-                plant["scientific name"],
-                [related["scientific name"]],
-                {},
-            )
+            return (DatabasePlant(plant), DatabasePlant(related))
 
         with ThreadPoolExecutor() as executor:
             yield from executor.map(
@@ -349,27 +344,17 @@ class NCDatabase(DatabasePlugin):
     def lookup(self, scientific_name):
         # Workaround crappy search in the web interface.
         name = scientific_name.split()[0]
-        for plant in self.model.get_plants(sci_name=name):
-            if re.match(f"{scientific_name}$", plant["scientific name"], re.I):
-                detail = self.model.get_plant(plant["plant name"].Id)
-
-                yield DatabaseElement(
-                    "NC",
-                    detail["scientific name"],
-                    [detail["common name"]],
-                    detail,
-                )
+        return (
+            DatabasePlant(self.model.get_plant(plant["plant name"].Id))
+            for plant in self.model.get_plants(sci_name=name)
+            if re.match(f"{scientific_name}$", plant["scientific name"], re.I)
+        )
 
     def search(self, common_name):
         # Workaround crappy search in the web interface.
         name = common_name.split()[0]
-        for plant in self.model.get_plants(sort_name=name):
-            if re.match(common_name, plant["plant name"].text, re.I):
-                detail = self.model.get_plant(plant["plant name"].Id)
-
-                yield DatabaseElement(
-                    "NC",
-                    detail["scientific name"],
-                    [detail["common name"]],
-                    detail,
-                )
+        return (
+            DatabasePlant(self.model.get_plant(plant["plant name"].Id))
+            for plant in self.model.get_plants(sort_name=name)
+            if re.match(common_name, plant["plant name"].text, re.I)
+        )
