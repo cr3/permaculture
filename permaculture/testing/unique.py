@@ -2,6 +2,7 @@
 
 from http.cookiejar import Cookie, CookieJar
 
+from permaculture.database import DatabasePlant
 from permaculture.tokenizer import tokenize
 
 
@@ -53,6 +54,16 @@ def unique_cookies(unique, count=1):
         cookie_jar.set_cookie(cookie)
 
     return cookie_jar
+
+
+def unique_plant(unique):
+    """Generate a unique database plant."""
+    return DatabasePlant(
+        {
+            "scientific name": unique("token"),
+            "common name": unique("text"),
+        }
+    )
 
 
 def unique_token(unique):

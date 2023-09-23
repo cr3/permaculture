@@ -16,6 +16,7 @@ from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import null_storage
+from permaculture.tokenizer import tokenize
 from permaculture.unit import inches
 
 logger = logging.getLogger(__name__)
@@ -293,10 +294,11 @@ class NCDatabase(DatabasePlugin):
     def lookup(self, scientific_name):
         # Workaround crappy search in the web interface.
         name = scientific_name.split()[0]
+        token = tokenize(scientific_name)
         return (
             DatabasePlant(self.model.get_plant(plant["plant name"].Id))
             for plant in self.model.get_plants(sci_name=name)
-            if re.match(f"{scientific_name}$", plant["scientific name"], re.I)
+            if plant["scientific name"] == token
         )
 
     def search(self, common_name):

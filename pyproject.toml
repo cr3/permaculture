@@ -67,6 +67,7 @@ permaculture = "permaculture.testing.fixtures"
 [tool.poetry.plugins."pytest_unique.unique"]
 cookie = "permaculture.testing.unique:unique_cookie"
 cookies = "permaculture.testing.unique:unique_cookies"
+plant = "permaculture.testing.unique:unique_plant"
 token = "permaculture.testing.unique:unique_token"
 
 [tool.poetry.scripts]
