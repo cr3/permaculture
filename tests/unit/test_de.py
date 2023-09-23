@@ -46,71 +46,48 @@ def test_de_web_perenial_plants_list_error():
         DEWeb(session).perenial_plants_list()
 
 
-def test_de_converter_convert_ignore():
-    """Converting an ignore item should return an empty list."""
-    result = DEConverter().convert_ignore("key", "value")
-    assert result == []
-
-
 @pytest.mark.parametrize(
-    "item, expected",
+    "value, expected",
     [
-        pytest.param(
-            ("key", "0,6 - 1,2"),
-            [
-                ("key/min", 0.6),
-                ("key/max", 1.2),
-            ],
-            id="dash",
+        (
+            "value",
+            "value",
         ),
-        pytest.param(
-            ("key", "0,6 \u2013 1,2"),
-            [
-                ("key/min", 0.6),
-                ("key/max", 1.2),
-            ],
-            id="endash",
-        ),
-        pytest.param(
-            ("key", "0,1"),
-            [
-                ("key/min", 0.1),
-                ("key/max", 0.1),
-            ],
-            id="single value",
+        (
+            "*",
+            None,
         ),
     ],
 )
-def test_de_converter_convert_range(item, expected):
-    """Converting a range should support single and double values."""
-    result = DEConverter().convert_range(*item)
+def test_de_converter_translate(value, expected):
+    """Translating * should return None."""
+    result = DEConverter().translate(value)
     assert result == expected
-
-
-def test_de_converter_convert_range_error():
-    """Converting a range with three or more values should raise."""
-    with pytest.raises(ValueError):
-        DEConverter().convert_range("key", "1 2 3")
 
 
 @pytest.mark.parametrize(
     "item, expected",
     [
-        pytest.param(
-            ("key", "value"),
-            [("key", "value")],
-            id="string",
-        ),
         pytest.param(
             ("key", "X"),
             [("key", True)],
             id="X",
         ),
+        pytest.param(
+            ("key", "*"),
+            [("key", False)],
+            id="*",
+        ),
+        pytest.param(
+            ("key", ""),
+            [("key", None)],
+            id="<empty>",
+        ),
     ],
 )
-def test_de_converter_convert_strijng(item, expected):
-    """Converting a string should return the string or True."""
-    result = DEConverter().convert_string(*item)
+def test_de_converter_convert_bool(item, expected):
+    """Converting a bool should return the True, False, or None."""
+    result = DEConverter().convert_bool(*item)
     assert result == expected
 
 
@@ -123,7 +100,7 @@ def test_de_converter_convert_strijng(item, expected):
             id="nutriments",
         ),
         pytest.param(
-            ("Comestible", "Fl Fr Fe N G R S JP T B"),
+            ("Comestible", "Fl,Fr,Fe,N,G,R,S,JP,T,B"),
             [
                 ("edible uses/flower", True),
                 ("edible uses/fruit", True),
@@ -266,7 +243,7 @@ def test_de_converter_convert_strijng(item, expected):
             id="blooming period",
         ),
         pytest.param(
-            ("Période de taille", "AD AF P É A T N"),
+            ("Période de taille", "AD,AF,P,É,A,T,N"),
             [
                 ("pruning period/before budburst", True),
                 ("pruning period/after flowering", True),
@@ -321,7 +298,7 @@ def test_de_converter_convert_strijng(item, expected):
             id="soil",
         ),
         pytest.param(
-            ("Utilisation écologique", "BR P Z"),
+            ("Utilisation écologique", "BR,P,Z"),
             [
                 ("ecological use/riparian strip", True),
                 ("ecological use/slopes", True),
@@ -330,11 +307,10 @@ def test_de_converter_convert_strijng(item, expected):
             id="ecological use",
         ),
         pytest.param(
-            ("Vie sauvage", "N A NA"),
+            ("Vie sauvage", "N A"),
             [
                 ("wildlife/food", True),
                 ("wildlife/shelter", True),
-                ("wildlife/food and shelter", True),
             ],
             id="wildlife",
         ),

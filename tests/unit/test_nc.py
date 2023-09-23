@@ -114,31 +114,6 @@ def test_nc_web_view_list(unique):
     assert result == "test"
 
 
-def test_nc_converter_convert_ignore():
-    """Converting an ignore item should return an empty list."""
-    result = NCConverter().convert_ignore("key", "value")
-    assert result == []
-
-
-@pytest.mark.parametrize(
-    "item, expected",
-    [
-        pytest.param(
-            ("Height", "1 inches - 2 inches"),
-            [
-                ("height/min", 1),
-                ("height/max", 2),
-            ],
-            id="Height",
-        ),
-    ],
-)
-def test_nc_converter_convert_range(item, expected):
-    """Converting a range should support single and double values."""
-    result = NCConverter().convert_range(*item)
-    assert result == expected
-
-
 @pytest.mark.parametrize(
     "item, expected",
     [
@@ -165,7 +140,7 @@ def test_nc_converter_convert_range(item, expected):
         ),
     ],
 )
-def test_nc_convert_convert_item(item, expected):
+def test_nc_converter_convert_item(item, expected):
     """Converting an item should consider types."""
     result = NCConverter().convert_item(*item)
     assert result == expected

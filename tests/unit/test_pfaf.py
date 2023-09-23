@@ -36,33 +36,6 @@ def test_pfaf_web_main_database_error(storage):
         file.main_database()
 
 
-def test_pfaf_converter_convert_ignore():
-    """Converting an ignore item should return an empty list."""
-    result = PFAFConverter().convert_ignore("key", "value")
-    assert result == []
-
-
-@pytest.mark.parametrize(
-    "item, expected",
-    [
-        pytest.param(
-            ("key", "string"),
-            [("key", "string")],
-            id="string",
-        ),
-        pytest.param(
-            ("key", 1),
-            [("key", 1)],
-            id="int",
-        ),
-    ],
-)
-def test_pfaf_converter_convert_string(item, expected):
-    """Converting a string should not convert other types."""
-    result = PFAFConverter().convert_string(*item)
-    assert result == expected
-
-
 @pytest.mark.parametrize(
     "item, expected",
     [

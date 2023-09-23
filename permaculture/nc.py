@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from requests import Session
 from yarl import URL
 
+from permaculture.converter import Converter
 from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
@@ -116,55 +117,8 @@ class NCWeb:
 
 
 @define(frozen=True)
-class NCConverter:
+class NCConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "nc"))
-
-    def translate(self, message, context=None):
-        """Convenience function to translate from locales."""
-        return self.locales.translate(message, context).lower()
-
-    def convert_ignore(self, *_):
-        return []
-
-    def convert_bool(self, key, value):
-        if value == "Yes":
-            return [(self.translate(key), True)]
-        elif value == "No":
-            return [(self.translate(key), False)]
-        else:
-            raise ValueError
-            return [(self.translate(key), None)]
-
-    def convert_float(self, key, value, unit=1.0):
-        # TODO: match unit inside this regex.
-        if m := re.match(r"([0-9.]+)", value):
-            new_value = float(m.group(1)) * unit
-        else:
-            new_value = None
-        return [(self.translate(key), new_value)]
-
-    def convert_list(self, key, value):
-        k = self.translate(key)
-        new_value = [self.translate(v, key) for v in re.split(r",\s+", value)]
-        return [(f"{k}/{v}", True) for v in new_value]
-
-    def convert_range(self, key, value, unit=1.0):
-        k = self.translate(key)
-        n = [
-            float(i) * unit for i in re.findall(r"[0-9]+(?:\.[0-9]+)?", value)
-        ]
-        match len(n):
-            case 0:
-                return []
-            case 1:
-                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
-            case _:
-                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
-
-    def convert_string(self, key, value):
-        if isinstance(value, str):
-            value = self.translate(value)
-        return [(self.translate(key), value)]
 
     def convert_item(self, key, value):
         dispatchers = {
@@ -180,11 +134,6 @@ class NCConverter:
             "USDA Hardiness Zones": self.convert_range,
         }
         return dispatchers.get(key, self.convert_string)(key, value)
-
-    def convert(self, data):
-        return dict(
-            item for k, v in data.items() for item in self.convert_item(k, v)
-        )
 
 
 @define(frozen=True)

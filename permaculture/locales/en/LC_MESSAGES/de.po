@@ -467,7 +467,3 @@ msgstr "food"
 msgctxt "Vie sauvage"
 msgid "A"
 msgstr "shelter"
-
-msgctxt "Vie sauvage"
-msgid "NA"
-msgstr "food and shelter"

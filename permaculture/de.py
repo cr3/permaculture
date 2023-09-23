@@ -1,16 +1,15 @@
 """Design Ecologique database."""
 
-import re
 from csv import reader
 from functools import partial
 from io import StringIO
-from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
 from requests import Session
 from yarl import URL
 
+from permaculture.converter import Converter
 from permaculture.database import DatabaseIterablePlugin, DatabasePlant
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
@@ -51,79 +50,51 @@ class DEWeb:
 
 
 @define(frozen=True)
-class DEConverter:
+class DEConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "de"))
 
     def translate(self, message, context=None):
-        """Convenience function to translate from locales."""
-        return self.locales.translate(message, context).lower()
+        """Translate `*` to None."""
+        return None if message == "*" else super().translate(message, context)
 
-    def convert_ignore(self, *_):
-        return []
-
-    def convert_list(self, key, value):
-        new_value = [self.translate(v, key) for v in re.split(r",?\s+", value)]
-        if len(new_value) == 1 and new_value[0] == value:
-            new_value = [self.translate(v, key) for v in value]
-
-        k = self.translate(key)
-        return [(f"{k}/{v}", True) for v in new_value]
-
-    def convert_range(self, key, value):
-        k = self.translate(key)
-        n = [float(i) for i in re.findall(r"[0-9.]+", value.replace(",", "."))]
-        match len(n):
-            case 2:
-                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
-            case 1:
-                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
-            case 0:
-                return []
-            case _:
-                raise ValueError(f"Unsupported range: {value!r}")
-
-    def convert_string(self, key, value):
-        value = True if value == "X" else self.translate(value, key)
-        return [(self.translate(key), value)]
+    def convert_bool(self, key, value):
+        """Convert `X` to True, `*` to False, otherwise None."""
+        new_value = True if value == "X" else False if value == "*" else None
+        return [(self.translate(key), new_value)]
 
     def convert_item(self, key, value):
         dispatchers = {
             "Accumulateur de Nutriments": self.convert_ignore,
             "Comestible": self.convert_list,
-            "Couleur de feuillage": self.convert_list,
-            "Couleur de floraison": self.convert_list,
+            "Couleur de feuillage": self.convert_letters,
+            "Couleur de floraison": self.convert_letters,
             "Couvre-sol": self.convert_ignore,
             "Cultivars intéressants": self.convert_ignore,
-            "Eau": self.convert_list,
-            "Forme": self.convert_list,
+            "Eau": self.convert_letters,
+            "Forme": self.convert_letters,
+            "Fixateur Azote": self.convert_ignore,
             "Haie": self.convert_ignore,
             "Hauteur(m)": self.convert_range,
-            "Inconvénient": self.convert_list,
+            "Inconvénient": self.convert_letters,
             "Intérêt automnale hivernal": self.convert_ignore,
             "Largeur(m)": self.convert_range,
             "Lien Information": self.convert_ignore,
-            "Lumière": self.convert_list,
-            "Multiplication": self.convert_list,
+            "Lumière": self.convert_letters,
+            "Medicinal": self.convert_bool,
+            "Multiplication": self.convert_letters,
             "Notes": self.convert_ignore,
             "Où peut-on la trouver?": self.convert_ignore,
-            "Pollinisateurs": self.convert_list,
-            "Période de floraison": self.convert_list,
+            "Pollinisateurs": self.convert_letters,
+            "Période de floraison": self.convert_letters,
             "Période de taille": self.convert_list,
-            "Racine": self.convert_list,
-            "Rythme de croissance": self.convert_list,
-            "Texture du sol": self.convert_list,
+            "Racine": self.convert_letters,
+            "Rythme de croissance": self.convert_letters,
+            "Texture du sol": self.convert_letters,
             "Utilisation écologique": self.convert_list,
-            "Vie sauvage": self.convert_list,
+            "Vie sauvage": self.convert_letters,
             "pH (Min-Max)": self.convert_range,
         }
         return dispatchers.get(key, self.convert_string)(key, value)
-
-    def convert(self, data):
-        return dict(
-            chain.from_iterable(
-                self.convert_item(k, v) for k, v in data.items()
-            )
-        )
 
 
 @define(frozen=True)
