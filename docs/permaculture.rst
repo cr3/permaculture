@@ -29,6 +29,14 @@ permaculture.command module
    :undoc-members:
    :show-inheritance:
 
+permaculture.converter module
+-----------------------------
+
+.. automodule:: permaculture.converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.data module
 ------------------------
 

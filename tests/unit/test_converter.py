@@ -1,22 +1,16 @@
 """Unit tests for the converter module."""
 
-from unittest.mock import Mock
-
 import pytest
-from attrs import define, field
 
 from permaculture.converter import Converter
-
-
-@define(frozen=True)
-class MockConverter(Converter):
-    locales = field(default=Mock(translate=lambda m, _: m))
+from permaculture.locales import Locales
 
 
 @pytest.fixture
 def converter():
-    """Return a concrete implementation of a Converter."""
-    return MockConverter()
+    """Return a testing Converter."""
+    locales = Locales.from_domain("testing")
+    return Converter(locales)
 
 
 @pytest.mark.parametrize(

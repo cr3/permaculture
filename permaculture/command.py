@@ -1,5 +1,6 @@
 """Permaculture command."""
 
+import logging
 import sys
 from argparse import ArgumentParser, FileType
 from functools import reduce
@@ -100,6 +101,7 @@ def make_config_parser(config_files):
     config.add_argument(
         "--log-level",
         action=LoggerLevelAction,
+        default=logging.WARNING,
     )
     config.add_argument(
         "--storage",

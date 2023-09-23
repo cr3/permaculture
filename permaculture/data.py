@@ -1,4 +1,15 @@
-"""Data manipulation functions."""
+"""Data manipulation functions.
+
+Flattening nested data into flat data:
+
+    >>> flatten({'a': {'b': 1}})
+    {'a/b': 1}
+
+Unflattening flat data into nested data:
+
+    >>> unflatten({'a/b': 1})
+    {'a': {'b': 1}}
+"""
 
 from collections.abc import Mapping
 from functools import partial
