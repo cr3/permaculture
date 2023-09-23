@@ -63,7 +63,7 @@ class PFAFModel:
         try:
             ws = self.file.main_database()
         except FileNotFoundError as error:
-            logger.debug(
+            logger.info(
                 "Skipping Plants For A Future: %(error)s", {"error": error}
             )
             return []

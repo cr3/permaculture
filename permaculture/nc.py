@@ -239,9 +239,7 @@ class NCModel:
         try:
             plant_list = self.web.view_list(sci_name, sort_name)
         except NCAuthenticationError as error:
-            logger.debug(
-                "Skipping Nature Capital: %(error)s", {"error": error}
-            )
+            logger.info("Skipping Nature Capital: %(error)s", {"error": error})
             return
 
         for table in self.parse_plant_list(plant_list):
@@ -307,5 +305,5 @@ class NCDatabase(DatabasePlugin):
         return (
             DatabasePlant(self.model.get_plant(plant["plant name"].Id))
             for plant in self.model.get_plants(sort_name=name)
-            if re.match(common_name, plant["plant name"].text, re.I)
+            if re.search(common_name, plant["plant name"].text, re.I)
         )

@@ -40,7 +40,7 @@ def test_make_config_parser_defaults():
     """Making a config parser should have sensible defaults."""
     config_parser = make_config_parser([])
     config = config_parser.parse_args([])
-    assert config.log_level == logging.INFO
+    assert config.log_level == logging.WARNING
 
 
 def test_make_config_parser_args():

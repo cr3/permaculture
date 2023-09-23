@@ -2,10 +2,9 @@
 
 import re
 import string
-from abc import ABC, abstractmethod
 from itertools import chain
 
-from attrs import define
+from attrs import define, field
 
 from permaculture.locales import Locales
 
@@ -13,10 +12,8 @@ FLOAT_RE = r"([+-]?\d+(?:\.\d*)?)"
 
 
 @define(frozen=True)
-class Converter(ABC):
-    @property
-    @abstractmethod
-    def locales(self) -> Locales: ...
+class Converter:
+    locales: Locales = field()
 
     def translate(self, message, context=None):
         """Convenience function to translate from locales."""
