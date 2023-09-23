@@ -1,13 +1,12 @@
 """Plants For A Future database."""
 
 import logging
-import re
 from functools import partial
-from itertools import chain
 
 import xlrd
 from attrs import define, field
 
+from permaculture.converter import Converter
 from permaculture.database import DatabaseIterablePlugin, DatabasePlant
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage
@@ -26,54 +25,28 @@ class PFAFFile:
 
 
 @define(frozen=True)
-class PFAFConverter:
+class PFAFConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "pfaf"))
-
-    def translate(self, message, context=None):
-        """Convenience function to translate from locales."""
-        return self.locales.translate(message, context).lower()
-
-    def convert_ignore(self, *_):
-        return []
-
-    def convert_list(self, key, value):
-        k = self.translate(key)
-        new_value = [
-            self.translate(v, key) for v in re.findall("[A-Z][^A-Z]*", value)
-        ]
-        return [(f"{k}/{v}", True) for v in new_value]
-
-    def convert_string(self, key, value):
-        if isinstance(value, str):
-            value = self.translate(value, key)
-        return [(self.translate(key), value)]
 
     def convert_item(self, key, value):
         dispatchers = {
             "Author": self.convert_ignore,
             "Cultivation details": self.convert_ignore,
-            "Deciduous/Evergreen": self.convert_list,
+            "Deciduous/Evergreen": self.convert_letters,
             "Drought": self.convert_ignore,
             "Edible uses": self.convert_ignore,
-            "Growth rate": self.convert_list,
+            "Growth rate": self.convert_letters,
             "Known hazards": self.convert_ignore,
             "Medicinal": self.convert_ignore,
-            "Moisture": self.convert_list,
+            "Moisture": self.convert_letters,
             "Propagation": self.convert_ignore,
             "Range": self.convert_ignore,
-            "Shade": self.convert_list,
-            "Soil": self.convert_list,
+            "Shade": self.convert_letters,
+            "Soil": self.convert_letters,
             "Uses notes": self.convert_ignore,
-            "pH": self.convert_list,
+            "pH": self.convert_letters,
         }
         return dispatchers.get(key, self.convert_string)(key, value)
-
-    def convert(self, data):
-        return dict(
-            chain.from_iterable(
-                self.convert_item(k, v) for k, v in data.items()
-            )
-        )
 
 
 @define(frozen=True)

@@ -42,60 +42,6 @@ def test_usda_web_plant_characteristics():
     session.get.assert_called_once_with("/api/PlantCharacteristics/1234")
 
 
-def test_usda_converter_convert_ignore():
-    """Converting an ignore item should return an empty list."""
-    result = USDAConverter().convert_ignore("key", "value")
-    assert result == []
-
-
-@pytest.mark.parametrize(
-    "item, expected",
-    [
-        pytest.param(
-            ("key", "Yes"),
-            [("key", True)],
-            id="Yes",
-        ),
-        pytest.param(
-            ("key", "No"),
-            [("key", False)],
-            id="No",
-        ),
-    ],
-)
-def test_usda_converter_convert_bool(item, expected):
-    """Converting a boolean should parse Yes and No."""
-    result = USDAConverter().convert_bool(*item)
-    assert result == expected
-
-
-def test_usda_converter_convert_bool_error():
-    """Converting an unknown boolean should raise."""
-    with pytest.raises(ValueError):
-        USDAConverter().convert_bool("key", "test")
-
-
-@pytest.mark.parametrize(
-    "item, expected",
-    [
-        pytest.param(
-            ("key", "string"),
-            [("key", "string")],
-            id="string",
-        ),
-        pytest.param(
-            ("key", 1),
-            [("key", 1)],
-            id="int",
-        ),
-    ],
-)
-def test_usda_converter_convert_string(item, expected):
-    """Converting a string should not convert other types."""
-    result = USDAConverter().convert_string(*item)
-    assert result == expected
-
-
 @pytest.mark.parametrize(
     "item, expected",
     [

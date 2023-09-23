@@ -8,6 +8,7 @@ from attrs import define, field
 from requests import Session
 from yarl import URL
 
+from permaculture.converter import Converter
 from permaculture.database import DatabaseIterablePlugin, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
@@ -70,39 +71,8 @@ class USDAWeb:
 
 
 @define(frozen=True)
-class USDAConverter:
+class USDAConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "usda"))
-
-    def translate(self, message, context=None):
-        """Convenience function to translate from locales."""
-        return self.locales.translate(message, context).lower()
-
-    def convert_ignore(self, *_):
-        return []
-
-    def convert_bool(self, key, value):
-        if value == "Yes":
-            return [(self.translate(key), True)]
-        elif value == "No":
-            return [(self.translate(key), False)]
-        else:
-            raise ValueError(f"Unknown boolean: {value!r}")
-
-    def convert_float(self, key, value):
-        return [(self.translate(key), float(value))]
-
-    def convert_int(self, key, value):
-        return [(self.translate(key), int(value))]
-
-    def convert_range(self, key, value):
-        k = self.translate(key)
-        v = float(value)
-        return [(f"{k}/min", v), (f"{k}/max", v)]
-
-    def convert_string(self, key, value):
-        if isinstance(value, str):
-            value = self.translate(value, key)
-        return [(self.translate(key), value)]
 
     def convert_token(self, key, value):
         return [(self.translate(key), tokenize(value))]
@@ -172,13 +142,6 @@ class USDAConverter:
             "pH, Minimum": self.convert_float,
         }
         return dispatchers.get(key, self.convert_string)(key, value)
-
-    def convert(self, data):
-        return dict(
-            chain.from_iterable(
-                self.convert_item(k, v) for k, v in data.items()
-            )
-        )
 
 
 @define(frozen=True)
