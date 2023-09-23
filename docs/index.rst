@@ -47,5 +47,6 @@ Additional Notes
    :maxdepth: 2
 
    contributing
+   style_guide
    license
    changes
