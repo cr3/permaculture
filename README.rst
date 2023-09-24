@@ -48,4 +48,3 @@ Project Information
 -------------------
 
 * `Documentation <https://cr3.github.io/permaculture/>`__
-* `Contributing <https://github.com/cr3/permaculture/blob/main/.github/CONTRIBUTING.md>`__
