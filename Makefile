@@ -13,8 +13,10 @@ MO_FILES := $(PO_FILES:.po=.mo)
 poetry.lock: pyproject.toml
 	poetry lock
 
-# Build venv with python deps.
-$(VENV): $(MO_FILES)
+# Build venv with both conda and python deps.
+$(VENV): environment.yml
+	@echo Installing Conda environment
+	@conda env update --prefix $@ --prune --file $^
 	@echo Installing Poetry environment
 	@poetry install
 	@$(TOUCH) $@
@@ -31,7 +33,7 @@ check: $(VENV)
 	@poetry run pre-commit run -a
 
 .PHONY: test
-test: $(VENV)
+test: $(VENV) $(MO_FILES)
 	@echo Testing code: Running pytest
 	@poetry run coverage run -p -m pytest
 
