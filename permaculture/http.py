@@ -190,6 +190,7 @@ class HTTPCacheAll:
             return None
 
         if "overwrite" in request.headers.get("X-Cache-All", ""):
+            del self.storage[key]
             return None
 
         return entry.response
@@ -200,16 +201,9 @@ class HTTPCacheAll:
 class HTTPCacheAdapter(HTTPAdapter):
     """An HTTP cache adapter for Python requests."""
 
-    def __init__(self, cache=None, log_keys=None, **kwargs):
+    def __init__(self, cache, **kwargs):
         super().__init__(**kwargs)
-
-        if cache is None:
-            cache = HTTPCache()
-        if log_keys is None:
-            log_keys = []
-
         self.cache = cache
-        self.log_keys = log_keys
 
     def send(self, request, *args, **kwargs):
         """
@@ -217,15 +211,16 @@ class HTTPCacheAdapter(HTTPAdapter):
         HTTP caching.
         """
         response = self.cache.retrieve(request)
-        if response is not None:
-            logger.debug(
-                "cache hit: %(method)s %(url)s",
-                {
-                    "method": request.method,
-                    "url": request.url,
-                },
-            )
-        else:
+        logger.debug(
+            "cache %(verb)s: %(method)s %(url)s",
+            {
+                "method": request.method,
+                "url": request.url,
+                "verb": "hit" if response else "miss",
+            },
+        )
+
+        if response is None:
             response = super().send(request, *args, **kwargs)
 
         return response
@@ -233,18 +228,6 @@ class HTTPCacheAdapter(HTTPAdapter):
     def build_response(self, req, response):
         """Build a Response object from a urllib3 response."""
         resp = super().build_response(req, response)
-
-        log_headers = {
-            k: v for k, v in resp.headers.items() if k in self.log_keys
-        }
-        logger.debug(
-            "cache miss: %(method)s %(url)s %(headers)s",
-            {
-                "method": req.method,
-                "url": req.url,
-                "headers": log_headers,
-            },
-        )
 
         if resp.status_code == 304:
             resp = self.cache.handle_304(resp)
