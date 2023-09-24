@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How to contribute &mdash; permaculture 0.0.3 documentation</title>
+  <title>How to contribute &mdash; permaculture 0.0.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="License" href="license.html" />
+    <link rel="next" title="Style Guide" href="style_guide.html" />
     <link rel="prev" title="permaculture.testing package" href="permaculture.testing.html" /> 
 </head>
 
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.3
+                0.0.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -61,12 +61,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#reporting-issues">Reporting issues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#submitting-patches">Submitting patches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up">Setting up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#starting-to-code">Starting to code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#checking-the-syntax">Checking the syntax</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#building-the-docs">Building the docs</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="style_guide.html">Style Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
 </ul>
@@ -140,7 +142,13 @@ relevant docstrings.</p></li>
 <li><p>Download and install:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://git-scm.com/download/win">Git</a></p></li>
+<li><p><a class="reference external" href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe">Miniconda</a> - Check the box “Add to PATH environment variable”</p></li>
 </ul>
+</li>
+<li><p>Install dependencies with <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; conda install --channel=conda-forge make poetry
+</pre></div>
+</div>
 </li>
 <li><p>Make sure you have a <a class="reference external" href="https://github.com/join">GitHub account</a>.</p></li>
 <li><p>Configure git with your <a class="reference external" href="https://docs.github.com/en/github/using-git/setting-your-username-in-git">username</a> and <a class="reference external" href="https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/setting-your-commit-email-address">email</a>.</p>
@@ -157,8 +165,8 @@ relevant docstrings.</p></li>
 </li>
 <li><p>Configure git with your token:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; git config --global credential.helper manager
-&gt; git clone https://github.com/cr3/python-template
-Cloning into &#39;python-template&#39;...
+&gt; git clone https://github.com/cr3/permaculture
+Cloning into &#39;permaculture&#39;...
 </pre></div>
 </div>
 <ul class="simple">
@@ -167,9 +175,8 @@ Cloning into &#39;python-template&#39;...
 <li><p>Sign in with token and paste your token</p></li>
 </ul>
 </li>
-<li><p><a class="reference external" href="https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#step-2-create-a-local-clone-of-your-fork">Clone</a> the main repository locally.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; git clone https://github.com/cr3/permaculture
-&gt; cd permaculture
+<li><p>Change into the <code class="docutils literal notranslate"><span class="pre">permaculture</span></code> directory:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; cd permaculture
 </pre></div>
 </div>
 </li>
@@ -177,6 +184,19 @@ Cloning into &#39;python-template&#39;...
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt; make setup
 </pre></div>
 </div>
+</li>
+</ul>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h2>
+<ul>
+<li><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Solving environment: failed
+
+ResolvePackageNotFound:
+  - python=3.11
+</pre></div>
+</div>
+<p>The cache is probably corrupt - run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">clean</span> <span class="pre">-a</span></code>.</p>
 </li>
 </ul>
 </section>
@@ -238,7 +258,7 @@ test fails without your patch. Run the tests as described below.</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="permaculture.testing.html" class="btn btn-neutral float-left" title="permaculture.testing package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="license.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="style_guide.html" class="btn btn-neutral float-right" title="Style Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
