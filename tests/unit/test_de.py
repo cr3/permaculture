@@ -51,29 +51,17 @@ def test_de_converter_translate(value, expected):
 
 
 @pytest.mark.parametrize(
-    "item, expected",
+    "value, expected",
     [
-        pytest.param(
-            ("key", "X"),
-            [("key", True)],
-            id="X",
-        ),
-        pytest.param(
-            ("key", "*"),
-            [("key", False)],
-            id="*",
-        ),
-        pytest.param(
-            ("key", ""),
-            [("key", None)],
-            id="<empty>",
-        ),
+        ("X", True),
+        ("*", False),
+        ("", None),
     ],
 )
-def test_de_converter_convert_bool(item, expected):
+def test_de_converter_convert_bool(value, expected):
     """Converting a bool should return the True, False, or None."""
-    result = DEConverter().convert_bool(*item)
-    assert result == expected
+    result = DEConverter().convert_bool("", value)
+    assert result == [("", expected)]
 
 
 @pytest.mark.parametrize(

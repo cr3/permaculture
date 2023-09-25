@@ -37,6 +37,21 @@ def test_pfaf_web_main_database_error(storage):
 
 
 @pytest.mark.parametrize(
+    "value, expected",
+    [
+        pytest.param("", None, id="empty"),
+        pytest.param("1.0", 1.0, id="str"),
+        pytest.param(1.0, 1.0, id="float"),
+        pytest.param(1, 1.0, id="int"),
+    ],
+)
+def test_pfaf_converter_convert_float(value, expected):
+    """Converting a float should accept a float or a string."""
+    result = PFAFConverter().convert_float("", value)
+    assert result == [("", expected)]
+
+
+@pytest.mark.parametrize(
     "item, expected",
     [
         pytest.param(

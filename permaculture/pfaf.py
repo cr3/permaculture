@@ -28,6 +28,12 @@ class PFAFFile:
 class PFAFConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "pfaf"))
 
+    def convert_float(self, key, value):
+        if isinstance(value, float | int):
+            return [(self.translate(key), float(value))]
+        else:
+            return super().convert_float(key, value)
+
     def convert_item(self, key, value):
         dispatchers = {
             "Author": self.convert_ignore,
@@ -36,6 +42,7 @@ class PFAFConverter(Converter):
             "Drought": self.convert_ignore,
             "Edible uses": self.convert_ignore,
             "Growth rate": self.convert_letters,
+            "Height": self.convert_float,
             "Known hazards": self.convert_ignore,
             "Medicinal": self.convert_ignore,
             "Moisture": self.convert_letters,
@@ -44,6 +51,7 @@ class PFAFConverter(Converter):
             "Shade": self.convert_letters,
             "Soil": self.convert_letters,
             "Uses notes": self.convert_ignore,
+            "Width": self.convert_float,
             "pH": self.convert_letters,
         }
         return dispatchers.get(key, self.convert_string)(key, value)

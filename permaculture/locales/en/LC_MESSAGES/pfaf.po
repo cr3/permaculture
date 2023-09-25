@@ -19,6 +19,9 @@ msgstr "edibility rating"
 msgid "FrostTender"
 msgstr "frost tender"
 
+msgid "Height"
+msgstr "height/avg"
+
 msgid "Latin name"
 msgstr "scientific name"
 
@@ -27,6 +30,9 @@ msgstr "medicinal rating"
 
 msgid "UK Hardiness"
 msgstr "hardiness/uk"
+
+msgid "Width"
+msgstr "width/avg"
 
 msgctxt "Deciduous/Evergreen"
 msgid "D"
