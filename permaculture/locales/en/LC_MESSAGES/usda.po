@@ -118,6 +118,9 @@ msgstr "rank id"
 msgid "RelatedLinks"
 msgstr "related links"
 
+msgid "Temperature, Minimum (°F)"
+msgstr "temperature/min"
+
 msgid "ScientificName"
 msgstr "scientific name"
 

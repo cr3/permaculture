@@ -13,6 +13,7 @@ from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
 from permaculture.tokenizer import tokenize
+from permaculture.unit import fahrenheit
 
 
 @define(frozen=True)
@@ -135,7 +136,9 @@ class USDAConverter(Converter):
             "ScientificName": self.convert_token,
             "Seed per Pound": self.convert_int,
             "Small Grain": self.convert_bool,
-            "Temperature, Minimum (°F)": self.convert_int,
+            "Temperature, Minimum (°F)": partial(
+                self.convert_float, unit=fahrenheit
+            ),
             "Veneer Product": self.convert_bool,
             "pH, Maximum": self.convert_float,
             "pH, Minimum": self.convert_float,
