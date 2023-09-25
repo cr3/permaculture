@@ -117,6 +117,11 @@ def test_converter_convert_letters(converter, item, expected):
     "item, expected",
     [
         pytest.param(
+            ("key", ""),
+            [],
+            id="<empty>",
+        ),
+        pytest.param(
             ("key", "A"),
             [("key/a", True)],
             id="A",

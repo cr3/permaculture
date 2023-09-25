@@ -28,13 +28,13 @@ class Converter:
 
     def convert_float(self, key, value, unit=1.0):
         if m := re.match(FLOAT_RE, value):
-            new_value = float(m.group(1)) * unit
+            f = float(m.group(1)) * unit
         elif value == "":
-            new_value = None
+            f = None
         else:
             raise ValueError(f"Unknown float: {value!r}")
 
-        return [(self.translate(key), new_value)]
+        return [(self.translate(key), f)]
 
     def convert_ignore(self, *_):
         return []
@@ -51,20 +51,23 @@ class Converter:
         """
         k = self.translate(key)
         punctuation = re.escape(string.punctuation)
-        new_value = [
+        values = [
             self.translate(v, key)
             for v in re.findall(rf"[^\s{punctuation}][a-z]*", value)
         ]
-        return [(f"{k}/{v}", True) for v in new_value]
+        return [(f"{k}/{v}", True) for v in values]
 
     def convert_list(self, key, value, sep=r",\s*"):
         """Convert a list of strings into a list of items.
 
-        The strings can be separated by a comma, or whitespace, or both.
+        The strings are separated by a comma optionally followed by whitespace.
         """
+        if value is None or not value.strip():
+            return []
+
         k = self.translate(key)
-        new_value = [self.translate(v, key) for v in re.split(sep, value)]
-        return [(f"{k}/{v}", True) for v in new_value]
+        values = [self.translate(v, key) for v in re.split(sep, value.strip())]
+        return [(f"{k}/{v}", True) for v in values]
 
     def convert_range(self, key, value, unit=1.0):
         k = self.translate(key)
