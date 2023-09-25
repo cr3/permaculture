@@ -3,7 +3,7 @@
 import logging
 import sys
 from argparse import ArgumentParser, FileType
-from functools import reduce
+from itertools import groupby
 
 from appdirs import user_cache_dir
 from attrs import evolve
@@ -11,9 +11,6 @@ from configargparse import ArgParser
 
 from permaculture.data import (
     flatten,
-    merge,
-    merge_numbers,
-    merge_strings,
     unflatten,
 )
 from permaculture.database import Database
@@ -29,11 +26,6 @@ from permaculture.storage import StorageAction
 def make_args_parser():
     """Make a parser for command-line arguments only."""
     args_parser = ArgumentParser()
-    args_parser.add_argument(
-        "--flatten",
-        action="store_true",
-        help="flatten output",
-    )
     args_parser.add_argument(
         "--output",
         type=FileType("wb"),
@@ -57,7 +49,9 @@ def make_args_parser():
         help="lookup characteristics by scientific name",
     )
     lookup.add_argument(
-        "name",
+        "names",
+        metavar="name",
+        nargs="+",
         help="scientific name to lookup",
     )
     search = command.add_parser(
@@ -134,20 +128,22 @@ def main(argv=None):
 
     match args.command:
         case "companions":
-            datas = (
-                {plant.scientific_name: related.scientific_name}
-                for plant, related in database.companions()
-            )
-            data = reduce(merge, datas, {})
+            data = {
+                key: [related.scientific_name for _, related in pairs]
+                for key, pairs in groupby(
+                    database.companions(),
+                    lambda pair: pair[0].scientific_name,
+                )
+            }
         case "lookup":
-            datas = database.lookup(args.name)
-            data = merge_numbers(merge_strings(reduce(merge, datas, {})))
+            content_type = args.serializer.default_content_type
+            f = flatten if content_type == "text/csv" else unflatten
+            data = [f(plant) for plant in database.lookup(*args.names)]
         case "search":
-            datas = (
+            data = [
                 {plant.scientific_name: plant.common_names}
                 for plant in database.search(args.name)
-            )
-            data = reduce(merge, datas, {})
+            ]
         case "store":
             storage = evolve(
                 config.storage,
@@ -158,6 +154,5 @@ def main(argv=None):
         case _:
             args_parser.error(f"Unsupported command: {args.command}")
 
-    data = flatten(data) if args.flatten else unflatten(data)
     output, *_ = args.serializer.encode(data)
     args.output.write(output)

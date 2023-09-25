@@ -67,7 +67,7 @@ msgid "Multiplication"
 msgstr "multiplication"
 
 msgid "Nom Anglais"
-msgstr "common name"
+msgstr "english name"
 
 msgid "Nom français"
 msgstr "french name"

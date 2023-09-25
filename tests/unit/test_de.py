@@ -8,25 +8,10 @@ from permaculture.de import (
     DEConverter,
     DEDatabase,
     DEModel,
-    DEPlant,
     DEWeb,
 )
 
 from .stubs import StubRequestsResponse
-
-
-def test_de_plant():
-    """Perenial plants should GET and return the spreadsheet."""
-    plant = DEPlant(
-        {
-            "genus": "a",
-            "species": "b",
-            "common name": "c",
-            "french name": "d",
-        }
-    )
-    assert plant.scientific_name == "a b"
-    assert plant.common_names == ["c", "d"]
 
 
 def test_de_web_perenial_plants_list(unique):
@@ -354,7 +339,7 @@ def test_de_database_iterate():
                 {
                     "genus": "a",
                     "species": "b",
-                    "common name": "c",
+                    "english name": "c",
                     "french name": "d",
                 }
             ]
@@ -365,9 +350,7 @@ def test_de_database_iterate():
     elements = list(database.iterate())
     assert elements == [
         {
-            "genus": "a",
-            "species": "b",
-            "common name": "c",
-            "french name": "d",
+            "scientific name": "a b",
+            "common name": ["c", "d"],
         },
     ]

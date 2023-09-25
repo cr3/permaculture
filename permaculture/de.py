@@ -17,16 +17,6 @@ from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
 
 
-class DEPlant(DatabasePlant):
-    @property
-    def scientific_name(self):
-        return f"{self['genus']} {self['species']}"
-
-    @property
-    def common_names(self):
-        return list(filter(None, [self["common name"], self["french name"]]))
-
-
 @define(frozen=True)
 class DEWeb:
     """Design Ecologique web interface."""
@@ -131,4 +121,16 @@ class DEDatabase(DatabaseIterablePlugin):
         return cls(model)
 
     def iterate(self):
-        return map(DEPlant, self.model.get_perenial_plants())
+        return (
+            DatabasePlant(
+                {
+                    "scientific name": f"{p.pop('genus')} {p.pop('species')}",
+                    "common name": [
+                        p.pop("english name"),
+                        p.pop("french name"),
+                    ],
+                    **p,
+                }
+            )
+            for p in self.model.get_perenial_plants()
+        )

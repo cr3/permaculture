@@ -123,7 +123,7 @@ class NCConverter(Converter):
 
     def convert_item(self, key, value):
         dispatchers = {
-            "Bacteria-Fungal Ratio": self.convert_float,
+            "Bacteria-Fungal Ratio": self.convert_ignore,
             "Compatible": self.convert_bool,
             "Height": partial(self.convert_range, unit=inches),
             "Minimum Root Depth": partial(self.convert_float, unit=inches),
@@ -289,14 +289,14 @@ class NCDatabase(DatabasePlugin):
                 ),
             )
 
-    def lookup(self, scientific_name):
+    def lookup(self, *scientific_names):
         # Workaround crappy search in the web interface.
-        name = scientific_name.split()[0]
-        token = tokenize(scientific_name)
+        tokens = [tokenize(n) for n in scientific_names]
         return (
             DatabasePlant(self.model.get_plant(plant["plant name"].Id))
-            for plant in self.model.get_plants(sci_name=name)
-            if plant["scientific name"] == token
+            for sci_name in scientific_names
+            for plant in self.model.get_plants(sci_name=sci_name.split()[0])
+            if plant["scientific name"] in tokens
         )
 
     def search(self, common_name):

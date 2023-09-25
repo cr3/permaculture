@@ -3,16 +3,19 @@
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from operator import methodcaller
+from functools import reduce
+from itertools import groupby
+from operator import attrgetter
 
 from attrs import define
 
+from permaculture.data import (
+    merge,
+    merge_numbers,
+    merge_strings,
+)
 from permaculture.registry import registry_load
 from permaculture.tokenizer import tokenize
-
-
-class DatabasePlantNotFound(Exception):
-    """Raised when a database element is not found."""
 
 
 class DatabasePlant(dict):
@@ -22,17 +25,24 @@ class DatabasePlant(dict):
 
     @property
     def common_names(self):
-        return [self["common name"]] if self.get("common name") else []
+        common_name = self.get("common name", [])
+        if not isinstance(common_name, list):
+            common_name = [common_name]
+
+        return [n for n in common_name if n]
 
     def with_database(self, name):
         """Add the database name to this plant."""
-        self["database"] = name
+        self[f"database/{name}"] = True
         return self
+
+
+DatabaseCompanion = tuple[DatabasePlant, DatabasePlant]
 
 
 @define(frozen=True)
 class DatabasePlugin(ABC):
-    def companions(self, compatible: bool) -> Iterator[DatabasePlant]:
+    def companions(self, compatible: bool) -> Iterator[DatabaseCompanion]:
         """Plant companions list."""
         yield from []
 
@@ -41,8 +51,8 @@ class DatabasePlugin(ABC):
         """Search for the scientific name by common name."""
 
     @abstractmethod
-    def lookup(self, scientific_name: str) -> Iterator[DatabasePlant]:
-        """Lookup characteristics by scientific name."""
+    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+        """Lookup characteristics by scientific names."""
 
 
 class DatabaseIterablePlugin(DatabasePlugin):
@@ -58,10 +68,10 @@ class DatabaseIterablePlugin(DatabasePlugin):
             ):
                 yield plant
 
-    def lookup(self, scientific_name: str) -> Iterator[DatabasePlant]:
-        token = tokenize(scientific_name)
+    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+        tokens = [tokenize(n) for n in scientific_names]
         for plant in self.iterate():
-            if plant.scientific_name == token:
+            if plant.scientific_name in tokens:
                 yield plant
 
 
@@ -83,25 +93,32 @@ class Database:
 
         return cls(databases)
 
-    def companions(self, compatible=True):
+    def companions(self, compatible=True) -> Iterator[DatabaseCompanion]:
         """Plant companions list."""
         for database in self.databases.values():
             yield from database.companions(compatible)
 
-    def lookup(self, scientific_name: str):
-        """Lookup characteristics by scientific name in all databases."""
-        not_found = True
-        for name, database in self.databases.items():
-            not_found = False
-            yield from map(
-                methodcaller("with_database", name),
-                database.lookup(scientific_name),
-            )
+    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+        """Lookup characteristics by scientific names in all databases."""
+        return merge_plants(
+            plant.with_database(name)
+            for name, database in self.databases.items()
+            for plant in database.lookup(*scientific_names)
+        )
 
-        if not_found:
-            raise DatabasePlantNotFound(scientific_name)
-
-    def search(self, common_name: str):
+    def search(self, common_name: str) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name in all databases."""
-        for database in self.databases.values():
-            yield from database.search(common_name)
+        return merge_plants(
+            plant.with_database(name)
+            for name, database in self.databases.items()
+            for plant in database.search(common_name)
+        )
+
+
+def merge_plants(plants: Iterator[DatabasePlant]) -> Iterator[DatabasePlant]:
+    """Group plants by scientific name, merging numbers and strings."""
+    keyfunc = attrgetter("scientific_name")
+    return (
+        DatabasePlant(merge_numbers(merge_strings(reduce(merge, p, {}))))
+        for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
+    )

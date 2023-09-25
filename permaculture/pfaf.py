@@ -86,4 +86,4 @@ class PFAFDatabase(DatabaseIterablePlugin):
         return cls(model)
 
     def iterate(self):
-        return map(DatabasePlant, self.model.all_plants())
+        return (DatabasePlant(p) for p in self.model.all_plants())

@@ -174,7 +174,8 @@ def _text_csv_serializer_encode(data, encoding="utf-8"):
         data = [data]
 
     f = StringIO()
-    writer = csv.DictWriter(f, data[0].keys(), quoting=csv.QUOTE_NONNUMERIC)
+    keys = sorted(set().union(*data))
+    writer = csv.DictWriter(f, keys, quoting=csv.QUOTE_NONNUMERIC)
     writer.writeheader()
     writer.writerows(data)
     return f.getvalue().encode(encoding)

@@ -2,7 +2,6 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from itertools import chain
 
 from attrs import define, field
 from requests import Session
@@ -162,18 +161,13 @@ class USDAModel:
     def plant_characteristics(self, plant):
         """Return the characteristics for a single plant."""
         return self.converter.convert(
-            dict(
-                chain(
-                    plant.items(),
-                    (
-                        (
-                            c["PlantCharacteristicName"],
-                            c["PlantCharacteristicValue"],
-                        )
-                        for c in self.web.plant_characteristics(plant["Id"])
-                    ),
-                )
-            )
+            {
+                **plant,
+                **{
+                    c["PlantCharacteristicName"]: c["PlantCharacteristicValue"]
+                    for c in self.web.plant_characteristics(plant["Id"])
+                },
+            }
         )
 
     def all_characteristics(self):
@@ -205,4 +199,4 @@ class USDADatabase(DatabaseIterablePlugin):
         return cls(model)
 
     def iterate(self):
-        return map(DatabasePlant, self.model.all_characteristics())
+        return (DatabasePlant(c) for c in self.model.all_characteristics())

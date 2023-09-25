@@ -2,7 +2,6 @@
 
 import re
 import string
-from itertools import chain
 
 from attrs import define, field
 
@@ -90,8 +89,6 @@ class Converter:
         return self.convert_string(key, value)
 
     def convert(self, data):
-        return dict(
-            chain.from_iterable(
-                self.convert_item(k, v) for k, v in data.items()
-            )
-        )
+        return {
+            k: v for item in data.items() for k, v in self.convert_item(*item)
+        }

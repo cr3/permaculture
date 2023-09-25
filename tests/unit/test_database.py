@@ -2,14 +2,20 @@
 
 from unittest.mock import Mock
 
-from permaculture.database import Database
+import pytest
+
+from permaculture.database import (
+    Database,
+    DatabasePlant,
+    merge_plants,
+)
 
 
 def test_database_plant_with_database(unique):
     plant = unique("plant")
     assert "database" not in plant
     plant = plant.with_database("a")
-    assert plant["database"] == "a"
+    assert plant["database/a"]
 
 
 def test_database_load_all():
@@ -51,8 +57,8 @@ def test_database_lookup(unique):
     )
     result = list(database.lookup(None))
     assert result == [a, b]
-    assert a["database"] == "a"
-    assert b["database"] == "b"
+    assert a["database/a"]
+    assert b["database/b"]
 
 
 def test_database_search(unique):
@@ -66,3 +72,54 @@ def test_database_search(unique):
     )
     result = list(database.search(None))
     assert result == [a, b]
+
+
+@pytest.mark.parametrize(
+    "plants, expected",
+    [
+        pytest.param(
+            [],
+            [],
+            id="empty",
+        ),
+        pytest.param(
+            [DatabasePlant({"scientific name": "a"})],
+            [DatabasePlant({"scientific name": "a"})],
+            id="singe",
+        ),
+        pytest.param(
+            [
+                DatabasePlant({"scientific name": "a"}),
+                DatabasePlant({"scientific name": "a"}),
+            ],
+            [
+                DatabasePlant({"scientific name": "a"}),
+            ],
+            id="group by scientific name",
+        ),
+        pytest.param(
+            [
+                DatabasePlant({"scientific name": "a", "x": 1}),
+                DatabasePlant({"scientific name": "a", "x": 3}),
+            ],
+            [
+                DatabasePlant({"scientific name": "a", "x": 2}),
+            ],
+            id="merge numbers",
+        ),
+        pytest.param(
+            [
+                DatabasePlant({"scientific name": "a", "x": "b"}),
+                DatabasePlant({"scientific name": "a", "x": "c"}),
+            ],
+            [
+                DatabasePlant({"scientific name": "a", "x": {"b": 1, "c": 1}}),
+            ],
+            id="merge strings",
+        ),
+    ],
+)
+def test_merge_plants(plants, expected):
+    """Merging plants group by scientific name, merging numbers and strings."""
+    result = list(merge_plants(plants))
+    assert result == expected
