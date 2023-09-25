@@ -58,6 +58,12 @@ def test_flatten_unflatten(nested, flat):
     assert flatten(unflatten(flat)) == flat
 
 
+def test_unflatten_error():
+    """Unflattening conflicting types should raise."""
+    with pytest.raises(TypeError):
+        unflatten({"a": "", "a/b": True})
+
+
 @pytest.mark.parametrize(
     "x, y, merged",
     [

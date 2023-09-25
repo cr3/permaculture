@@ -56,8 +56,11 @@ def unflatten(data, sep="/"):
                 index = int(index)
                 while index >= len(s):
                     s.append(value)
-            elif index not in s:
-                s[index] = value
+            elif isinstance(s, dict):
+                if index not in s:
+                    s[index] = value
+            else:
+                raise TypeError(f"Conflicting types for {key!r} in {data}")
 
             s = s[index]
 
