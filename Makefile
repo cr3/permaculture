@@ -7,9 +7,6 @@ TOUCH := $(PYTHON) -c 'import sys; from pathlib import Path; Path(sys.argv[1]).t
 PO_FILES := $(shell find permaculture/locales -name '*.po')
 MO_FILES := $(PO_FILES:.po=.mo)
 
-%.mo: %.po
-	poetry run scripts/msgfmt.py --output-file $@ $^
-
 poetry.lock: pyproject.toml
 	poetry lock
 
@@ -21,7 +18,7 @@ $(VENV): environment.yml
 	@poetry install
 	@$(TOUCH) $@
 
-# Convenience target to build venv
+# Convenience target to build venv.
 .PHONY: setup
 setup: $(VENV)
 
@@ -32,8 +29,17 @@ check: $(VENV)
 	@echo Linting code: Running pre-commit
 	@poetry run pre-commit run -a
 
+%.po: $(VENV)
+
+%.mo: %.po
+	@poetry run scripts/msgfmt.py --output-file $@ $^
+
+# Convenience target to build locales.
+.PHONY: locales
+locales: $(MO_FILES)
+
 .PHONY: test
-test: $(VENV) $(MO_FILES)
+test: locales
 	@echo Testing code: Running pytest
 	@poetry run coverage run -p -m pytest
 
@@ -50,7 +56,7 @@ docs: $(VENV)
 	@poetry run sphinx-build -W -d build/doctrees docs build/html
 
 .PHONY: build
-build: $(MO_FILES)
+build: locales
 	@echo Creating wheel file
 	@poetry build
 
