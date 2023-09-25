@@ -185,6 +185,10 @@ msgid "B"
 msgstr "white"
 
 msgctxt "Couleur de floraison"
+msgid "M"
+msgstr "purple"
+
+msgctxt "Couleur de floraison"
 msgid "J"
 msgstr "yellow"
 

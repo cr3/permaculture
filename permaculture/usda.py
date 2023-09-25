@@ -11,7 +11,7 @@ from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
 from permaculture.tokenizer import tokenize
-from permaculture.unit import fahrenheit
+from permaculture.unit import fahrenheit, inches
 
 USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
 
@@ -132,7 +132,9 @@ class USDAConverter(Converter):
             "Propagated by Tubers": self.convert_bool,
             "Pulpwood Product": self.convert_bool,
             "Resprout Ability": self.convert_bool,
-            "Root Depth, Minimum (inches)": self.convert_int,
+            "Root Depth, Minimum (inches)": partial(
+                self.convert_float, unit=inches
+            ),
             "ScientificName": self.convert_token,
             "Seed per Pound": self.convert_int,
             "Small Grain": self.convert_bool,

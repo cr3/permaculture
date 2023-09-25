@@ -1,6 +1,7 @@
 """Permaculture command."""
 
 import logging
+import re
 import sys
 from argparse import ArgumentParser, FileType
 from itertools import groupby
@@ -53,6 +54,11 @@ def make_args_parser():
         metavar="name",
         nargs="+",
         help="scientific name to lookup",
+    )
+    lookup.add_argument(
+        "--exclude",
+        default="$",
+        help="exclude characteristics from the output",
     )
     search = command.add_parser(
         "search",
@@ -138,7 +144,11 @@ def main(argv=None):
         case "lookup":
             content_type = args.serializer.default_content_type
             f = flatten if content_type == "text/csv" else unflatten
-            data = [f(plant) for plant in database.lookup(*args.names)]
+            exclude = re.compile(args.exclude, re.I)
+            data = [
+                {k: v for k, v in f(plant).items() if not exclude.match(k)}
+                for plant in database.lookup(*args.names)
+            ]
         case "search":
             data = [
                 {plant.scientific_name: plant.common_names}

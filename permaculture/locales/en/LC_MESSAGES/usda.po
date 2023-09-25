@@ -118,8 +118,8 @@ msgstr "rank id"
 msgid "RelatedLinks"
 msgstr "related links"
 
-msgid "Temperature, Minimum (°F)"
-msgstr "temperature/min"
+msgid "Root Depth, Minimum (inches)"
+msgstr "root depth/min"
 
 msgid "ScientificName"
 msgstr "scientific name"
@@ -132,6 +132,9 @@ msgstr "scientific sort"
 
 msgid "SubordinateTaxa"
 msgstr "subordinate taxa"
+
+msgid "Temperature, Minimum (°F)"
+msgstr "temperature/min"
 
 msgid "WetlandData"
 msgstr "wetland data"

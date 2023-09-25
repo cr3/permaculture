@@ -41,7 +41,7 @@ Output a CSV file of all plants that have companions:
     > permaculture --serializer application/json \
       | jq -r 'keys[]' \
       | tr '\n' '\0' \
-      | xargs -0 permaculture --serializer=text/csv lookup \
+      | xargs -0 permaculture --serializer=text/csv lookup --exclude=common \
       | tee companions.csv
 
 
