@@ -9,6 +9,10 @@ from unidecode import unidecode
 def tokenize(words):
     # Strip leading and trailing spaces.
     words = words.strip()
+    # Remove parentheses.
+    words = re.sub(r"\([^)]*\)", "", words)
+    # Remove brackets.
+    words = re.sub(r"\[[^]]*\]", "", words)
     # Remove accents.
     words = unidecode(words)
     # Remove punctuation.
