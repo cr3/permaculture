@@ -4,7 +4,7 @@ import logging
 import re
 import string
 from concurrent.futures import ThreadPoolExecutor
-from functools import partial
+from functools import cache, partial
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -125,9 +125,11 @@ class NCConverter(Converter):
         dispatchers = {
             "Bacteria-Fungal Ratio": self.convert_ignore,
             "Compatible": self.convert_bool,
+            "Growth Rate": self.convert_list,
             "Height": partial(self.convert_range, unit=inches),
             "Minimum Root Depth": partial(self.convert_float, unit=inches),
             "Notes": self.convert_ignore,
+            "Soil Moisture": self.convert_list,
             "Soil Type": self.convert_list,
             "Soil pH": self.convert_range,
             "Spread": partial(self.convert_range, unit=inches),
@@ -274,9 +276,12 @@ class NCDatabase(DatabasePlugin):
         return cls(model)
 
     def companions(self, compatible):
+        # Additional cache to speedup getting the same plants.
+        get_plant = cache(self.model.get_plant)
+
         def get_element(companion):
-            plant = self.model.get_plant(companion["plant"].Id)
-            related = self.model.get_plant(companion["related"].Id)
+            plant = get_plant(companion["plant"].Id)
+            related = get_plant(companion["related"].Id)
             return (DatabasePlant(plant), DatabasePlant(related))
 
         with ThreadPoolExecutor() as executor:
@@ -290,7 +295,11 @@ class NCDatabase(DatabasePlugin):
             )
 
     def lookup(self, *scientific_names):
-        # Workaround crappy search in the web interface.
+        # The search in the web interface concatenates words, so
+        # searching for "symphytum officinale" actually searches for
+        # "symphytumofficinale" which doesn't match anything. This
+        # workaround searches for the first word and the iterates over
+        # all the matches for the plants that match the full name.
         tokens = [tokenize(n) for n in scientific_names]
         return (
             DatabasePlant(self.model.get_plant(plant["plant name"].Id))
@@ -300,7 +309,7 @@ class NCDatabase(DatabasePlugin):
         )
 
     def search(self, common_name):
-        # Workaround crappy search in the web interface.
+        # Same comment as in the `lookup` method.
         name = common_name.split()[0]
         return (
             DatabasePlant(self.model.get_plant(plant["plant name"].Id))
