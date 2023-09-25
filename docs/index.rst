@@ -14,14 +14,20 @@ Welcome!
 Databases
 ---------
 
+Supported plant databases.
+
 .. toctree::
    :maxdepth: 2
 
+   de
    nc
    pfaf
+   usda
 
 Books
 -----
+
+Summary of books on permaculture.
 
 .. toctree::
    :maxdepth: 2
@@ -32,8 +38,7 @@ Books
 API Reference
 -------------
 
-If you are looking for information on a specific function, class or
-method, this part of the documentation is for you.
+Documentation on functions, classes and methods.
 
 .. toctree::
    :maxdepth: 3

@@ -31,6 +31,20 @@ To ``lookup`` the characteristics of a plant by scientific name:
     ...
 
 
+Advanced Usage
+--------------
+
+Output a CSV file of all plants that have companions:
+
+.. code-block:: text
+
+    > permaculture --serializer application/json \
+      | jq -r 'keys[]' \
+      | tr '\n' '\0' \
+      | xargs -0 permaculture --serializer=text/csv lookup \
+      | tee companions.csv
+
+
 Configuration
 -------------
 
