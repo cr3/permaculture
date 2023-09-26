@@ -78,7 +78,7 @@ msgid "Pollinisateurs"
 msgstr "pollinators"
 
 msgid "Période de floraison"
-msgstr "blooming period"
+msgstr "bloom period"
 
 msgid "Période de taille"
 msgstr "pruning period"

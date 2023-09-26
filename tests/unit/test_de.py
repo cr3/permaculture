@@ -209,11 +209,10 @@ def test_de_converter_convert_bool(value, expected):
         pytest.param(
             ("Période de floraison", "P É A"),
             [
-                ("blooming period/spring", True),
-                ("blooming period/summer", True),
-                ("blooming period/autumn", True),
+                ("bloom period/min", "spring"),
+                ("bloom period/max", "autumn"),
             ],
-            id="blooming period",
+            id="bloom period",
         ),
         pytest.param(
             ("Période de taille", "AD,AF,P,É,A,T,N"),

@@ -80,7 +80,7 @@ msgstr "neutral"
 
 msgctxt "pH"
 msgid "B"
-msgstr "base/alkaline"
+msgstr "alkaline"
 
 msgctxt "Shade"
 msgid "F"

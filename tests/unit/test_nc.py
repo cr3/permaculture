@@ -118,6 +118,14 @@ def test_nc_web_view_list(unique):
     "item, expected",
     [
         pytest.param(
+            ("Bloom Time", "Spring - Late Summer"),
+            [
+                ("bloom period/min", "spring"),
+                ("bloom period/max", "summer"),
+            ],
+            id="Bloom Time",
+        ),
+        pytest.param(
             ("Soil Type", "Sandy, Loamy"),
             [
                 ("soil type/sandy", True),

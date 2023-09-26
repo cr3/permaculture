@@ -16,6 +16,9 @@ msgstr ""
 msgid "AcceptedId"
 msgstr "accepted id"
 
+msgid "Bloom Period"
+msgstr "bloom period/min"
+
 msgid "CommonName"
 msgstr "common name"
 
@@ -144,3 +147,27 @@ msgstr "ph/max"
 
 msgid "pH, Minimum"
 msgstr "ph/min"
+
+msgctxt "Bloom Period"
+msgid "Early Spring"
+msgstr "spring"
+
+msgctxt "Bloom Period"
+msgid "Early Summer"
+msgstr "summer"
+
+msgctxt "Bloom Period"
+msgid "Late Spring"
+msgstr "spring"
+
+msgctxt "Bloom Period"
+msgid "Late Summer"
+msgstr "summer"
+
+msgctxt "Bloom Period"
+msgid "Mid Spring"
+msgstr "spring"
+
+msgctxt "Bloom Period"
+msgid "Mid Summer"
+msgstr "summer"

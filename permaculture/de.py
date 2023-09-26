@@ -1,5 +1,7 @@
 """Design Ecologique database."""
 
+import re
+import string
 from csv import reader
 from functools import partial
 from io import StringIO
@@ -53,6 +55,17 @@ class DEConverter(Converter):
         new_value = True if value == "X" else False if value == "*" else None
         return [(self.translate(key), new_value)]
 
+    def convert_period(self, key, value):
+        punctuation = re.escape(string.punctuation)
+        if values := [
+            self.translate(v, key)
+            for v in re.findall(rf"[^\s{punctuation}][a-z]*", value)
+        ]:
+            k = self.translate(key)
+            return [(f"{k}/min", values[0]), (f"{k}/max", values[-1])]
+        else:
+            return []
+
     def convert_item(self, key, value):
         dispatchers = {
             "Accumulateur de Nutriments": self.convert_ignore,
@@ -76,7 +89,7 @@ class DEConverter(Converter):
             "Notes": self.convert_ignore,
             "Où peut-on la trouver?": self.convert_ignore,
             "Pollinisateurs": self.convert_letters,
-            "Période de floraison": self.convert_letters,
+            "Période de floraison": self.convert_period,
             "Période de taille": self.convert_list,
             "Racine": self.convert_letters,
             "Rythme de croissance": self.convert_letters,

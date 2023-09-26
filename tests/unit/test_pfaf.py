@@ -86,7 +86,7 @@ def test_pfaf_converter_convert_float(value, expected):
             [
                 ("ph/acid", True),
                 ("ph/neutral", True),
-                ("ph/base/alkaline", True),
+                ("ph/alkaline", True),
             ],
             id="pH",
         ),

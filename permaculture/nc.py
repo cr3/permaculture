@@ -123,10 +123,29 @@ class NCWeb:
 class NCConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "nc"))
 
+    def convert_period(self, key, value):
+        if value is None or not value.strip():
+            return []
+
+        k = self.translate(key)
+        n = [self.translate(v, key) for v in re.split(r"\s*-\s*", value)]
+        match len(n):
+            case 1:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[0])]
+            case 2:
+                return [(f"{k}/min", n[0]), (f"{k}/max", n[1])]
+            case _:
+                raise ValueError(f"Unknown period: {value!r}")
+
     def convert_item(self, key, value):
         dispatchers = {
             "Bacteria-Fungal Ratio": self.convert_ignore,
+            "Bloom Time": self.convert_period,
             "Compatible": self.convert_bool,
+            "Fire Damage": self.convert_list,
+            "Flood": self.convert_list,
+            "Flower Color": self.convert_list,
+            "Fruit Time": self.convert_period,
             "Growth Rate": self.convert_list,
             "Height": partial(self.convert_range, unit=inches),
             "Minimum Root Depth": partial(self.convert_float, unit=inches),

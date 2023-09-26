@@ -13,6 +13,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Bloom Time"
+msgstr "bloom period"
+
+msgid "Fruit Time"
+msgstr "fruit period"
+
 msgid "Minimum Root Depth"
 msgstr "root depth/min"
 
@@ -27,6 +33,38 @@ msgstr "ph"
 
 msgid "USDA Hardiness Zones"
 msgstr "hardiness/usda"
+
+msgctxt "Bloom Time"
+msgid "Early Fall"
+msgstr "fall"
+
+msgctxt "Bloom Time"
+msgid "Early Summer"
+msgstr "summer"
+
+msgctxt "Bloom Time"
+msgid "Early Spring"
+msgstr "spring"
+
+msgctxt "Bloom Time"
+msgid "Early Winter"
+msgstr "winter"
+
+msgctxt "Bloom Time"
+msgid "Late Fall"
+msgstr "fall"
+
+msgctxt "Bloom Time"
+msgid "Late Summer"
+msgstr "summer"
+
+msgctxt "Bloom Time"
+msgid "Late Spring"
+msgstr "spring"
+
+msgctxt "Bloom Time"
+msgid "Late Winter"
+msgstr "winter"
 
 msgctxt "Sun"
 msgid "Full Sun"

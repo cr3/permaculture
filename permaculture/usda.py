@@ -79,6 +79,7 @@ class USDAConverter(Converter):
 
     def convert_item(self, key, value):
         dispatchers = {
+            "AcceptedId": self.convert_ignore,
             "Adapted to Coarse Textured Soils": self.convert_bool,
             "Adapted to Fine Textured Soils": self.convert_bool,
             "Adapted to Medium Textured Soils": self.convert_bool,
