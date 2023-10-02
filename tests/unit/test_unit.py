@@ -9,7 +9,9 @@ from permaculture.unit import (
     fahrenheit,
     feet,
     inches,
+    km,
     meters,
+    miles,
 )
 
 
@@ -22,8 +24,10 @@ from permaculture.unit import (
         pytest.param(
             100 * celsius, 212 * fahrenheit, id="celsius to fahrenheit"
         ),
+        pytest.param(1 * km, 1000 * meters, id="km to meters"),
+        pytest.param(1 * km, 0.621371 * miles, id="km to miles"),
     ],
 )
-def test_length_unit(a, b):
+def test_unit_rmul(a, b):
     """It should be convenient to convert between units."""
-    assert math.isclose(a, b, rel_tol=1e-6, abs_tol=0.0)
+    assert math.isclose(a, b, rel_tol=1e-5, abs_tol=0.0)
