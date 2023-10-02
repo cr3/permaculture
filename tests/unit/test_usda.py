@@ -166,7 +166,7 @@ def test_usda_model_all_characteristics(unique):
         ),
     )
     storage = MemoryStorage()
-    characteristics = USDAModel(web, storage).all_characteristics()
+    characteristics = USDAModel(web, storage=storage).all_characteristics()
     assert characteristics == [
         {
             "id": "1",

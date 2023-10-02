@@ -3,7 +3,6 @@
 from pathlib import Path
 
 from attrs import define
-from requests import Session
 from yarl import URL
 
 from permaculture.http import HTTPSession
@@ -14,7 +13,7 @@ from permaculture.storage import null_storage
 class GoogleSpreadsheet:
     """Google spreadsheet."""
 
-    session: Session
+    session: HTTPSession
     doc_id: str
 
     @classmethod

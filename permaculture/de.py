@@ -6,22 +6,23 @@ from io import StringIO
 
 from attrs import define, field
 from bs4 import BeautifulSoup
-from requests import Session
 from yarl import URL
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlugin, DatabasePlant
+from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
+
+DE_ORIGIN = "https://designecologique.ca"
 
 
 @define(frozen=True)
 class DEWeb:
     """Design Ecologique web interface."""
 
-    session: Session = field()
+    session: HTTPSession = field(factory=partial(HTTPSession, DE_ORIGIN))
     storage: Storage = field(default=null_storage)
 
     def perenial_plants_list(self):
@@ -89,15 +90,12 @@ class DEConverter(Converter):
 
 @define(frozen=True)
 class DEModel:
-    web: DEWeb = field()
+    web: DEWeb = field(factory=DEWeb)
     converter: DEConverter = field(factory=DEConverter)
 
-    @classmethod
-    def from_url(cls, url: URL, storage=null_storage):
-        """Instantiate a Design Ecologique model from URL."""
-        session = HTTPSession(url).with_cache(storage)
-        web = DEWeb(session, storage)
-        return cls(web)
+    def with_cache(self, storage):
+        self.web.session.with_cache(storage)
+        return self
 
     def get_perenial_plants(self):
         data = self.web.perenial_plants_list().export(0)
@@ -110,14 +108,11 @@ class DEModel:
 
 @define(frozen=True)
 class DEDatabase(DatabasePlugin):
-    model: DEModel
+    model: DEModel = field(factory=DEModel)
 
     @classmethod
     def from_config(cls, config):
-        model = DEModel.from_url(
-            "https://designecologique.ca",
-            config.storage,
-        )
+        model = DEModel().with_cache(config.storage)
         return cls(model)
 
     def iterate(self):

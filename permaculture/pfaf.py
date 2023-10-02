@@ -7,7 +7,7 @@ import xlrd
 from attrs import define, field
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlugin, DatabasePlant
+from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage
 

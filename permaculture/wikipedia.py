@@ -8,7 +8,6 @@ from itertools import count
 import pandas as pd
 from attrs import define
 from bs4 import BeautifulSoup
-from requests import Session
 
 from permaculture.http import HTTPSession
 from permaculture.storage import null_storage
@@ -18,7 +17,7 @@ from permaculture.storage import null_storage
 class Wikipedia:
     """Wikipedia API."""
 
-    session: Session
+    session: HTTPSession
 
     @classmethod
     def from_url(cls, url, storage=null_storage):

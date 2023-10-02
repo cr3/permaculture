@@ -3,24 +3,24 @@
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-from attrs import define, field
-from requests import Session
-from yarl import URL
+from attrs import define, evolve, field
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlugin, DatabasePlant
+from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
 from permaculture.tokenizer import tokenize
 from permaculture.unit import fahrenheit
 
+USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
+
 
 @define(frozen=True)
 class USDAWeb:
     """USDA web interface."""
 
-    session: Session
+    session: HTTPSession = field(factory=partial(HTTPSession, USDA_ORIGIN))
 
     def characteristics_search(self) -> bytes:
         """Search characteristics."""
@@ -150,16 +150,13 @@ class USDAConverter(Converter):
 class USDAModel:
     """USDA model."""
 
-    web: USDAWeb
-    storage: Storage
+    web: USDAWeb = field(factory=USDAWeb)
     converter: USDAConverter = field(factory=USDAConverter)
+    storage: Storage = field(default=null_storage)
 
-    @classmethod
-    def from_url(cls, url: URL, storage=null_storage):
-        """Instantiate USDA Plants from URL."""
-        session = HTTPSession(url).with_cache(storage)
-        web = USDAWeb(session)
-        return cls(web, storage)
+    def with_cache(self, storage):
+        self.web.session.with_cache(storage)
+        return evolve(self, storage=storage)
 
     def plant_characteristics(self, plant):
         """Return the characteristics for a single plant."""
@@ -191,14 +188,11 @@ class USDAModel:
 
 @define(frozen=True)
 class USDADatabase(DatabasePlugin):
-    model: USDAModel
+    model: USDAModel = field(factory=USDAModel)
 
     @classmethod
     def from_config(cls, config):
-        model = USDAModel.from_url(
-            "https://plantsservices.sc.egov.usda.gov",
-            config.storage,
-        )
+        model = USDAModel().with_cache(config.storage)
         return cls(model)
 
     def iterate(self):

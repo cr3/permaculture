@@ -19,6 +19,8 @@ from permaculture.storage import null_storage
 from permaculture.tokenizer import tokenize
 from permaculture.unit import inches
 
+NC_ORIGIN = "https://permacultureplantdata.com"
+
 logger = logging.getLogger(__name__)
 
 
@@ -77,7 +79,7 @@ class NCAdapter(HTTPCacheAdapter):
 
 @define(frozen=True)
 class NCWeb:
-    session: Session = field()
+    session: HTTPSession = field(factory=partial(HTTPSession, NC_ORIGIN))
 
     def view_complist(self, start):
         """View companion list."""
@@ -141,20 +143,18 @@ class NCConverter(Converter):
 
 @define(frozen=True)
 class NCModel:
-    web: NCWeb
+    web: NCWeb = field(factory=NCWeb)
     converter: NCConverter = field(factory=NCConverter)
 
-    @classmethod
-    def from_url(
-        cls, url: URL, username: str, password: str, storage=null_storage
+    def with_authentication(
+        self, username: str, password: str, storage=null_storage
     ):
-        """Instantiate a Natural Capital model from URL."""
+        """Add authentication credentials to the model."""
         cache = HTTPCacheAll(storage)
         authentication = NCAuthentication(username, password)
         adapter = NCAdapter(authentication, cache=cache)
-        session = HTTPSession(url).with_adapter(adapter)
-        web = NCWeb(session)
-        return cls(web)
+        self.web.session.with_adapter(adapter)
+        return self
 
     def parse_tr(self, row):
         """Parse a table row into an iterator of text or links."""
@@ -263,12 +263,11 @@ class NCLink:
 
 @define(frozen=True)
 class NCDatabase(DatabasePlugin):
-    model: NCModel
+    model: NCModel = field(factory=NCModel)
 
     @classmethod
     def from_config(cls, config):
-        model = NCModel.from_url(
-            "https://permacultureplantdata.com",
+        model = NCModel().with_authentication(
             config.nc_username,
             config.nc_password,
             config.storage,
