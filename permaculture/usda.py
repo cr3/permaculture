@@ -10,8 +10,7 @@ from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
-from permaculture.tokenizer import tokenize
-from permaculture.unit import fahrenheit, inches
+from permaculture.unit import fahrenheit, feet, inches
 
 USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
 
@@ -74,9 +73,6 @@ class USDAWeb:
 class USDAConverter(Converter):
     locales: Locales = field(factory=partial(Locales.from_domain, "usda"))
 
-    def convert_token(self, key, value):
-        return [(self.translate(key), tokenize(value))]
-
     def convert_item(self, key, value):
         dispatchers = {
             "AcceptedId": self.convert_ignore,
@@ -86,6 +82,7 @@ class USDAConverter(Converter):
             "Berry/Nut/Seed Product": self.convert_bool,
             "Christmas Tree Product": self.convert_ignore,
             "Cold Stratification Required": self.convert_bool,
+            "CommonName": self.convert_token,
             "Coppice Potential": self.convert_bool,
             "Fall Conspicuous": self.convert_bool,
             "Fire Resistant": self.convert_bool,
@@ -109,7 +106,9 @@ class USDAConverter(Converter):
             "HasWetlandData": self.convert_ignore,
             "HasWildlife": self.convert_ignore,
             "Height at 20 Years, Maximum (feet)": self.convert_ignore,
-            "Height, Mature (feet)": self.convert_range,
+            "Height, Mature (feet)": partial(self.convert_float, unit=feet),
+            "Id": self.convert_ignore,
+            "ImageId": self.convert_ignore,
             "Known Allelopath": self.convert_bool,
             "Leaf Retention": self.convert_bool,
             "Low Growing Grass": self.convert_bool,
@@ -117,6 +116,7 @@ class USDAConverter(Converter):
             "Naval Store Product": self.convert_bool,
             "Nursery Stock Product": self.convert_bool,
             "Palatable Human": self.convert_bool,
+            "PlantLocationId": self.convert_ignore,
             "Planting Density per Acre, Maximum": self.convert_int,
             "Planting Density per Acre, Minimum": self.convert_int,
             "Post Product": self.convert_bool,
@@ -132,6 +132,7 @@ class USDAConverter(Converter):
             "Propagated by Sprigs": self.convert_bool,
             "Propagated by Tubers": self.convert_bool,
             "Pulpwood Product": self.convert_bool,
+            "RankId": self.convert_ignore,
             "Resprout Ability": self.convert_bool,
             "Root Depth, Minimum (inches)": partial(
                 self.convert_float, unit=inches
@@ -195,6 +196,7 @@ class USDADatabase(DatabasePlugin):
 
     @classmethod
     def from_config(cls, config):
+        """Instantiate USDADatabase from config."""
         model = USDAModel().with_cache(config.storage)
         return cls(model)
 

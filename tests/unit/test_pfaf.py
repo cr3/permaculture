@@ -39,7 +39,6 @@ def test_pfaf_web_main_database_error(storage):
 @pytest.mark.parametrize(
     "value, expected",
     [
-        pytest.param("", None, id="empty"),
         pytest.param("1.0", 1.0, id="str"),
         pytest.param(1.0, 1.0, id="float"),
         pytest.param(1, 1.0, id="int"),
@@ -63,13 +62,19 @@ def test_pfaf_converter_convert_float(value, expected):
             id="Deciduous/Evergreen",
         ),
         pytest.param(
-            ("Growth rate", "SMF"),
-            [
-                ("growth rate/slow", True),
-                ("growth rate/medium", True),
-                ("growth rate/fast", True),
-            ],
-            id="Growth rate",
+            ("Growth rate", "S"),
+            [("growth rate", "slow")],
+            id="Growth rate slow",
+        ),
+        pytest.param(
+            ("Growth rate", "M"),
+            [("growth rate", "medium")],
+            id="Growth rate medium",
+        ),
+        pytest.param(
+            ("Growth rate", "F"),
+            [("growth rate", "fast")],
+            id="Growth rate fast",
         ),
         pytest.param(
             ("Moisture", "DMWeWa"),

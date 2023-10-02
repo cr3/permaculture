@@ -17,7 +17,7 @@ msgid "AcceptedId"
 msgstr "accepted id"
 
 msgid "Bloom Period"
-msgstr "bloom period/min"
+msgstr "bloom period/avg"
 
 msgid "CommonName"
 msgstr "common name"
@@ -32,7 +32,7 @@ msgid "Height at 20 Years, Maximum (feet)"
 msgstr "height"
 
 msgid "Height, Mature (feet)"
-msgstr "height"
+msgstr "height/max"
 
 msgid "ImageId"
 msgstr "image id"

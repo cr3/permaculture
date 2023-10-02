@@ -35,20 +35,44 @@ def test_converter_convert_bool_error(converter):
 
 
 @pytest.mark.parametrize(
-    "value, expected",
+    "item, expected",
     [
-        ("1", 1.0),
-        ("+1", 1.0),
-        ("-1", -1.0),
-        ("1.", 1.0),
-        ("1.0", 1.0),
-        ("", None),
+        pytest.param(
+            ("key", "1"),
+            [("key", 1.0)],
+            id="1",
+        ),
+        pytest.param(
+            ("key", "+1"),
+            [("key", 1.0)],
+            id="+1",
+        ),
+        pytest.param(
+            ("key", "-1"),
+            [("key", -1.0)],
+            id="-1",
+        ),
+        pytest.param(
+            ("key", "1."),
+            [("key", 1.0)],
+            id="1.",
+        ),
+        pytest.param(
+            ("key", "1.0"),
+            [("key", 1.0)],
+            id="1.0",
+        ),
+        pytest.param(
+            ("key", ""),
+            [],
+            id="<empty>",
+        ),
     ],
 )
-def test_converter_convert_float(converter, value, expected):
+def test_converter_convert_float(converter, item, expected):
     """Converting a float should parse strings."""
-    result = converter.convert_float("", value)
-    assert result == [("", expected)]
+    result = converter.convert_float(*item)
+    assert result == expected
 
 
 def test_converter_convert_float_unit(converter):
@@ -117,11 +141,6 @@ def test_converter_convert_letters(converter, item, expected):
     "item, expected",
     [
         pytest.param(
-            ("key", ""),
-            [],
-            id="<empty>",
-        ),
-        pytest.param(
             ("key", "A"),
             [("key/a", True)],
             id="A",
@@ -154,14 +173,6 @@ def test_converter_convert_list(converter, item, expected):
                 ("key/max", 2),
             ],
             id="unit",
-        ),
-        pytest.param(
-            ("key", "1,0 - 2,0"),
-            [
-                ("key/min", 1.0),
-                ("key/max", 2.0),
-            ],
-            id="comma",
         ),
         pytest.param(
             ("key", "1.0 - 2.0"),
@@ -214,3 +225,19 @@ def test_converter_convert_string(converter, item, expected):
     """Converting a string should not convert other types."""
     result = converter.convert_string(*item)
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (
+            "key a.",
+            "key",
+        ),
+        ("key (paren)", "key"),
+    ],
+)
+def test_converter_convert_token(converter, value, expected):
+    """Converting a token should tokenize the value."""
+    result = converter.convert_token("", value)
+    assert result == [("", expected)]

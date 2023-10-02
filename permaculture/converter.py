@@ -6,6 +6,7 @@ import string
 from attrs import define, field
 
 from permaculture.locales import Locales
+from permaculture.tokenizer import tokenize
 
 FLOAT_RE = r"([+-]?\d+(?:\.\d*)?)"
 
@@ -29,12 +30,11 @@ class Converter:
     def convert_float(self, key, value, unit=1.0):
         if m := re.match(FLOAT_RE, value):
             f = float(m.group(1)) * unit
+            return [(self.translate(key), f)]
         elif value == "":
-            f = None
+            return []
         else:
             raise ValueError(f"Unknown float: {value!r}")
-
-        return [(self.translate(key), f)]
 
     def convert_ignore(self, *_):
         return []
@@ -62,19 +62,13 @@ class Converter:
 
         The strings are separated by a comma optionally followed by whitespace.
         """
-        if value is None or not value.strip():
-            return []
-
         k = self.translate(key)
-        values = [self.translate(v, key) for v in re.split(sep, value.strip())]
+        values = [self.translate(v, key) for v in re.split(sep, value)]
         return [(f"{k}/{v}", True) for v in values]
 
     def convert_range(self, key, value, unit=1.0):
         k = self.translate(key)
-        n = [
-            float(i) * unit
-            for i in re.findall(FLOAT_RE, value.replace(",", "."))
-        ]
+        n = [float(i) * unit for i in re.findall(FLOAT_RE, value)]
         match len(n):
             case 0:
                 return []
@@ -88,10 +82,16 @@ class Converter:
             value = self.translate(value, key)
         return [(self.translate(key), value)]
 
+    def convert_token(self, key, value):
+        return [(self.translate(key), tokenize(value))]
+
     def convert_item(self, key, value):
         return self.convert_string(key, value)
 
     def convert(self, data):
         return {
-            k: v for item in data.items() for k, v in self.convert_item(*item)
+            k: v
+            for item in data.items()
+            if item[1] is not None and item[1] != ""
+            for k, v in self.convert_item(*item)
         }

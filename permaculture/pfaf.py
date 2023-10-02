@@ -37,11 +37,12 @@ class PFAFConverter(Converter):
     def convert_item(self, key, value):
         dispatchers = {
             "Author": self.convert_ignore,
+            "Common name": self.convert_token,
             "Cultivation details": self.convert_ignore,
             "Deciduous/Evergreen": self.convert_letters,
             "Drought": self.convert_ignore,
             "Edible uses": self.convert_ignore,
-            "Growth rate": self.convert_letters,
+            "Habitat": self.convert_ignore,
             "Height": self.convert_float,
             "Known hazards": self.convert_ignore,
             "Medicinal": self.convert_ignore,
@@ -90,6 +91,7 @@ class PFAFDatabase(DatabasePlugin):
 
     @classmethod
     def from_config(cls, config):
+        """Instantiate PFAFDatabase from config."""
         model = PFAFModel.from_storage(config.storage)
         return cls(model)
 

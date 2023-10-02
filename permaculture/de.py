@@ -66,6 +66,9 @@ class DEConverter(Converter):
         else:
             return []
 
+    def convert_range(self, key, value, unit=1.0):
+        return super().convert_range(key, value.replace(",", "."))
+
     def convert_item(self, key, value):
         dispatchers = {
             "Accumulateur de Nutriments": self.convert_ignore,
@@ -125,6 +128,7 @@ class DEDatabase(DatabasePlugin):
 
     @classmethod
     def from_config(cls, config):
+        """Instantiate DEDatabase from config."""
         model = DEModel().with_cache(config.storage)
         return cls(model)
 
@@ -134,8 +138,10 @@ class DEDatabase(DatabasePlugin):
                 {
                     "scientific name": f"{p.pop('genus')} {p.pop('species')}",
                     "common name": [
-                        p.pop("english name"),
-                        p.pop("french name"),
+                        v
+                        for k in ["english name", "french name"]
+                        for v in [p.pop(k, "")]
+                        if v
                     ],
                     **p,
                 }

@@ -11,13 +11,13 @@ from bs4 import BeautifulSoup
 from requests import Session
 from yarl import URL
 
-from permaculture.converter import Converter
+from permaculture.converter import FLOAT_RE, Converter
 from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import null_storage
 from permaculture.tokenizer import tokenize
-from permaculture.unit import inches
+from permaculture.unit import feet, inches
 
 NC_ORIGIN = "https://permacultureplantdata.com"
 
@@ -137,23 +137,37 @@ class NCConverter(Converter):
             case _:
                 raise ValueError(f"Unknown period: {value!r}")
 
+    def convert_range(self, key, value, unit=1.0):
+        if m := re.match(rf"{FLOAT_RE} (?P<u>\w+)", value):
+            u = m.group("u")
+            match u:
+                case "inches":
+                    unit = inches
+                case "feet":
+                    unit = feet
+                case _:
+                    raise ValueError(f"Unknown range unit: {u!r}")
+
+        return super().convert_range(key, value, unit)
+
     def convert_item(self, key, value):
         dispatchers = {
             "Bacteria-Fungal Ratio": self.convert_ignore,
             "Bloom Time": self.convert_period,
+            "Common name": self.convert_token,
             "Compatible": self.convert_bool,
             "Fire Damage": self.convert_list,
             "Flood": self.convert_list,
             "Flower Color": self.convert_list,
             "Fruit Time": self.convert_period,
             "Growth Rate": self.convert_list,
-            "Height": partial(self.convert_range, unit=inches),
+            "Height": self.convert_range,
             "Minimum Root Depth": partial(self.convert_float, unit=inches),
             "Notes": self.convert_ignore,
             "Soil Moisture": self.convert_list,
             "Soil Type": self.convert_list,
             "Soil pH": self.convert_range,
-            "Spread": partial(self.convert_range, unit=inches),
+            "Spread": self.convert_range,
             "Sun": self.convert_list,
             "USDA Hardiness Zones": self.convert_range,
         }
@@ -260,7 +274,9 @@ class NCModel:
         try:
             plant_list = self.web.view_list(sci_name, sort_name)
         except NCAuthenticationError as error:
-            logger.info("Skipping Nature Capital: %(error)s", {"error": error})
+            logger.info(
+                "Skipping Natural Capital: %(error)s", {"error": error}
+            )
             return
 
         for table in self.parse_plant_list(plant_list):
@@ -286,6 +302,7 @@ class NCDatabase(DatabasePlugin):
 
     @classmethod
     def from_config(cls, config):
+        """Instantiate NCDatabase from config."""
         model = NCModel().with_authentication(
             config.nc_username,
             config.nc_password,

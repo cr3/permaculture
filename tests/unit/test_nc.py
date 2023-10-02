@@ -290,7 +290,6 @@ def test_nc_model_parse_detail(text, expected):
             [
                 {
                     "plant": "a",
-                    "related": None,
                 },
             ],
             id="one plant, no related",

@@ -68,6 +68,25 @@ def test_de_converter_convert_bool(value, expected):
     "item, expected",
     [
         pytest.param(
+            ("key", "1,0 - 2,0"),
+            [
+                ("key/min", 1.0),
+                ("key/max", 2.0),
+            ],
+            id="comma",
+        ),
+    ],
+)
+def test_de_converter_convert_range(item, expected):
+    """Converting a range should support single and double values."""
+    result = DEConverter().convert_range(*item)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
             ("Accumulateur de Nutriments", "*"),
             [],
             id="nutriments",

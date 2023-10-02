@@ -150,7 +150,7 @@ def test_usda_converter_convert_item(item, expected):
 
 def test_usda_model_all_characteristics(unique):
     """All characteristics should return the general characteristics."""
-    scientific_name, common_name = unique("token"), unique("text")
+    scientific_name, common_name = unique("token"), unique("token")
     web = Mock(
         plant_characteristics=Mock(return_value={}),
         characteristics_search=Mock(
@@ -169,7 +169,6 @@ def test_usda_model_all_characteristics(unique):
     characteristics = USDAModel(web, storage=storage).all_characteristics()
     assert characteristics == [
         {
-            "id": "1",
             "scientific name": scientific_name,
             "common name": common_name,
         }
@@ -183,7 +182,6 @@ def test_usda_database_iterate(unique):
         all_characteristics=Mock(
             return_value=[
                 {
-                    "id": "1",
                     "scientific name": scientific_name,
                     "common name": common_name,
                 }
@@ -195,7 +193,6 @@ def test_usda_database_iterate(unique):
     elements = list(database.iterate())
     assert elements == [
         {
-            "id": "1",
             "scientific name": scientific_name,
             "common name": common_name,
         },
