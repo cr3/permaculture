@@ -6,7 +6,7 @@ from csv import reader
 from functools import partial
 from io import StringIO
 
-from attrs import define, field
+from attrs import define, evolve, field
 from bs4 import BeautifulSoup
 from yarl import URL
 
@@ -15,6 +15,7 @@ from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
+from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import Storage, null_storage
 
 DE_ORIGIN = "https://designecologique.ca"
@@ -26,6 +27,10 @@ class DEWeb:
 
     session: HTTPSession = field(factory=partial(HTTPSession, DE_ORIGIN))
     storage: Storage = field(default=null_storage)
+
+    def with_cache(self, storage):
+        session = self.session.with_cache(storage)
+        return evolve(self, session=session, storage=storage)
 
     def perenial_plants_list(self):
         """List of perenial plants useful for permaculture in Quebec.
@@ -110,8 +115,8 @@ class DEModel:
     converter: DEConverter = field(factory=DEConverter)
 
     def with_cache(self, storage):
-        self.web.session.with_cache(storage)
-        return self
+        web = self.web.with_cache(storage)
+        return evolve(self, web=web)
 
     def get_perenial_plants(self):
         data = self.web.perenial_plants_list().export(0)
@@ -125,12 +130,14 @@ class DEModel:
 @define(frozen=True)
 class DEDatabase(DatabasePlugin):
     model: DEModel = field(factory=DEModel)
+    priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
         """Instantiate DEDatabase from config."""
         model = DEModel().with_cache(config.storage)
-        return cls(model)
+        priority = LocationPriority("Quebec").with_cache(config.storage)
+        return cls(model, priority)
 
     def iterate(self):
         return (
@@ -144,7 +151,8 @@ class DEDatabase(DatabasePlugin):
                         if v
                     ],
                     **p,
-                }
+                },
+                self.priority.weight,
             )
             for p in self.model.get_perenial_plants()
         )

@@ -7,7 +7,6 @@ import pytest
 from permaculture.database import (
     Database,
     DatabasePlant,
-    merge_plants,
 )
 
 
@@ -85,41 +84,64 @@ def test_database_search(unique):
         pytest.param(
             [DatabasePlant({"scientific name": "a"})],
             [DatabasePlant({"scientific name": "a"})],
-            id="singe",
+            id="single",
         ),
         pytest.param(
             [
                 DatabasePlant({"scientific name": "a"}),
                 DatabasePlant({"scientific name": "a"}),
             ],
+            [DatabasePlant({"scientific name": "a"})],
+            id="group by scientific name",
+        ),
+    ],
+)
+def test_database_merge_all(plants, expected):
+    """Merging all plants should group by scientific name."""
+    result = list(Database([]).merge_all(plants))
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "plants, expected",
+    [
+        pytest.param(
+            [],
+            {},
+            id="empty",
+        ),
+        pytest.param(
+            [DatabasePlant({"scientific name": "a"})],
+            DatabasePlant({"scientific name": "a"}),
+            id="single",
+        ),
+        pytest.param(
             [
                 DatabasePlant({"scientific name": "a"}),
+                DatabasePlant({"scientific name": "a"}),
             ],
+            DatabasePlant({"scientific name": "a"}),
             id="group by scientific name",
         ),
         pytest.param(
             [
-                DatabasePlant({"scientific name": "a", "x": 1}),
-                DatabasePlant({"scientific name": "a", "x": 3}),
+                DatabasePlant({"scientific name": "a", "x": 1}, 2.0),
+                DatabasePlant({"scientific name": "a", "x": 4}, 1.0),
             ],
-            [
-                DatabasePlant({"scientific name": "a", "x": 2}),
-            ],
+            DatabasePlant({"scientific name": "a", "x": 2.0}),
             id="merge numbers",
         ),
         pytest.param(
             [
-                DatabasePlant({"scientific name": "a", "x": "b"}),
-                DatabasePlant({"scientific name": "a", "x": "c"}),
+                DatabasePlant({"scientific name": "a", "x": "b"}, 2.0),
+                DatabasePlant({"scientific name": "a", "x": "c"}, 1.0),
             ],
-            [
-                DatabasePlant({"scientific name": "a", "x": {"b": 1, "c": 1}}),
-            ],
+            DatabasePlant({"scientific name": "a", "x": "b"}),
             id="merge strings",
         ),
     ],
 )
-def test_merge_plants(plants, expected):
-    """Merging plants group by scientific name, merging numbers and strings."""
-    result = list(merge_plants(plants))
+def test_database_merge(plants, expected):
+    """Merging plants should merge numbers and strings."""
+    result = Database([]).merge(plants)
     assert result == expected

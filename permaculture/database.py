@@ -2,33 +2,28 @@
 
 import re
 from collections.abc import Iterator
-from functools import reduce
-from itertools import groupby
-from operator import attrgetter
+from itertools import groupby, starmap
+from operator import attrgetter, mul
 
 from attrs import define
 
-from permaculture.data import (
-    merge,
-    merge_numbers,
-    merge_strings,
-)
+from permaculture.data import merge
 from permaculture.registry import registry_load
 from permaculture.tokenizer import tokenize
 
 
 class DatabasePlant(dict):
+    def __init__(self, data, weight=1.0):
+        super().__init__(data)
+        self.weight = weight
+
     @property
     def scientific_name(self):
         return self["scientific name"]
 
     @property
     def common_names(self):
-        common_name = self.get("common name", [])
-        if not isinstance(common_name, list):
-            common_name = [common_name]
-
-        return [n for n in common_name if n]
+        return self.get("common name", [])
 
     def with_database(self, name):
         """Add the database name to this plant."""
@@ -91,7 +86,7 @@ class Database:
 
     def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names in all databases."""
-        return merge_plants(
+        return self.merge_all(
             plant.with_database(name)
             for name, database in self.databases.items()
             for plant in database.lookup(*scientific_names)
@@ -99,17 +94,36 @@ class Database:
 
     def search(self, common_name: str) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name in all databases."""
-        return merge_plants(
+        return self.merge_all(
             plant.with_database(name)
             for name, database in self.databases.items()
             for plant in database.search(common_name)
         )
 
+    def merge_all(
+        self, plants: Iterator[DatabasePlant]
+    ) -> Iterator[DatabasePlant]:
+        """Group plants by scientific name, merging numbers and strings."""
+        keyfunc = attrgetter("scientific_name")
+        return (
+            DatabasePlant(self.merge(p))
+            for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
+        )
 
-def merge_plants(plants: Iterator[DatabasePlant]) -> Iterator[DatabasePlant]:
-    """Group plants by scientific name, merging numbers and strings."""
-    keyfunc = attrgetter("scientific_name")
-    return (
-        DatabasePlant(merge_numbers(merge_strings(reduce(merge, p, {}))))
-        for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
-    )
+    def merge(self, plants: Iterator[DatabasePlant]) -> DatabasePlant:
+        """Group plants by scientific name, merging numbers and strings."""
+        plants = list(plants)
+
+        # Resolve collisions using plant weights.
+        def resolve(key, values):
+            weights = [p.weight for p in plants if key in p]
+            if isinstance(values[0], float | int):
+                value = sum(
+                    starmap(mul, zip(weights, values, strict=True))
+                ) / sum(weights)
+            else:
+                _, value = max(zip(weights, values, strict=True))
+
+            return value
+
+        return merge(plants, resolve)

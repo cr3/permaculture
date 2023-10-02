@@ -9,6 +9,7 @@ from attrs import define, field
 from permaculture.converter import Converter
 from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.locales import Locales
+from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import FileStorage
 
 logger = logging.getLogger(__name__)
@@ -37,11 +38,12 @@ class PFAFConverter(Converter):
     def convert_item(self, key, value):
         dispatchers = {
             "Author": self.convert_ignore,
-            "Common name": self.convert_token,
+            "Common name": self.convert_list,
             "Cultivation details": self.convert_ignore,
             "Deciduous/Evergreen": self.convert_letters,
             "Drought": self.convert_ignore,
             "Edible uses": self.convert_ignore,
+            "Growth rate": self.convert_list,
             "Habitat": self.convert_ignore,
             "Height": self.convert_float,
             "Known hazards": self.convert_ignore,
@@ -88,12 +90,19 @@ class PFAFModel:
 @define(frozen=True)
 class PFAFDatabase(DatabasePlugin):
     model: PFAFModel
+    priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
         """Instantiate PFAFDatabase from config."""
         model = PFAFModel.from_storage(config.storage)
-        return cls(model)
+        priority = LocationPriority("United Kingdom").with_cache(
+            config.storage
+        )
+        return cls(model, priority)
 
     def iterate(self):
-        return (DatabasePlant(p) for p in self.model.all_plants())
+        return (
+            DatabasePlant(p, self.priority.weight)
+            for p in self.model.all_plants()
+        )

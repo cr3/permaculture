@@ -63,17 +63,17 @@ def test_pfaf_converter_convert_float(value, expected):
         ),
         pytest.param(
             ("Growth rate", "S"),
-            [("growth rate", "slow")],
+            [("growth rate/slow", True)],
             id="Growth rate slow",
         ),
         pytest.param(
             ("Growth rate", "M"),
-            [("growth rate", "medium")],
+            [("growth rate/medium", True)],
             id="Growth rate medium",
         ),
         pytest.param(
             ("Growth rate", "F"),
-            [("growth rate", "fast")],
+            [("growth rate/fast", True)],
             id="Growth rate fast",
         ),
         pytest.param(

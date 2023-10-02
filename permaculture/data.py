@@ -9,10 +9,16 @@ Unflattening flat data into nested data:
 
     >>> unflatten({'a/b': 1})
     {'a': {'b': 1}}
+
+Merging a list of dictionaries by calculating the mean on collision:
+
+    >>> merge([{'a': 1}, {'a': 2}], lambda _, v: sum(v)/len(v))
+    {'a': 1.5}
 """
 
 from collections.abc import Mapping
-from functools import partial
+from itertools import groupby
+from operator import itemgetter
 from statistics import mean
 
 
@@ -67,66 +73,39 @@ def unflatten(data, sep="/"):
     return d
 
 
-def merge(x, y):
-    """Merge the data of one dict into another dict.
+def resolve(key, values):
+    """Default function to resolve collisions when merging dictionaries."""
+    if isinstance(values[0], str):
+        values = [v for v in values if v != ""]
+        return values[0] if len(values) == 1 else values
+    elif isinstance(values[0], float | int):
+        return mean(values)
+    else:
+        raise TypeError(f"Unsupported values for {key!r}: {values!r}")
 
-    If both dicts have different values for the same key, they are merged
-    into a list.
+
+def merge(dicts, resolve=resolve):
+    """Merge a list of dictionaries by resolving collisions.
+
+    :param resolve: Function called on collision to resolve colliding values.
     """
-    d = x.copy()
-    for key, y_value in y.items():
-        if x_value := d.get(key):
-            if isinstance(x_value, Mapping):
-                d[key] = merge(x_value, y_value)
-            elif isinstance(x_value, list):
-                y_value = y_value if isinstance(y_value, list) else [y_value]
-                d[key] = list(set(x_value + y_value))
-            elif x_value != y_value:
-                d[key] = (
-                    x_value
-                    if y_value == "" or y_value is None
-                    else (
-                        y_value
-                        if x_value == "" or y_value is None
-                        else [x_value, y_value]
-                    )
-                )
+    d = {}
+
+    for key, values in groupby(
+        sorted((item for d in dicts for item in d.items()), key=itemgetter(0)),
+        itemgetter(0),
+    ):
+        values = list(map(itemgetter(1), values))
+        if len(set(map(type, values))) > 1:
+            raise ValueError(f"Different types for {key!r}: {values!r}")
+
+        if isinstance(values[0], Mapping):
+            d[key] = merge(values, resolve)
+        elif isinstance(values[0], list):
+            d[key] = list({i for v in values for i in v})
+        elif len(values) == 1 or len(set(values)) == 1:
+            d[key] = values[0]
         else:
-            d[key] = y_value
+            d[key] = resolve(key, values)
 
     return d
-
-
-def visit(data, f):
-    """Visit each key/value within nested data with the given function."""
-
-    def _visit(d):
-        for key, value in d.items():
-            if isinstance(value, Mapping):
-                yield key, dict(_visit(value))
-            else:
-                yield key, f(key, value, d)
-
-    return dict(_visit(data))
-
-
-merge_strings = partial(
-    visit,
-    f=lambda k, v, _d: (
-        {i: True for i in v}
-        if isinstance(v, list) and all(isinstance(i, str) for i in v)
-        else v
-    ),
-)
-"""Merge lists of strings into a dictionary of booleans."""
-
-
-merge_numbers = partial(
-    visit,
-    f=lambda _k, v, _d: (
-        mean(v)
-        if isinstance(v, list) and all(isinstance(k, int | float) for k in v)
-        else v
-    ),
-)
-"""Merge lists of floats into their mean."""

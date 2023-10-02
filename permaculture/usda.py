@@ -9,6 +9,7 @@ from permaculture.converter import Converter
 from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
+from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import Storage, null_storage
 from permaculture.unit import fahrenheit, feet, inches
 
@@ -82,15 +83,17 @@ class USDAConverter(Converter):
             "Berry/Nut/Seed Product": self.convert_bool,
             "Christmas Tree Product": self.convert_ignore,
             "Cold Stratification Required": self.convert_bool,
-            "CommonName": self.convert_token,
+            "CommonName": self.convert_list,
             "Coppice Potential": self.convert_bool,
             "Fall Conspicuous": self.convert_bool,
             "Fire Resistant": self.convert_bool,
             "Flower Conspicuous": self.convert_bool,
+            "Flower Color": self.convert_list,
             "Fodder Product": self.convert_bool,
             "Frost Free Days, Minimum": self.convert_int,
             "Fruit/Seed Conspicuous": self.convert_bool,
             "Fruit/Seed Persistence": self.convert_bool,
+            "Growth Rate": self.convert_list,
             "HasCharacteristics": self.convert_ignore,
             "HasDistributionData": self.convert_ignore,
             "HasDocumentation": self.convert_ignore,
@@ -193,12 +196,17 @@ class USDAModel:
 @define(frozen=True)
 class USDADatabase(DatabasePlugin):
     model: USDAModel = field(factory=USDAModel)
+    priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
         """Instantiate USDADatabase from config."""
         model = USDAModel().with_cache(config.storage)
-        return cls(model)
+        priority = LocationPriority("United States").with_cache(config.storage)
+        return cls(model, priority)
 
     def iterate(self):
-        return (DatabasePlant(c) for c in self.model.all_characteristics())
+        return (
+            DatabasePlant(c, self.priority.weight)
+            for c in self.model.all_characteristics()
+        )

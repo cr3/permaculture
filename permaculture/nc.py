@@ -15,6 +15,7 @@ from permaculture.converter import FLOAT_RE, Converter
 from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
+from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import null_storage
 from permaculture.tokenizer import tokenize
 from permaculture.unit import feet, inches
@@ -154,7 +155,7 @@ class NCConverter(Converter):
         dispatchers = {
             "Bacteria-Fungal Ratio": self.convert_ignore,
             "Bloom Time": self.convert_period,
-            "Common name": self.convert_token,
+            "Common name": self.convert_list,
             "Compatible": self.convert_bool,
             "Fire Damage": self.convert_list,
             "Flood": self.convert_list,
@@ -299,6 +300,7 @@ class NCLink:
 @define(frozen=True)
 class NCDatabase(DatabasePlugin):
     model: NCModel = field(factory=NCModel)
+    priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
@@ -308,7 +310,8 @@ class NCDatabase(DatabasePlugin):
             config.nc_password,
             config.storage,
         )
-        return cls(model)
+        priority = LocationPriority("United States").with_cache(config.storage)
+        return cls(model, priority)
 
     def companions(self, compatible):
         # Additional cache to speedup getting the same plants.
@@ -317,7 +320,10 @@ class NCDatabase(DatabasePlugin):
         def get_element(companion):
             plant = get_plant(companion["plant"].Id)
             related = get_plant(companion["related"].Id)
-            return (DatabasePlant(plant), DatabasePlant(related))
+            return (
+                DatabasePlant(plant, self.priority.weight),
+                DatabasePlant(related, self.priority.weight),
+            )
 
         with ThreadPoolExecutor() as executor:
             yield from executor.map(
@@ -325,7 +331,7 @@ class NCDatabase(DatabasePlugin):
                 (
                     c
                     for c in self.model.get_all_plant_companions()
-                    if c["related"] and c["compatible"] == compatible
+                    if "related" in c and c["compatible"] == compatible
                 ),
             )
 
@@ -337,7 +343,10 @@ class NCDatabase(DatabasePlugin):
         # all the matches for the plants that match the full name.
         tokens = [tokenize(n) for n in scientific_names]
         return (
-            DatabasePlant(self.model.get_plant(plant["plant name"].Id))
+            DatabasePlant(
+                self.model.get_plant(plant["plant name"].Id),
+                self.priority.weight,
+            )
             for sci_name in scientific_names
             for plant in self.model.get_plants(sci_name=sci_name.split()[0])
             if plant["scientific name"] in tokens
@@ -347,7 +356,10 @@ class NCDatabase(DatabasePlugin):
         # Same comment as in the `lookup` method.
         name = common_name.split()[0]
         return (
-            DatabasePlant(self.model.get_plant(plant["plant name"].Id))
+            DatabasePlant(
+                self.model.get_plant(plant["plant name"].Id),
+                self.priority.weight,
+            )
             for plant in self.model.get_plants(sort_name=name)
             if re.search(common_name, plant["plant name"].text, re.I)
         )
