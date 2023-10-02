@@ -8,7 +8,7 @@ from requests import Session
 from yarl import URL
 
 from permaculture.converter import Converter
-from permaculture.database import DatabaseIterablePlugin, DatabasePlant
+from permaculture.database import DatabasePlugin, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.storage import Storage, null_storage
@@ -190,7 +190,7 @@ class USDAModel:
 
 
 @define(frozen=True)
-class USDADatabase(DatabaseIterablePlugin):
+class USDADatabase(DatabasePlugin):
     model: USDAModel
 
     @classmethod

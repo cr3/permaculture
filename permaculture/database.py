@@ -1,7 +1,6 @@
 """Database utilities."""
 
 import re
-from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from functools import reduce
 from itertools import groupby
@@ -41,26 +40,17 @@ DatabaseCompanion = tuple[DatabasePlant, DatabasePlant]
 
 
 @define(frozen=True)
-class DatabasePlugin(ABC):
+class DatabasePlugin:
     def companions(self, compatible: bool) -> Iterator[DatabaseCompanion]:
         """Plant companions list."""
-        yield from []
+        return []
 
-    @abstractmethod
-    def search(self, common_name: str) -> Iterator[DatabasePlant]:
-        """Search for the scientific name by common name."""
-
-    @abstractmethod
-    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
-        """Lookup characteristics by scientific names."""
-
-
-class DatabaseIterablePlugin(DatabasePlugin):
-    @abstractmethod
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over all plants."""
+        return []
 
     def search(self, common_name: str) -> Iterator[DatabasePlant]:
+        """Search for the scientific name by common name."""
         for plant in self.iterate():
             if any(
                 re.search(common_name, tokenize(n), re.I)
@@ -69,6 +59,7 @@ class DatabaseIterablePlugin(DatabasePlugin):
                 yield plant
 
     def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+        """Lookup characteristics by scientific names."""
         tokens = [tokenize(n) for n in scientific_names]
         for plant in self.iterate():
             if plant.scientific_name in tokens:

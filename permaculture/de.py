@@ -10,7 +10,7 @@ from requests import Session
 from yarl import URL
 
 from permaculture.converter import Converter
-from permaculture.database import DatabaseIterablePlugin, DatabasePlant
+from permaculture.database import DatabasePlugin, DatabasePlant
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
@@ -109,7 +109,7 @@ class DEModel:
 
 
 @define(frozen=True)
-class DEDatabase(DatabaseIterablePlugin):
+class DEDatabase(DatabasePlugin):
     model: DEModel
 
     @classmethod

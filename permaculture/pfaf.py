@@ -7,7 +7,7 @@ import xlrd
 from attrs import define, field
 
 from permaculture.converter import Converter
-from permaculture.database import DatabaseIterablePlugin, DatabasePlant
+from permaculture.database import DatabasePlugin, DatabasePlant
 from permaculture.locales import Locales
 from permaculture.storage import FileStorage
 
@@ -85,7 +85,7 @@ class PFAFModel:
 
 
 @define(frozen=True)
-class PFAFDatabase(DatabaseIterablePlugin):
+class PFAFDatabase(DatabasePlugin):
     model: PFAFModel
 
     @classmethod
