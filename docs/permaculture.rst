@@ -77,6 +77,22 @@ permaculture.http module
    :undoc-members:
    :show-inheritance:
 
+permaculture.ipinfo module
+--------------------------
+
+.. automodule:: permaculture.ipinfo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.location module
+----------------------------
+
+.. automodule:: permaculture.location
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.logger module
 --------------------------
 
@@ -93,10 +109,26 @@ permaculture.nc module
    :undoc-members:
    :show-inheritance:
 
+permaculture.nominatim module
+-----------------------------
+
+.. automodule:: permaculture.nominatim
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.pfaf module
 ------------------------
 
 .. automodule:: permaculture.pfaf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.priority module
+----------------------------
+
+.. automodule:: permaculture.priority
    :members:
    :undoc-members:
    :show-inheritance:
