@@ -35,7 +35,7 @@ in a multi polygon:
 
 import sys
 from collections.abc import Sequence
-from functools import total_ordering
+from functools import cached_property, total_ordering
 from itertools import pairwise
 from math import asin, cos, radians, sin, sqrt
 
@@ -167,7 +167,7 @@ class LocationPolygon(LocationPolygonOrdering, list):
         points = map(LocationPoint.from_point, points)
         return cls(points)
 
-    @property
+    @cached_property
     def area(self):
         """Return the area of the polygon."""
         # https://en.wikipedia.org/wiki/Shoelace_formula
