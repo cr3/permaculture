@@ -9,6 +9,7 @@ from hamcrest import assert_that, has_properties, is_
 from permaculture.storage import (
     FileStorage,
     MemoryStorage,
+    SqliteStorage,
     StorageAction,
     null_storage,
 )
@@ -18,6 +19,7 @@ from permaculture.storage import (
     params=[
         "file",
         "memory",
+        "sqlite",
     ]
 )
 def real_storage(request, tmpdir):
@@ -26,6 +28,8 @@ def real_storage(request, tmpdir):
         yield FileStorage(tmpdir)
     elif request.param == "memory":
         yield MemoryStorage()
+    elif request.param == "sqlite":
+        yield SqliteStorage.from_path(tmpdir / "storage.sqlite")
     else:
         raise KeyError(f"Unsupported storage type: {request.param}")
 
@@ -103,16 +107,6 @@ def test_real_storage_length(key, real_storage):
     assert len(real_storage) == 1
 
 
-def test_file_storage_setitem(key, tmpdir):
-    """Setting a key should create the parent directory."""
-    parent = tmpdir / "parent"
-    assert not parent.exists()
-
-    storage = FileStorage(parent)
-    storage[key] = True
-    assert parent.exists()
-
-
 def test_null_storage_getitem(key):
     """Getting an existing key should always return the default."""
     null_storage[key] = True
@@ -142,3 +136,20 @@ def test_null_storage_length(key):
     """The length of a null storage should always be 0."""
     null_storage[key] = True
     assert len(null_storage) == 0
+
+
+def test_file_storage_setitem(key, tmpdir):
+    """Setting a key should create the parent directory."""
+    parent = tmpdir / "parent"
+    assert not parent.exists()
+
+    storage = FileStorage(parent)
+    storage[key] = True
+    assert parent.exists()
+
+
+def test_sqlite_storage_from_path_twice(key, tmpdir):
+    """Instantiating an SQLite storage from path twice should not fail."""
+    path = tmpdir / "storage.sqlite"
+    SqliteStorage.from_path(path)
+    SqliteStorage.from_path(path)

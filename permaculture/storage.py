@@ -1,6 +1,7 @@
 """Storage providers."""
 
 import logging
+import sqlite3
 from collections.abc import MutableMapping
 from pathlib import Path
 from urllib.parse import quote, unquote
@@ -45,6 +46,35 @@ class Storage(MutableMapping):
 
 
 MemoryStorage: Storage = dict
+
+
+@define(frozen=True)
+class _NullStorage(Storage):
+    """Null storage.
+
+    This storage stores a value and always retrieves the default value.
+    """
+
+    def __getitem__(self, key):
+        """Raise KeyError."""
+        raise KeyError(key)
+
+    def __setitem__(self, key, value):
+        """Noop."""
+
+    def __delitem__(self, key):
+        """Raise KeyError."""
+        raise KeyError(key)
+
+    def __iter__(self):
+        yield from ()
+
+    def __len__(self):
+        """Return 0."""
+        return 0
+
+
+null_storage = _NullStorage()
 
 
 @define(frozen=True)
@@ -103,29 +133,67 @@ class FileStorage(Storage):
 
 
 @define(frozen=True)
-class _NullStorage(Storage):
-    """Null storage.
+class SqliteStorage(Storage):
+    """Sqlite storage.
 
-    This storage stores a value and always retrieves the default value.
+    :param path: Path to SQLite database.
+    :param serializer: Serializer, defaults to `application/x-pickle`.
     """
 
+    conn = field()
+    serializer: Serializer = field(
+        default="application/x-pickle",
+        converter=lambda x: (
+            x if isinstance(x, Serializer) else Serializer.load(x)
+        ),
+    )
+
+    @classmethod
+    def from_path(cls, path):
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        conn = sqlite3.connect(path)
+        conn.execute("CREATE TABLE IF NOT EXISTS storage (key, data)")
+        conn.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_storage_key "
+            "ON storage (key)"
+        )
+        conn.commit()
+
+        return cls(conn)
+
     def __getitem__(self, key):
-        """Raise KeyError."""
-        raise KeyError(key)
+        cursor = self.conn.execute(
+            "SELECT data FROM storage WHERE key = ?", (key,)
+        )
+        row = cursor.fetchone()
+        if row is None:
+            raise KeyError(key)
+
+        return self.serializer.decode(row[0])
 
     def __setitem__(self, key, value):
-        """Noop."""
+        data, *_ = self.serializer.encode(value)
+        self.conn.execute("INSERT INTO storage VALUES (?, ?)", (key, data))
+        self.conn.commit()
 
     def __delitem__(self, key):
-        """Raise KeyError."""
-        raise KeyError(key)
+        cursor = self.conn.execute(
+            "DELETE FROM storage WHERE key = ? RETURNING 1", (key,)
+        )
+        row = cursor.fetchone()
+        if row is None:
+            raise KeyError(key)
+
+        self.conn.commit()
 
     def __iter__(self):
-        yield from ()
+        cursor = self.conn.execute("SELECT key FROM storage")
+        for row in cursor.fetchmany():
+            yield row[0]
 
     def __len__(self):
-        """Return 0."""
-        return 0
-
-
-null_storage = _NullStorage()
+        cursor = self.conn.execute("SELECT COUNT(key) FROM storage")
+        row = cursor.fetchone()
+        return row[0]
