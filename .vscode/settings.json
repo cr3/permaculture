@@ -1,5 +1,7 @@
 {
     "files.insertFinalNewline": true,
+    "keyboard.dispatch": "keyCode",
+    "notebook.output.textLineLimit": 500,
     "python.formatting.provider": "none",
     "python.testing.pytestArgs": [
         "tests"
