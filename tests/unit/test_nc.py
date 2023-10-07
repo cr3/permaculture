@@ -109,6 +109,7 @@ def test_nc_web_view_list(unique):
             "sortName": sort_name,
             "sciName": sci_name,
             "bfilter": "Set Filter",
+            "limitstart": 0,
         },
     )
     assert result == "test"
@@ -372,6 +373,42 @@ def test_nc_model_get_all_plant_companions():
         assert mock_complist.call_args_list == [
             call(letter) for letter in string.ascii_uppercase
         ]
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        pytest.param(
+            dedent("""\
+            <table width="100%">
+              <tr>
+                <td width="50%"><b>Items 1 - 50 of 100</td>
+              </tr>
+            </table>",
+        """),
+            100,
+            id="total",
+        ),
+    ],
+)
+def test_nc_model_parse_plant_total(text, expected):
+    """Parsing a plant total should return a total number of plants."""
+    model = NCModel(None)
+    result = model.parse_plant_total(text)
+    assert result == expected
+
+
+def test_nc_model_get_plant_total():
+    """Getting the plant total should the total number of plants."""
+    with patch.object(NCWeb, "view_list") as mock_list:
+        mock_list.return_value = dedent("""\
+            <table width="100%">
+            </table>
+        """)
+        web = NCWeb(None)
+        model = NCModel(web)
+        model.get_plant_total()
+        mock_list.assert_called_once()
 
 
 def test_nc_database_lookup(unique):

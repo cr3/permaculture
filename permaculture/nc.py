@@ -5,6 +5,7 @@ import re
 import string
 from concurrent.futures import ThreadPoolExecutor
 from functools import cache, partial
+from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -104,7 +105,7 @@ class NCWeb:
         )
         return response.text
 
-    def view_list(self, sci_name="", sort_name=""):
+    def view_list(self, sci_name="", sort_name="", limit_start=0):
         """View plant list."""
         response = self.session.post(
             "/plant-database/new-the-plant-list",
@@ -115,6 +116,7 @@ class NCWeb:
                 "sortName": sort_name,
                 "sciName": sci_name,
                 "bfilter": "Set Filter",
+                "limitstart": limit_start,
             },
         )
         return response.text
@@ -235,6 +237,30 @@ class NCModel:
         for letter in string.ascii_uppercase:
             yield from self.get_plant_companions(letter)
 
+    def parse_items(self, table):
+        """Parse the items total inside a bold tag."""
+        b = table.find("b")
+        m = re.match(r"Items \d+ - \d+ of (?P<total>\d+)", b.text)
+        if not m:
+            raise ValueError(f"Expected Items, got {b.text!r}")
+
+        return int(m.group("total"))
+
+    def parse_plant_total(self, text):
+        """Parse a plant list consisting of an HTML table of plants."""
+        soup = BeautifulSoup(text, "html.parser")
+        tables = soup.select("table[width='100%']")
+        for table in tables:
+            if table.find("td", attrs={"width": "50%"}):
+                return self.parse_items(table)
+
+        return -1
+
+    def get_plant_total(self):
+        """Get the total number of plants."""
+        text = self.web.view_list()
+        return self.parse_plant_total(text)
+
     def parse_key_value(self, key_value):
         """Parse a bold key and roman value."""
         prefix = key_value.find("b").text
@@ -267,13 +293,15 @@ class NCModel:
         return detail
 
     def get_plant(self, Id):
+        """Get plant details by Id."""
         detail = self.web.view_detail(Id)
         data = self.parse_detail(detail)
         return self.converter.convert(data)
 
-    def get_plants(self, sci_name="", sort_name=""):
+    def get_plants(self, sci_name="", sort_name="", limit_start=0):
+        """Get plants by scientific name or by common name."""
         try:
-            plant_list = self.web.view_list(sci_name, sort_name)
+            plant_list = self.web.view_list(sci_name, sort_name, limit_start)
         except NCAuthenticationError as error:
             logger.info(
                 "Skipping Natural Capital: %(error)s", {"error": error}
@@ -335,31 +363,55 @@ class NCDatabase(DatabasePlugin):
                 ),
             )
 
+    def iterate(self):
+        def get_plants(limit_start):
+            for plant in self.model.get_plants(limit_start=limit_start):
+                yield DatabasePlant(
+                    self.model.get_plant(plant["plant name"].Id),
+                    self.priority.weight,
+                )
+
+        total = self.model.get_plant_total()
+        with ThreadPoolExecutor() as executor:
+            yield from chain.from_iterable(
+                executor.map(
+                    get_plants,
+                    range(0, total, 50),
+                )
+            )
+
     def lookup(self, *scientific_names):
         # The search in the web interface concatenates words, so
         # searching for "symphytum officinale" actually searches for
         # "symphytumofficinale" which doesn't match anything. This
-        # workaround searches for the first word and the iterates over
-        # all the matches for the plants that match the full name.
+        # workaround searches each word and the iterates over all
+        # the matches for the plants that match the full name.
+        if not scientific_names:
+            yield from self.iterate()
+        seen = set()
         tokens = [tokenize(n) for n in scientific_names]
-        return (
-            DatabasePlant(
-                self.model.get_plant(plant["plant name"].Id),
-                self.priority.weight,
-            )
-            for sci_name in scientific_names
-            for plant in self.model.get_plants(sci_name=sci_name.split()[0])
-            if plant["scientific name"] in tokens
-        )
+        for sci_name in scientific_names:
+            for part in sci_name.split():
+                for plant in self.model.get_plants(sci_name=part):
+                    name = plant["scientific name"]
+                    if name not in seen and name in tokens:
+                        seen.add(name)
+                        yield DatabasePlant(
+                            self.model.get_plant(plant["plant name"].Id),
+                            self.priority.weight,
+                        )
 
     def search(self, common_name):
         # Same comment as in the `lookup` method.
-        name = common_name.split()[0]
-        return (
-            DatabasePlant(
-                self.model.get_plant(plant["plant name"].Id),
-                self.priority.weight,
-            )
-            for plant in self.model.get_plants(sort_name=name)
-            if re.search(common_name, plant["plant name"].text, re.I)
-        )
+        seen = set()
+        for part in common_name.split():
+            for plant in self.model.get_plants(sort_name=part):
+                name = plant["plant name"].text
+                if name not in seen and all(
+                    re.search(n, name, re.I) for n in common_name.split()
+                ):
+                    seen.add(name)
+                    yield DatabasePlant(
+                        self.model.get_plant(plant["plant name"].Id),
+                        self.priority.weight,
+                    )
