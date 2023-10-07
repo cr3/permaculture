@@ -35,6 +35,16 @@ Summary of books on permaculture.
    la-ferme-impossible
    la-revolution-dun-seul-brin-de-paille
 
+Videos
+------
+
+Interesting videos on permaculture.
+
+.. toctree::
+    :maxdepth: 2
+
+    videos
+
 API Reference
 -------------
 
