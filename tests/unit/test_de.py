@@ -357,6 +357,7 @@ def test_de_database_iterate():
     assert elements == [
         {
             "scientific name": "a b",
-            "common name": ["c", "d"],
+            "common name/c": True,
+            "common name/d": True,
         },
     ]

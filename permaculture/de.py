@@ -144,12 +144,12 @@ class DEDatabase(DatabasePlugin):
             DatabasePlant(
                 {
                     "scientific name": f"{p.pop('genus')} {p.pop('species')}",
-                    "common name": [
-                        v
+                    **{
+                        f"common name/{v}": True
                         for k in ["english name", "french name"]
                         for v in [p.pop(k, "")]
                         if v
-                    ],
+                    },
                     **p,
                 },
                 self.priority.weight,
