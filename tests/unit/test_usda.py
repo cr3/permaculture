@@ -4,7 +4,6 @@ from unittest.mock import ANY, Mock
 
 import pytest
 
-from permaculture.storage import MemoryStorage
 from permaculture.usda import (
     USDAConverter,
     USDADatabase,
@@ -165,12 +164,11 @@ def test_usda_model_all_characteristics(unique):
             }
         ),
     )
-    storage = MemoryStorage()
-    characteristics = USDAModel(web, storage=storage).all_characteristics()
+    characteristics = list(USDAModel(web).all_characteristics())
     assert characteristics == [
         {
             "scientific name": scientific_name,
-            "common name": common_name,
+            f"common name/{common_name}": True,
         }
     ]
 
@@ -183,7 +181,7 @@ def test_usda_database_iterate(unique):
             return_value=[
                 {
                     "scientific name": scientific_name,
-                    "common name": common_name,
+                    f"common name/{common_name}": True,
                 }
             ]
         )
@@ -194,6 +192,6 @@ def test_usda_database_iterate(unique):
     assert elements == [
         {
             "scientific name": scientific_name,
-            "common name": common_name,
+            f"common name/{common_name}": True,
         },
     ]

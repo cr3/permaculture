@@ -3,14 +3,14 @@
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-from attrs import define, evolve, field
+from attrs import define, field
 
 from permaculture.converter import Converter
 from permaculture.database import DatabasePlant, DatabasePlugin
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
-from permaculture.storage import Storage, null_storage
+from permaculture.tokenizer import tokenize
 from permaculture.unit import fahrenheit, feet, inches
 
 USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
@@ -22,45 +22,85 @@ class USDAWeb:
 
     session: HTTPSession = field(factory=partial(HTTPSession, USDA_ORIGIN))
 
-    def characteristics_search(self) -> bytes:
+    def characteristics_search(self, **kwargs):
         """Search characteristics."""
         payload = {
-            "Text": None,
-            "Field": None,
-            "Locations": None,
-            "Groups": None,
-            "Durations": None,
-            "GrowthHabits": None,
-            "WetlandRegions": None,
-            "NoxiousLocations": None,
-            "InvasiveLocations": None,
-            "Countries": None,
-            "Provinces": None,
-            "Counties": None,
-            "Cities": None,
-            "Localities": None,
             "ArtistFirstLetters": None,
-            "ImageLocations": None,
             "Artists": None,
+            "Cities": None,
             "CopyrightStatuses": None,
-            "ImageTypes": None,
-            "SortBy": "sortSciName",
-            "Offset": None,
+            "Counties": None,
+            "Countries": None,
+            "Durations": None,
+            "Field": None,
             "FilterOptions": None,
-            "UnfilteredPlantIds": None,
-            "Type": "Characteristics",
-            "TaxonSearchCriteria": None,
+            "Groups": None,
+            "GrowthHabits": None,
+            "ImageLocations": None,
+            "ImageTypes": None,
+            "InvasiveLocations": None,
+            "Localities": None,
+            "Locations": None,
             "MasterId": -1,
+            "NoxiousLocations": None,
+            "Offset": None,
+            "Provinces": None,
+            "SortBy": "sortSciName",
+            "TaxonSearchCriteria": None,
+            "Text": None,
+            "Type": "Characteristics",
+            "UnfilteredPlantIds": None,
+            "WetlandRegions": None,
+            **kwargs,
         }
         response = self.session.post(
-            "/api/CharacteristicsSearch", json=payload
+            "/api/CharacteristicsSearch",
+            json=payload,
+        )
+        return response.json()
+
+    def plant_search(self, **kwargs):
+        """Search plants."""
+        payload = {
+            "ArtistFirstLetters": None,
+            "Artists": None,
+            "Cities": None,
+            "CopyrightStatuses": None,
+            "Counties": None,
+            "Countries": None,
+            "Durations": None,
+            "Field": None,
+            "FilterOptions": None,
+            "Groups": None,
+            "GrowthHabits": None,
+            "ImageLocations": None,
+            "ImageTypes": None,
+            "InvasiveLocations": None,
+            "Localities": None,
+            "Locations": None,
+            "MasterId": None,
+            "NoxiousLocations": None,
+            "Offset": -1,
+            "Provinces": None,
+            "SortBy": None,
+            "TaxonSearchCriteria": None,
+            "Text": None,
+            "Type": "Characteristics",
+            "UnfilteredPlantIds": None,
+            "WetlandRegions": None,
+            **kwargs,
+        }
+        response = self.session.post(
+            "/api/PlantSearch",
+            json=payload,
         )
         return response.json()
 
     def plant_profile(self, symbol):
         """Plant profile for a symbol."""
         response = self.session.get(
-            "/api/PlantProfile", params={"symbol": symbol}
+            "/api/PlantProfile",
+            params={"symbol": symbol},
         )
         return response.json()
 
@@ -143,6 +183,7 @@ class USDAConverter(Converter):
             "ScientificName": self.convert_token,
             "Seed per Pound": self.convert_int,
             "Small Grain": self.convert_bool,
+            "Synonyms": self.convert_ignore,
             "Temperature, Minimum (°F)": partial(
                 self.convert_float, unit=fahrenheit
             ),
@@ -159,11 +200,10 @@ class USDAModel:
 
     web: USDAWeb = field(factory=USDAWeb)
     converter: USDAConverter = field(factory=USDAConverter)
-    storage: Storage = field(default=null_storage)
 
     def with_cache(self, storage):
         self.web.session.with_cache(storage)
-        return evolve(self, storage=storage)
+        return self
 
     def plant_characteristics(self, plant):
         """Return the characteristics for a single plant."""
@@ -177,20 +217,19 @@ class USDAModel:
             }
         )
 
+    def plant_search(self, text, field):
+        search = self.web.plant_search(Field=field, Text=text)
+        for plant in search["PlantResults"]:
+            yield self.plant_characteristics(plant)
+
     def all_characteristics(self):
         """Return the characteristics for all plants."""
-        key = "usda-plants-all-characteristics"
-        if key not in self.storage:
-            search = self.web.characteristics_search()
-            with ThreadPoolExecutor() as executor:
-                self.storage[key] = list(
-                    executor.map(
-                        self.plant_characteristics,
-                        search["PlantResults"],
-                    )
-                )
-
-        return self.storage[key]
+        search = self.web.characteristics_search()
+        with ThreadPoolExecutor() as executor:
+            return executor.map(
+                self.plant_characteristics,
+                search["PlantResults"],
+            )
 
 
 @define(frozen=True)
@@ -209,4 +248,19 @@ class USDADatabase(DatabasePlugin):
         return (
             DatabasePlant(c, self.priority.weight)
             for c in self.model.all_characteristics()
+        )
+
+    def lookup(self, *scientific_names):
+        tokens = [tokenize(n) for n in scientific_names]
+        return (
+            DatabasePlant(plant, self.priority.weight)
+            for token in tokens
+            for plant in self.model.plant_search(token, "Scientific Name")
+            if plant["scientific name"] in tokens
+        )
+
+    def search(self, common_name):
+        return (
+            DatabasePlant(plant, self.priority.weight)
+            for plant in self.model.plant_search(common_name, "Common Name")
         )
