@@ -23,7 +23,13 @@ class DatabasePlant(dict):
 
     @property
     def common_names(self):
-        return self.get("common name", [])
+        names = []
+        for key in self:
+            if m := re.match(r"common name/(?P<name>.+)", key):
+                name = m.group("name")
+                names.append(name)
+
+        return names
 
     def with_database(self, name):
         """Add the database name to this plant."""
@@ -57,7 +63,7 @@ class DatabasePlugin:
         """Lookup characteristics by scientific names."""
         tokens = [tokenize(n) for n in scientific_names]
         for plant in self.iterate():
-            if plant.scientific_name in tokens:
+            if not tokens or plant.scientific_name in tokens:
                 yield plant
 
 

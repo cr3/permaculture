@@ -52,13 +52,22 @@ def make_args_parser():
     lookup.add_argument(
         "names",
         metavar="name",
-        nargs="+",
+        nargs="*",
         help="scientific name to lookup",
     )
     lookup.add_argument(
         "--exclude",
-        default="$",
-        help="exclude characteristics from the output",
+        dest="excludes",
+        default=["$"],
+        action="append",
+        help="exclude these characteristics from the output",
+    )
+    lookup.add_argument(
+        "--include",
+        dest="includes",
+        default=[],
+        action="append",
+        help="only include these characteristics in the output",
     )
     search = command.add_parser(
         "search",
@@ -144,9 +153,14 @@ def main(argv=None):
         case "lookup":
             content_type = args.serializer.default_content_type
             f = flatten if content_type == "text/csv" else unflatten
-            exclude = re.compile(args.exclude, re.I)
+            exclude = re.compile("|".join(args.excludes), re.I)
+            include = re.compile("|".join(args.includes), re.I)
             data = [
-                {k: v for k, v in f(plant).items() if not exclude.match(k)}
+                {
+                    k: v
+                    for k, v in f(plant).items()
+                    if include.match(k) and not exclude.match(k)
+                }
                 for plant in database.lookup(*args.names)
             ]
         case "search":
