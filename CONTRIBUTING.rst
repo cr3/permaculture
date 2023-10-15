@@ -146,6 +146,16 @@ Starting to code
 .. _create a pull request: https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request
 
 
+Editing notebooks
+-----------------
+
+Edit Jupyter notebooks in the ``notebooks`` directory:
+
+.. code-block:: text
+
+    > poetry install --with notebooks
+
+
 Running the tests
 -----------------
 
