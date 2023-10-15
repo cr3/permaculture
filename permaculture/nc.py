@@ -167,6 +167,7 @@ class NCConverter(Converter):
             "Height": self.convert_range,
             "Minimum Root Depth": partial(self.convert_float, unit=inches),
             "Notes": self.convert_ignore,
+            "Root Type": self.convert_list,
             "Soil Moisture": self.convert_list,
             "Soil Type": self.convert_list,
             "Soil pH": self.convert_range,

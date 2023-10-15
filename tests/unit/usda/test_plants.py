@@ -1,43 +1,43 @@
-"""Unit tests for the USDA module."""
+"""Unit tests for the USDA Plants module."""
 
 from unittest.mock import ANY, Mock
 
 import pytest
 
-from permaculture.usda import (
-    USDAConverter,
-    USDADatabase,
-    USDAModel,
-    USDAWeb,
+from permaculture.usda.plants import (
+    PlantsConverter,
+    PlantsDatabase,
+    PlantsModel,
+    PlantsWeb,
 )
 
-from .stubs import StubRequestsResponse
+from ..stubs import StubRequestsResponse
 
 
-def test_usda_web_characteristics_search():
+def test_plants_web_characteristics_search():
     """CharacteristicsSearch should POST a JSON payload."""
     session = Mock(post=Mock(return_value=StubRequestsResponse()))
-    USDAWeb(session).characteristics_search()
+    PlantsWeb(session).characteristics_search()
     session.post.assert_called_once_with(
         "/api/CharacteristicsSearch",
         json=ANY,
     )
 
 
-def test_usda_web_plant_profile():
+def test_plants_web_plant_profile():
     """PlantProfile should GET with the symbol query param."""
     session = Mock(get=Mock(return_value=StubRequestsResponse()))
-    USDAWeb(session).plant_profile("test")
+    PlantsWeb(session).plant_profile("test")
     session.get.assert_called_once_with(
         "/api/PlantProfile",
         params={"symbol": "test"},
     )
 
 
-def test_usda_web_plant_characteristics():
+def test_plants_web_plant_characteristics():
     """PlantCharacteristics should GET with the id in the URL."""
     session = Mock(get=Mock(return_value=StubRequestsResponse()))
-    USDAWeb(session).plant_characteristics(1234)
+    PlantsWeb(session).plant_characteristics(1234)
     session.get.assert_called_once_with("/api/PlantCharacteristics/1234")
 
 
@@ -141,13 +141,13 @@ def test_usda_web_plant_characteristics():
         ),
     ],
 )
-def test_usda_converter_convert_item(item, expected):
+def test_plants_converter_convert_item(item, expected):
     """Converting an item should consider types."""
-    result = USDAConverter().convert_item(*item)
+    result = PlantsConverter().convert_item(*item)
     assert result == expected
 
 
-def test_usda_model_all_characteristics(unique):
+def test_plants_model_all_characteristics(unique):
     """All characteristics should return the general characteristics."""
     scientific_name, common_name = unique("token"), unique("token")
     web = Mock(
@@ -164,7 +164,7 @@ def test_usda_model_all_characteristics(unique):
             }
         ),
     )
-    characteristics = list(USDAModel(web).all_characteristics())
+    characteristics = list(PlantsModel(web).all_characteristics())
     assert characteristics == [
         {
             "scientific name": scientific_name,
@@ -173,7 +173,7 @@ def test_usda_model_all_characteristics(unique):
     ]
 
 
-def test_usda_database_iterate(unique):
+def test_plants_database_iterate(unique):
     """Iterating over the database should return a list of elements."""
     scientific_name, common_name = unique("token"), unique("text")
     model = Mock(
@@ -187,7 +187,7 @@ def test_usda_database_iterate(unique):
         )
     )
 
-    database = USDADatabase(model)
+    database = PlantsDatabase(model)
     elements = list(database.iterate())
     assert elements == [
         {

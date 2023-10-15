@@ -60,7 +60,8 @@ seaborn = "^0.13.0"
 permaculture = "permaculture.testing.fixtures"
 
 [tool.poetry.plugins."permaculture.databases"]
-"usda" = "permaculture.usda:USDADatabase"
+"usda/plants" = "permaculture.usda.plants:PlantsDatabase"
+"usda/phytochem" = "permaculture.usda.phytochem:PhytochemDatabase"
 "de" = "permaculture.de:DEDatabase"
 "nc" = "permaculture.nc:NCDatabase"
 "pfaf" = "permaculture.pfaf:PFAFDatabase"

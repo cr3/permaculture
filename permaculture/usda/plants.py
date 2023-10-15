@@ -13,14 +13,14 @@ from permaculture.priority import LocationPriority, Priority
 from permaculture.tokenizer import tokenize
 from permaculture.unit import fahrenheit, feet, inches
 
-USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
+PLANTS_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
 
 
 @define(frozen=True)
-class USDAWeb:
-    """USDA web interface."""
+class PlantsWeb:
+    """USDA Plants web interface."""
 
-    session: HTTPSession = field(factory=partial(HTTPSession, USDA_ORIGIN))
+    session: HTTPSession = field(factory=partial(HTTPSession, PLANTS_ORIGIN))
 
     def characteristics_search(self, **kwargs):
         """Search characteristics."""
@@ -111,8 +111,10 @@ class USDAWeb:
 
 
 @define(frozen=True)
-class USDAConverter(Converter):
-    locales: Locales = field(factory=partial(Locales.from_domain, "usda"))
+class PlantsConverter(Converter):
+    locales: Locales = field(
+        factory=partial(Locales.from_domain, "usda-plants")
+    )
 
     def convert_item(self, key, value):
         dispatchers = {
@@ -130,6 +132,7 @@ class USDAConverter(Converter):
             "Flower Conspicuous": self.convert_bool,
             "Flower Color": self.convert_list,
             "Fodder Product": self.convert_bool,
+            "Foliage Color": self.convert_list,
             "Frost Free Days, Minimum": self.convert_int,
             "Fruit/Seed Conspicuous": self.convert_bool,
             "Fruit/Seed Persistence": self.convert_bool,
@@ -195,11 +198,11 @@ class USDAConverter(Converter):
 
 
 @define(frozen=True)
-class USDAModel:
-    """USDA model."""
+class PlantsModel:
+    """USDA Plants model."""
 
-    web: USDAWeb = field(factory=USDAWeb)
-    converter: USDAConverter = field(factory=USDAConverter)
+    web: PlantsWeb = field(factory=PlantsWeb)
+    converter: PlantsConverter = field(factory=PlantsConverter)
 
     def with_cache(self, storage):
         self.web.session.with_cache(storage)
@@ -233,14 +236,14 @@ class USDAModel:
 
 
 @define(frozen=True)
-class USDADatabase(DatabasePlugin):
-    model: USDAModel = field(factory=USDAModel)
+class PlantsDatabase(DatabasePlugin):
+    model: PlantsModel = field(factory=PlantsModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate USDADatabase from config."""
-        model = USDAModel().with_cache(config.storage)
+        """Instantiate PlantsDatabase from config."""
+        model = PlantsModel().with_cache(config.storage)
         priority = LocationPriority("United States").with_cache(config.storage)
         return cls(model, priority)
 

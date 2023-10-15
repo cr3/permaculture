@@ -22,7 +22,8 @@ Supported plant databases.
    de
    nc
    pfaf
-   usda
+   usda-phytochem
+   usda-plants
 
 Books
 -----
@@ -41,9 +42,9 @@ Videos
 Interesting videos on permaculture.
 
 .. toctree::
-    :maxdepth: 2
+   :maxdepth: 2
 
-    videos
+   videos
 
 API Reference
 -------------
