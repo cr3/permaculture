@@ -194,14 +194,23 @@ text_csv_serializer = SerializerPlugin(
 )
 """Serializer for text/csv."""
 
-text_html_serializer = SerializerPlugin(
-    lambda data: data.encode("utf-8"),
-    lambda payload: payload.decode("utf-8"),
+
+def _text_plain_serializer_encode(data, encoding="utf-8"):
+    if not isinstance(data, list):
+        data = [data]
+
+    return "\n".join(map(str, data)).encode(encoding)
+
+
+def _text_plain_serializer_decode(payload, encoding="utf-8"):
+    return payload.decode("utf-8").split("\n")
+
+
+text_plain_serializer = SerializerPlugin(
+    _text_plain_serializer_encode,
+    _text_plain_serializer_decode,
     "utf-8",
 )
-"""Serializer for text/html."""
-
-text_plain_serializer = text_html_serializer
 """Serializer for text/plain."""
 
 www_form_serializer = SerializerPlugin(

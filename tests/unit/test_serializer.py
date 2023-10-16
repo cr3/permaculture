@@ -218,9 +218,9 @@ def test_text_csv_serializer():
 
 def test_text_plain_serializer():
     """The text/plain content type should encode a string."""
-    payload = text_plain_serializer.encode(STRING_TEST)
+    payload = text_plain_serializer.encode([STRING_TEST])
     assert isinstance(payload, bytes)
-    assert text_plain_serializer.decode(payload) == STRING_TEST
+    assert text_plain_serializer.decode(payload) == [STRING_TEST]
 
 
 @pytest.mark.parametrize(

@@ -73,7 +73,6 @@ permaculture = "permaculture.testing.fixtures"
 "application/x-www-form-urlencoded" = "permaculture.serializer:www_form_serializer"
 "application/x-yaml" = "permaculture.serializer:yaml_serializer"
 "text/csv" = "permaculture.serializer:text_csv_serializer"
-"text/html" = "permaculture.serializer:text_html_serializer"
 "text/plain" = "permaculture.serializer:text_plain_serializer"
 
 [tool.poetry.plugins."pytest_unique.unique"]
