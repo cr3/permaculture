@@ -63,7 +63,7 @@ class DatabasePlugin:
         """Lookup characteristics by scientific names."""
         tokens = [tokenize(n) for n in scientific_names]
         for plant in self.iterate():
-            if not tokens or plant.scientific_name in tokens:
+            if plant.scientific_name in tokens:
                 yield plant
 
 
@@ -89,6 +89,11 @@ class Database:
         """Plant companions list."""
         for database in self.databases.values():
             yield from database.companions(compatible)
+
+    def iterate(self) -> Iterator[DatabasePlant]:
+        """Iterate over plants."""
+        for database in self.databases.values():
+            yield from database.iterate()
 
     def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names in all databases."""

@@ -387,8 +387,6 @@ class NCDatabase(DatabasePlugin):
         # "symphytumofficinale" which doesn't match anything. This
         # workaround searches each word and the iterates over all
         # the matches for the plants that match the full name.
-        if not scientific_names:
-            yield from self.iterate()
         seen = set()
         tokens = [tokenize(n) for n in scientific_names]
         for sci_name in scientific_names:

@@ -45,6 +45,10 @@ def make_args_parser():
         "companions",
         help="plant companions list",
     )
+    command.add_parser(
+        "iterate",
+        help="iterate over all scientific names",
+    )
     lookup = command.add_parser(
         "lookup",
         help="lookup characteristics by scientific name",
@@ -52,7 +56,7 @@ def make_args_parser():
     lookup.add_argument(
         "names",
         metavar="name",
-        nargs="*",
+        nargs="+",
         help="scientific name to lookup",
     )
     lookup.add_argument(
@@ -150,6 +154,11 @@ def main(argv=None):
                     lambda pair: pair[0].scientific_name,
                 )
             }
+        case "iterate":
+            data = [
+                plant.scientific_name
+                for plant in database.iterate()
+            ]
         case "lookup":
             content_type = args.serializer.default_content_type
             f = flatten if content_type == "text/csv" else unflatten
