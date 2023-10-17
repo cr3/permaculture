@@ -199,11 +199,11 @@ def _text_plain_serializer_encode(data, encoding="utf-8"):
     if not isinstance(data, list):
         data = [data]
 
-    return "\n".join(map(str, data)).encode(encoding)
+    return "".join(f"{d}\n" for d in data).encode(encoding)
 
 
 def _text_plain_serializer_decode(payload, encoding="utf-8"):
-    return payload.decode("utf-8").split("\n")
+    return payload.decode("utf-8").rstrip("\n").split("\n")
 
 
 text_plain_serializer = SerializerPlugin(

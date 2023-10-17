@@ -10,7 +10,7 @@ from attrs import define, field
 from bs4 import BeautifulSoup
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant, DatabasePlugin
+from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
@@ -167,7 +167,7 @@ class PhytochemPlant(PhytochemLink):
 
 
 @define(frozen=True)
-class PhytochemDatabase(DatabasePlugin):
+class PhytochemDatabase(Database):
     model: PhytochemModel = field(factory=PhytochemModel)
     priority: Priority = field(factory=Priority)
 
@@ -179,6 +179,7 @@ class PhytochemDatabase(DatabasePlugin):
         return cls(model, priority)
 
     def lookup(self, *scientific_names):
+        # TODO: Do we really need to tokenize scientific names?
         [tokenize(n) for n in scientific_names]
         for sci_name in scientific_names:
             for link in self.model.search(sci_name):

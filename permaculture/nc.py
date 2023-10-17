@@ -13,7 +13,7 @@ from requests import Session
 from yarl import URL
 
 from permaculture.converter import FLOAT_RE, Converter
-from permaculture.database import DatabasePlant, DatabasePlugin
+from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
@@ -327,7 +327,7 @@ class NCLink:
 
 
 @define(frozen=True)
-class NCDatabase(DatabasePlugin):
+class NCDatabase(Database):
     model: NCModel = field(factory=NCModel)
     priority: Priority = field(factory=Priority)
 

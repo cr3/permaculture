@@ -5,8 +5,8 @@ from unittest.mock import Mock
 import pytest
 
 from permaculture.database import (
-    Database,
     DatabasePlant,
+    Databases,
 )
 
 
@@ -19,42 +19,57 @@ def test_database_plant_with_database(unique):
 
 def test_database_load_all():
     """Loading should instantiate all databases by default."""
-    config = Mock(database=None)
+    config = Mock(databases=[])
     registry = {
         "databases": {
             "a": Mock(),
             "b": Mock(),
         },
     }
-    database = Database.load(config, registry)
-    assert "a" in database.databases
-    assert "b" in database.databases
+    databases = Databases.load(config, registry)
+    assert "a" in databases
+    assert "b" in databases
 
 
 def test_database_load_one():
     """Loading can instantiate a single database from the config."""
-    config = Mock(database="A")
+    config = Mock(databases=["A"])
     registry = {
         "databases": {
             "a": Mock(),
             "b": Mock(),
         },
     }
-    database = Database.load(config, registry)
-    assert "a" in database.databases
-    assert "b" not in database.databases
+    databases = Databases.load(config, registry)
+    assert "a" in databases
+    assert "b" not in databases
+
+
+def test_database_iterate(unique):
+    """Iterating should iterate over all databases in the registry."""
+    a, b = unique("plant"), unique("plant")
+    databases = Databases(
+        {
+            "a": Mock(iterate=Mock(return_value=[a])),
+            "b": Mock(iterate=Mock(return_value=[b])),
+        },
+    )
+    result = list(databases.iterate())
+    assert result == [a, b]
+    assert a["database/a"]
+    assert b["database/b"]
 
 
 def test_database_lookup(unique):
     """Looking up should iterate over all databases in the registry."""
     a, b = unique("plant"), unique("plant")
-    database = Database(
-        databases={
+    databases = Databases(
+        {
             "a": Mock(lookup=Mock(return_value=[a])),
             "b": Mock(lookup=Mock(return_value=[b])),
         },
     )
-    result = list(database.lookup(None))
+    result = list(databases.lookup(None))
     assert result == [a, b]
     assert a["database/a"]
     assert b["database/b"]
@@ -63,13 +78,13 @@ def test_database_lookup(unique):
 def test_database_search(unique):
     """Searching should iterate over all databases in the registry."""
     a, b = unique("plant"), unique("plant")
-    database = Database(
-        databases={
+    databases = Databases(
+        {
             "a": Mock(search=Mock(return_value=[a])),
             "b": Mock(search=Mock(return_value=[b])),
         },
     )
-    result = list(database.search(None))
+    result = list(databases.search(None))
     assert result == [a, b]
 
 
@@ -98,7 +113,7 @@ def test_database_search(unique):
 )
 def test_database_merge_all(plants, expected):
     """Merging all plants should group by scientific name."""
-    result = list(Database([]).merge_all(plants))
+    result = list(Databases({}).merge_all(plants))
     assert result == expected
 
 
@@ -143,5 +158,5 @@ def test_database_merge_all(plants, expected):
 )
 def test_database_merge(plants, expected):
     """Merging plants should merge numbers and strings."""
-    result = Database([]).merge(plants)
+    result = Databases({}).merge(plants)
     assert result == expected

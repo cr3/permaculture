@@ -1,7 +1,6 @@
 """Unit tests for the command module."""
 
 import logging
-import sys
 from unittest.mock import patch
 
 import pytest
@@ -13,18 +12,18 @@ from permaculture.command import (
 )
 
 
-def test_make_args_parser_defaults(unique):
-    """Making an args parser should have remaining args."""
-    args_parser = make_args_parser()
-    args, _ = args_parser.parse_known_args(["lookup", unique("text")])
-    assert args.output == sys.stdout.buffer
-
-
 def test_make_args_parser_command(unique):
-    """Making an args parser should have remaining args."""
+    """Making an args parser should parse known commands."""
     args_parser = make_args_parser()
     args, _ = args_parser.parse_known_args(["lookup", unique("text")])
     assert args.command == "lookup"
+
+
+def test_make_args_parser_command_error(unique):
+    """Making an args parser should raise on unknown commands."""
+    args_parser = make_args_parser()
+    with pytest.raises(SystemExit):
+        args_parser.parse_known_args(["test"])
 
 
 def test_make_args_parser_remaining(unique):

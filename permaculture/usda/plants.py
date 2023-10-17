@@ -6,7 +6,7 @@ from functools import partial
 from attrs import define, field
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant, DatabasePlugin
+from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
@@ -236,7 +236,7 @@ class PlantsModel:
 
 
 @define(frozen=True)
-class PlantsDatabase(DatabasePlugin):
+class PlantsDatabase(Database):
     model: PlantsModel = field(factory=PlantsModel)
     priority: Priority = field(factory=Priority)
 

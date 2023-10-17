@@ -7,7 +7,7 @@ import xlrd
 from attrs import define, field
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant, DatabasePlugin
+from permaculture.database import Database, DatabasePlant
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import FileStorage
@@ -88,7 +88,7 @@ class PFAFModel:
 
 
 @define(frozen=True)
-class PFAFDatabase(DatabasePlugin):
+class PFAFDatabase(Database):
     model: PFAFModel
     priority: Priority = field(factory=Priority)
 

@@ -41,7 +41,7 @@ DatabaseCompanion = tuple[DatabasePlant, DatabasePlant]
 
 
 @define(frozen=True)
-class DatabasePlugin:
+class Database:
     def companions(self, compatible: bool) -> Iterator[DatabaseCompanion]:
         """Plant companions list."""
         return []
@@ -67,39 +67,40 @@ class DatabasePlugin:
                 yield plant
 
 
-@define(frozen=True)
-class Database:
-    databases: dict[str, DatabasePlugin]
-
+class Databases(dict):
     @classmethod
     def load(cls, config=None, registry=None):
         """Load databases from registry."""
         if registry is None or "databases" not in registry:
             registry = registry_load("databases", registry)
 
+        include = re.compile("|".join(config.databases), re.I)
         databases = {
             k: v.from_config(config)
             for k, v in registry.get("databases", {}).items()
-            if not config.database or config.database.lower() == k
+            if include.match(k)
         }
 
         return cls(databases)
 
     def companions(self, compatible=True) -> Iterator[DatabaseCompanion]:
         """Plant companions list."""
-        for database in self.databases.values():
+        for database in self.values():
             yield from database.companions(compatible)
 
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over plants."""
-        for database in self.databases.values():
-            yield from database.iterate()
+        return self.merge_all(
+            plant.with_database(name)
+            for name, database in self.items()
+            for plant in database.iterate()
+        )
 
     def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names in all databases."""
         return self.merge_all(
             plant.with_database(name)
-            for name, database in self.databases.items()
+            for name, database in self.items()
             for plant in database.lookup(*scientific_names)
         )
 
@@ -107,7 +108,7 @@ class Database:
         """Search for the scientific name by common name in all databases."""
         return self.merge_all(
             plant.with_database(name)
-            for name, database in self.databases.items()
+            for name, database in self.items()
             for plant in database.search(common_name)
         )
 

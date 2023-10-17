@@ -14,7 +14,7 @@ from permaculture.data import (
     flatten,
     unflatten,
 )
-from permaculture.database import Database
+from permaculture.database import Databases
 from permaculture.logger import (
     LoggerHandlerAction,
     LoggerLevelAction,
@@ -23,20 +23,12 @@ from permaculture.logger import (
 from permaculture.serializer import SerializerAction
 from permaculture.storage import StorageAction
 
+logger = logging.getLogger(__name__)
+
 
 def make_args_parser():
     """Make a parser for command-line arguments only."""
     args_parser = ArgumentParser()
-    args_parser.add_argument(
-        "--output",
-        type=FileType("wb"),
-        default=sys.stdout.buffer,
-        help="output file (default stdout)",
-    )
-    args_parser.add_argument(
-        "--serializer",
-        action=SerializerAction,
-    )
     command = args_parser.add_subparsers(
         dest="command",
         help="permaculture command",
@@ -46,8 +38,16 @@ def make_args_parser():
         help="plant companions list",
     )
     command.add_parser(
+        "help",
+        help="show configuration help",
+    )
+    command.add_parser(
         "iterate",
         help="iterate over all scientific names",
+    )
+    command.add_parser(
+        "list",
+        help="list available databases",
     )
     lookup = command.add_parser(
         "lookup",
@@ -64,14 +64,14 @@ def make_args_parser():
         dest="excludes",
         default=["$"],
         action="append",
-        help="exclude these characteristics from the output",
+        help="exclude these characteristics",
     )
     lookup.add_argument(
         "--include",
         dest="includes",
         default=[],
         action="append",
-        help="only include these characteristics in the output",
+        help="only include these characteristics",
     )
     search = command.add_parser(
         "search",
@@ -102,10 +102,24 @@ def make_config_parser(config_files):
     """Make a parser for configuration files and command-line arguments."""
     config = ArgParser(
         default_config_files=config_files,
+        add_help=False,
+    )
+    config.add_argument(
+        "--output",
+        type=FileType("wb"),
+        default=sys.stdout.buffer,
+        help="output file (default: stdout)",
+    )
+    config.add_argument(
+        "--serializer",
+        action=SerializerAction,
     )
     config.add_argument(
         "--database",
-        help="filter on a database",
+        dest="databases",
+        default=[],
+        action="append",
+        help="regular on databases (default: all)",
     )
     config.add_argument(
         "--log-file",
@@ -143,24 +157,26 @@ def main(argv=None):
     config = config_parser.parse_args(remaining)
 
     setup_logger(config.log_level, config.log_file, name="permaculture")
-    database = Database.load(config)
+    databases = Databases.load(config)
 
     match args.command:
         case "companions":
             data = {
                 key: [related.scientific_name for _, related in pairs]
                 for key, pairs in groupby(
-                    database.companions(),
+                    databases.companions(),
                     lambda pair: pair[0].scientific_name,
                 )
             }
+        case "help":
+            config_parser.print_help()
+            sys.exit(0)
         case "iterate":
-            data = [
-                plant.scientific_name
-                for plant in database.iterate()
-            ]
+            data = [plant.scientific_name for plant in databases.iterate()]
+        case "list":
+            data = list(databases)
         case "lookup":
-            content_type = args.serializer.default_content_type
+            content_type = config.serializer.default_content_type
             f = flatten if content_type == "text/csv" else unflatten
             exclude = re.compile("|".join(args.excludes), re.I)
             include = re.compile("|".join(args.includes), re.I)
@@ -170,12 +186,12 @@ def main(argv=None):
                     for k, v in f(plant).items()
                     if include.match(k) and not exclude.match(k)
                 }
-                for plant in database.lookup(*args.names)
+                for plant in databases.lookup(*args.names)
             ]
         case "search":
             data = [
                 {plant.scientific_name: plant.common_names}
-                for plant in database.search(args.name)
+                for plant in databases.search(args.name)
             ]
         case "store":
             storage = evolve(
@@ -184,8 +200,17 @@ def main(argv=None):
             )
             storage[args.key] = args.file.read()
             return
-        case _:
-            args_parser.error(f"Unsupported command: {args.command}")
+        case command:
+            args_parser.error(f"Programming error for command: {command}")
 
-    output, *_ = args.serializer.encode(data)
-    args.output.write(output)
+    try:
+        output, *_ = config.serializer.encode(data)
+    except Exception as e:
+        logger.debug(e, exc_info=True)
+        args_parser.error(
+            "Unsupported serializer"
+            f" {config.serializer.default_content_type!r} for command:"
+            f" {args.command}"
+        )
+
+    config.output.write(output)
