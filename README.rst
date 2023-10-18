@@ -39,7 +39,7 @@ To show the list of commands:
 
 .. code-block:: text
 
-    > poetry run permaculture --help
+    > permaculture --help
     usage: permaculture [-h] {companions,help,iterate,list,lookup,search,store} ...
 
     positional arguments:

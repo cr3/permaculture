@@ -5,7 +5,6 @@ import re
 import string
 from concurrent.futures import ThreadPoolExecutor
 from functools import cache, partial
-from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -376,12 +375,9 @@ class NCDatabase(Database):
 
         total = self.model.get_plant_total()
         with ThreadPoolExecutor() as executor:
-            yield from chain.from_iterable(
-                executor.map(
-                    get_plants,
-                    range(0, total, 50),
-                )
-            )
+            results = executor.map(get_plants, range(0, total, 50))
+
+        return (plant for plants in results for plant in plants)
 
     def lookup(self, *scientific_names):
         # The search in the web interface concatenates words, so
@@ -391,7 +387,7 @@ class NCDatabase(Database):
         # the matches for the plants that match the full name.
         seen = set()
         tokens = [tokenize(n) for n in scientific_names]
-        for sci_name in scientific_names:
+        for sci_name in tokens:
             for part in sci_name.split():
                 for plant in self.model.get_plants(sci_name=part):
                     name = plant["scientific name"]

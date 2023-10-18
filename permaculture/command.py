@@ -5,6 +5,7 @@ import re
 import sys
 from argparse import ArgumentParser, FileType
 from itertools import groupby
+from pathlib import Path
 
 from appdirs import user_cache_dir
 from attrs import evolve
@@ -58,6 +59,12 @@ def make_args_parser():
         metavar="name",
         nargs="+",
         help="scientific name to lookup",
+    )
+    lookup.add_argument(
+        "-f",
+        "--file",
+        action="store_true",
+        help="obtain patterns from given names",
     )
     lookup.add_argument(
         "--exclude",
@@ -177,16 +184,24 @@ def main(argv=None):
             data = list(databases)
         case "lookup":
             content_type = config.serializer.default_content_type
-            f = flatten if content_type == "text/csv" else unflatten
             exclude = re.compile("|".join(args.excludes), re.I)
             include = re.compile("|".join(args.includes), re.I)
+            f = flatten if content_type == "text/csv" else unflatten
+            if args.file:
+                names = [
+                    name
+                    for file in args.names
+                    for name in Path(file).read_text().splitlines()
+                ]
+            else:
+                names = args.names
             data = [
                 {
                     k: v
                     for k, v in f(plant).items()
                     if include.match(k) and not exclude.match(k)
                 }
-                for plant in databases.lookup(*args.names)
+                for plant in databases.lookup(*names)
             ]
         case "search":
             data = [

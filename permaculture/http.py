@@ -240,9 +240,9 @@ class HTTPSession(Session):
         super().__init__(**kwargs)
         self.origin = origin
 
-    def with_cache(self, storage, cache_cls=HTTPCacheAll):
+    def with_cache(self, storage, cache_cls=HTTPCacheAll, **kwargs):
         cache = cache_cls(storage)
-        adapter = HTTPCacheAdapter(cache)
+        adapter = HTTPCacheAdapter(cache, **kwargs)
         return self.with_adapter(adapter)
 
     def with_adapter(self, adapter: HTTPAdapter):

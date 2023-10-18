@@ -126,7 +126,7 @@ class FileStorage(Storage):
             raise KeyError(key) from error
 
     def __iter__(self):
-        return (self.path_to_key(p) for p in self.base_dir.iterdir())
+        return map(self.path_to_key, self.base_dir.iterdir())
 
     def __len__(self):
         return sum(1 for _ in self)

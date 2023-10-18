@@ -7,10 +7,10 @@ from concurrent.futures import ThreadPoolExecutor
 from csv import DictReader
 from functools import partial
 from io import StringIO
-from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
+from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
 from permaculture.database import Database, DatabasePlant
@@ -40,10 +40,21 @@ class PhytochemWeb:
             "type": Type,
             **params,
         }
-        response = self.session.get(
-            f"/phytochem/download/{Id}",
-            params=params,
-        )
+        try:
+            response = self.session.get(
+                f"/phytochem/download/{Id}",
+                params=params,
+            )
+        except HTTPError as error:
+            if error.response.status_code == 404:
+                logger.info(
+                    "Skipping %(name)s: %(error)s",
+                    {"name": name, "error": error},
+                )
+                return ""
+            else:
+                raise
+
         return response.text
 
     def search_results(self, q="", et="", offset=0):
@@ -72,6 +83,26 @@ class PhytochemConverter(Converter):
     locales: Locales = field(
         factory=partial(Locales.from_domain, "usda-phytochem"),
     )
+
+    def convert_chemical(self, key, value):
+        if m := re.match(r"(?P<prefix>.*)/(?P<r>\([+-]\)-)(?P<name>.+)", key):
+            suffix = "left" if m.group("r") == "(+)-" else "right"
+            key = f"{m.group('prefix')}/{m.group('name')}_{suffix}"
+
+        return [(key.lower(), value)]
+
+    def convert_use(self, key, value):
+        if m := re.match(r"(?P<name>.*)\((?P<detail>.+)\)$", key):
+            key = "_".join(m.groups())
+        return [(key.lower(), value)]
+
+    def convert_item(self, key, value):
+        if key.startswith("use"):
+            return self.convert_use(key, value)
+        elif key.startswith("chemical"):
+            return self.convert_chemical(key, value)
+        else:
+            return super().convert_item(key, value)
 
 
 @define(frozen=True)
@@ -109,7 +140,7 @@ class PhytochemModel:
                         model=self,
                     )
                 except ValueError as error:
-                    logger.info(f"Skipping plant: {error}")
+                    logger.debug("Skipping plant: %(error)s", {"error": error})
 
             offset = response["lastRecord"]
             if offset > response["records"]:
@@ -156,6 +187,7 @@ class PhytochemEthnoplant(PhytochemLink):
             self.Id,
             self.Type,
             column="uses",
+            name=self.scientific_name,
         )
         return self.model.converter.convert(
             {
@@ -171,6 +203,7 @@ class PhytochemPlant(PhytochemLink):
             self.Id,
             self.Type,
             column="chemical_value",
+            name=self.scientific_name,
             view="allChem",
         )
         return self.model.converter.convert(
@@ -212,9 +245,9 @@ class PhytochemDatabase(Database):
             ]
 
         with ThreadPoolExecutor() as executor:
-            yield from chain.from_iterable(
-                executor.map(get_plants, ("E", "P"))
-            )
+            results = executor.map(get_plants, ("E", "P"))
+
+        return (p for plants in results for p in plants)
 
     def lookup(self, *scientific_names):
         tokens = [tokenize(n) for n in scientific_names]

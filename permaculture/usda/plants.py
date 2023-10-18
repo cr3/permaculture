@@ -78,7 +78,7 @@ class PlantsWeb:
             "InvasiveLocations": None,
             "Localities": None,
             "Locations": None,
-            "MasterId": None,
+            "MasterId": -1,
             "NoxiousLocations": None,
             "Offset": -1,
             "Provinces": None,
@@ -221,7 +221,11 @@ class PlantsModel:
         )
 
     def plant_search(self, text, field):
-        search = self.web.plant_search(Field=field, Text=text)
+        search = self.web.plant_search(
+            Field=field,
+            SortBy="sortSciName",
+            Text=text,
+        )
         for plant in search["PlantResults"]:
             yield self.plant_characteristics(plant)
 

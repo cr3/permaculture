@@ -6,6 +6,7 @@ from unittest.mock import ANY, Mock, patch
 import pytest
 
 from permaculture.usda.phytochem import (
+    PhytochemConverter,
     PhytochemDatabase,
     PhytochemEthnoplant,
     PhytochemLink,
@@ -65,6 +66,52 @@ def test_phytochem_web_search_results(unique):
         "/phytochem/search-results",
         params=params,
     )
+
+
+@pytest.mark.parametrize(
+    "item, expected",
+    [
+        pytest.param(
+            ("use/name", True),
+            [
+                ("use/name", True),
+            ],
+            id="use/name",
+        ),
+        pytest.param(
+            ("use/name(detail)", True),
+            [
+                ("use/name_detail", True),
+            ],
+            id="use/name(detail)",
+        ),
+        pytest.param(
+            ("chemical/name", 0),
+            [
+                ("chemical/name", 0),
+            ],
+            id="chemical/name",
+        ),
+        pytest.param(
+            ("chemical/(-)-name", 0),
+            [
+                ("chemical/name_right", 0),
+            ],
+            id="chemical/(-)-name",
+        ),
+        pytest.param(
+            ("chemical/(+)-name", 0),
+            [
+                ("chemical/name_left", 0),
+            ],
+            id="chemical/(+)-name",
+        ),
+    ],
+)
+def test_phytochem_converter_convert_item(item, expected):
+    """Converting an item should consider use and chemical types."""
+    result = PhytochemConverter().convert_item(*item)
+    assert result == expected
 
 
 def test_phytochem_model_download_csv():
