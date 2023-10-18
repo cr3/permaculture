@@ -68,6 +68,7 @@ def test_phytochem_web_search_results(unique):
 
 
 def test_phytochem_model_download_csv():
+    """Downloading a CSV should return a list of dicts."""
     with patch.object(PhytochemWeb, "download") as mock_download:
         mock_download.return_value = "col\nval\n"
         web = PhytochemWeb(None)
@@ -87,7 +88,7 @@ def test_phytochem_model_download_csv():
             </div>
             """),
             [
-                PhytochemEthnoplant(21069, "ethnoplants", "test", ANY),
+                PhytochemEthnoplant(21069, "ethnoplants", "Test", [], ANY),
             ],
             id="ethnoplants",
         ),
@@ -98,13 +99,26 @@ def test_phytochem_model_download_csv():
             </div>
             """),
             [
-                PhytochemPlant(6843, "plants", "test", ANY),
+                PhytochemPlant(6843, "plants", "Test", [], ANY),
+            ],
+            id="plants",
+        ),
+        pytest.param(
+            dedent("""\
+            <div class="entity etP">
+              <a href="/phytochem/plants/show/6843">Test</a>
+              (a; b)
+            </div>
+            """),
+            [
+                PhytochemPlant(6843, "plants", "Test", ["a", "b"], ANY),
             ],
             id="plants",
         ),
     ],
 )
 def test_phytochem_model_search(text, expected):
+    """Searching for plants should parse div records."""
     with patch.object(PhytochemWeb, "search_results") as mock_search_results:
         mock_search_results.return_value = {
             "documentRecords": text,
@@ -119,6 +133,7 @@ def test_phytochem_model_search(text, expected):
 
 
 def test_phytochem_model_search_pagination():
+    """Searching should paginate through all records."""
     with patch.object(PhytochemWeb, "search_results") as mock_search_results:
         mock_search_results.side_effect = [
             {"documentRecords": "", "lastRecord": 20, "records": 21},
@@ -136,11 +151,11 @@ def test_phytochem_model_search_pagination():
     [
         (
             "/phytochem/ethnoplants/show/11458",
-            PhytochemEthnoplant(11458, "ethnoplants", "test", ANY),
+            PhytochemEthnoplant(11458, "ethnoplants", "test", [], ANY),
         ),
         (
             "/phytochem/plants/show/6847",
-            PhytochemPlant(6847, "plants", "test", ANY),
+            PhytochemPlant(6847, "plants", "test", [], ANY),
         ),
     ],
 )
@@ -154,6 +169,7 @@ def test_phytochem_database_lookup(unique):
     """Looking up a scientific name should return a list of elements."""
     scientific_name, activity = unique("token"), unique("integer")
     link = Mock(
+        scientific_name=scientific_name,
         get_plant=Mock(
             return_value={
                 "scientific name": scientific_name,

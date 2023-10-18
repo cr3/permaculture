@@ -50,6 +50,13 @@ class Database:
         """Iterate over all plants."""
         return []
 
+    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+        """Lookup characteristics by scientific names."""
+        tokens = [tokenize(n) for n in scientific_names]
+        for plant in self.iterate():
+            if plant.scientific_name in tokens:
+                yield plant
+
     def search(self, common_name: str) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name."""
         for plant in self.iterate():
@@ -57,13 +64,6 @@ class Database:
                 re.search(common_name, tokenize(n), re.I)
                 for n in plant.common_names
             ):
-                yield plant
-
-    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
-        """Lookup characteristics by scientific names."""
-        tokens = [tokenize(n) for n in scientific_names]
-        for plant in self.iterate():
-            if plant.scientific_name in tokens:
                 yield plant
 
 

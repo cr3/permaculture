@@ -366,11 +366,13 @@ class NCDatabase(Database):
 
     def iterate(self):
         def get_plants(limit_start):
-            for plant in self.model.get_plants(limit_start=limit_start):
-                yield DatabasePlant(
+            return [
+                DatabasePlant(
                     self.model.get_plant(plant["plant name"].Id),
                     self.priority.weight,
                 )
+                for plant in self.model.get_plants(limit_start=limit_start)
+            ]
 
         total = self.model.get_plant_total()
         with ThreadPoolExecutor() as executor:

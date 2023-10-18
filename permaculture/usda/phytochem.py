@@ -1,10 +1,13 @@
 """USDA Phytochemical and Ethnobotanical Databases."""
 
+import logging
 import re
-from abc import ABC, abstractmethod
+from abc import ABC
+from concurrent.futures import ThreadPoolExecutor
 from csv import DictReader
 from functools import partial
 from io import StringIO
+from itertools import chain
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -13,10 +16,11 @@ from permaculture.converter import Converter
 from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
-from permaculture.priority import LocationPriority, Priority
 from permaculture.tokenizer import tokenize
 
 PHYTOCHEM_ORIGIN = "https://phytochem.nal.usda.gov"
+
+logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -42,7 +46,7 @@ class PhytochemWeb:
         )
         return response.text
 
-    def search_results(self, q, et="", offset=0):
+    def search_results(self, q="", et="", offset=0):
         """Search for plants using scientific or common names.
 
         :param q: Scientific or common name.
@@ -85,17 +89,27 @@ class PhytochemModel:
         text = self.web.download(Id, Type, filetype="csv", **params)
         yield from DictReader(StringIO(text))
 
-    def search(self, terms):
+    def search(self, q="", et=""):
         """Search for terms in the databases."""
         offset = 0
         while True:
-            response = self.web.search_results(terms, offset=offset)
+            response = self.web.search_results(q=q, et=et, offset=offset)
             bs = BeautifulSoup(response["documentRecords"], "html.parser")
-            token = tokenize(terms)
-            for a in bs.select(".entity > a"):
-                name = tokenize(a.text)
-                if name == token:
-                    yield PhytochemLink.from_url(a["href"], name, model=self)
+            for e in bs.select(".entity"):
+                if m := re.search(r"\((.+)\)", e.text):
+                    common_names = [n.strip() for n in m.group(1).split(";")]
+                else:
+                    common_names = []
+
+                try:
+                    yield PhytochemLink.from_url(
+                        e.a["href"],
+                        e.a.text,
+                        common_names=common_names,
+                        model=self,
+                    )
+                except ValueError as error:
+                    logger.info(f"Skipping plant: {error}")
 
             offset = response["lastRecord"]
             if offset > response["records"]:
@@ -106,11 +120,12 @@ class PhytochemModel:
 class PhytochemLink(ABC):
     Id: int
     Type: str
-    name: str
+    scientific_name: str
+    common_names: list[str] = field(factory=list)
     model: PhytochemModel = field(factory=PhytochemModel)
 
     @classmethod
-    def from_url(cls, url, name, **kwargs):
+    def from_url(cls, url, scientific_name, **kwargs):
         m = re.match(r"/phytochem/(?P<Type>\w+)/show/(?P<Id>\d+)$", url)
         if not m:
             raise ValueError(f"Unsupported url: {url}")
@@ -125,11 +140,14 @@ class PhytochemLink(ABC):
                 raise ValueError(f"Unsupported type: {Type}")
 
         Id = int(m.group("Id"))
-        return cls(Id, Type, name, **kwargs)
+        return cls(Id, Type, scientific_name, **kwargs)
 
-    @abstractmethod
     def get_plant(self):
         """Get the plant for this type."""
+        return {
+            "scientific name": self.scientific_name,
+            **{f"common name/{n}": True for n in self.common_names},
+        }
 
 
 class PhytochemEthnoplant(PhytochemLink):
@@ -141,7 +159,7 @@ class PhytochemEthnoplant(PhytochemLink):
         )
         return self.model.converter.convert(
             {
-                "scientific name": self.name,
+                **super().get_plant(),
                 **{f"use/{row['Ethnobotanical Use']}": True for row in rows},
             }
         )
@@ -157,10 +175,10 @@ class PhytochemPlant(PhytochemLink):
         )
         return self.model.converter.convert(
             {
-                "scientific name": self.name,
+                **super().get_plant(),
                 **{
-                    f"chemical/{row['Chemical']}": int(row["Activity Count"])
-                    for row in rows
+                    f"chemical/{r['Chemical']}": int(r["Activity Count"])
+                    for r in rows
                 },
             }
         )
@@ -169,18 +187,48 @@ class PhytochemPlant(PhytochemLink):
 @define(frozen=True)
 class PhytochemDatabase(Database):
     model: PhytochemModel = field(factory=PhytochemModel)
-    priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
         """Instantiate PhytochemDatabase from config."""
         model = PhytochemModel().with_cache(config.storage)
-        priority = LocationPriority("United States").with_cache(config.storage)
-        return cls(model, priority)
+        return cls(model)
+
+    def iterate(self):
+        def get_plants(et):
+            return [
+                DatabasePlant(
+                    self.model.converter.convert(
+                        {
+                            "scientific name": link.scientific_name,
+                            **{
+                                f"common name/{n}": True
+                                for n in link.common_names
+                            },
+                        }
+                    )
+                )
+                for link in self.model.search(et=et)
+            ]
+
+        with ThreadPoolExecutor() as executor:
+            yield from chain.from_iterable(
+                executor.map(get_plants, ("E", "P"))
+            )
 
     def lookup(self, *scientific_names):
-        # TODO: Do we really need to tokenize scientific names?
-        [tokenize(n) for n in scientific_names]
-        for sci_name in scientific_names:
-            for link in self.model.search(sci_name):
-                yield DatabasePlant(link.get_plant(), self.priority.weight)
+        tokens = [tokenize(n) for n in scientific_names]
+        return (
+            DatabasePlant(link.get_plant())
+            for token in tokens
+            for link in self.model.search(q=token)
+            if tokenize(link.scientific_name) in tokens
+        )
+
+    def search(self, common_name):
+        token = tokenize(common_name)
+        return (
+            DatabasePlant(link.get_plant())
+            for link in self.model.search(q=token)
+            if token in map(tokenize, link.common_names)
+        )
