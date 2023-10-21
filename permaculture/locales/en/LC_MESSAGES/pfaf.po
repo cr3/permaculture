@@ -31,6 +31,9 @@ msgstr "medicinal rating"
 msgid "UK Hardiness"
 msgstr "hardiness/uk"
 
+msgid "Shade"
+msgstr "sun"
+
 msgid "Width"
 msgstr "width/avg"
 
@@ -84,15 +87,15 @@ msgstr "alkaline"
 
 msgctxt "Shade"
 msgid "F"
-msgstr "full"
+msgstr "shade"
 
 msgctxt "Shade"
 msgid "S"
-msgstr "semi"
+msgstr "partial"
 
 msgctxt "Shade"
 msgid "N"
-msgstr "none"
+msgstr "full"
 
 msgctxt "Soil"
 msgid "L"

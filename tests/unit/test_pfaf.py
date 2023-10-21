@@ -98,9 +98,9 @@ def test_pfaf_converter_convert_float(value, expected):
         pytest.param(
             ("Shade", "FSN"),
             [
-                ("shade/full", True),
-                ("shade/semi", True),
-                ("shade/none", True),
+                ("sun/shade", True),
+                ("sun/partial", True),
+                ("sun/full", True),
             ],
             id="Shade",
         ),
