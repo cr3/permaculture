@@ -186,6 +186,7 @@ class PlantsConverter(Converter):
             "ScientificName": self.convert_token,
             "Seed per Pound": self.convert_int,
             "Small Grain": self.convert_bool,
+            "Symbol": self.convert_ignore,
             "Synonyms": self.convert_ignore,
             "Temperature, Minimum (°F)": partial(
                 self.convert_float, unit=fahrenheit
