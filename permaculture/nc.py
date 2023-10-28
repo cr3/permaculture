@@ -152,6 +152,12 @@ class NCConverter(Converter):
 
         return super().convert_range(key, value, unit)
 
+    def convert_string(self, key, value):
+        if value == "(none)":
+            return [(key, None)]
+        else:
+            return super().convert_string(key, value)
+
     def convert_item(self, key, value):
         dispatchers = {
             "Bacteria-Fungal Ratio": self.convert_ignore,
