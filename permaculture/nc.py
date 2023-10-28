@@ -15,9 +15,9 @@ from permaculture.converter import FLOAT_RE, Converter
 from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
+from permaculture.nlp import normalize
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import null_storage
-from permaculture.tokenizer import tokenize
 from permaculture.unit import feet, inches
 
 NC_ORIGIN = "https://permacultureplantdata.com"
@@ -386,7 +386,7 @@ class NCDatabase(Database):
         # workaround searches each word and the iterates over all
         # the matches for the plants that match the full name.
         seen = set()
-        tokens = [tokenize(n) for n in scientific_names]
+        tokens = [normalize(n) for n in scientific_names]
         for sci_name in tokens:
             for part in sci_name.split():
                 for plant in self.model.get_plants(sci_name=part):

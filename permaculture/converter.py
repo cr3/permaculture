@@ -6,7 +6,7 @@ import string
 from attrs import define, field
 
 from permaculture.locales import Locales
-from permaculture.tokenizer import tokenize
+from permaculture.nlp import normalize
 
 FLOAT_RE = r"([+-]?\d+(?:\.\d*)?)"
 
@@ -83,7 +83,7 @@ class Converter:
         return [(self.translate(key), value)]
 
     def convert_token(self, key, value):
-        return [(self.translate(key), tokenize(value))]
+        return [(self.translate(key), normalize(value))]
 
     def convert_item(self, key, value):
         return self.convert_string(key, value)

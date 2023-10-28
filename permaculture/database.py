@@ -8,8 +8,8 @@ from operator import attrgetter, mul
 from attrs import define
 
 from permaculture.data import merge
+from permaculture.nlp import normalize
 from permaculture.registry import registry_load
-from permaculture.tokenizer import tokenize
 
 
 class DatabasePlant(dict):
@@ -52,16 +52,16 @@ class Database:
 
     def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names."""
-        tokens = [tokenize(n) for n in scientific_names]
+        normalized_names = [normalize(n) for n in scientific_names]
         for plant in self.iterate():
-            if plant.scientific_name in tokens:
+            if plant.scientific_name in normalized_names:
                 yield plant
 
     def search(self, common_name: str) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name."""
         for plant in self.iterate():
             if any(
-                re.search(common_name, tokenize(n), re.I)
+                re.search(common_name, normalize(n), re.I)
                 for n in plant.common_names
             ):
                 yield plant

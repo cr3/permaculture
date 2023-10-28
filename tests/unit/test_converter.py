@@ -238,6 +238,6 @@ def test_converter_convert_string(converter, item, expected):
     ],
 )
 def test_converter_convert_token(converter, value, expected):
-    """Converting a token should tokenize the value."""
+    """Converting a token should normalize the value."""
     result = converter.convert_token("", value)
     assert result == [("", expected)]

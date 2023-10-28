@@ -16,7 +16,7 @@ from permaculture.converter import Converter
 from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
-from permaculture.tokenizer import tokenize
+from permaculture.nlp import normalize
 
 PHYTOCHEM_ORIGIN = "https://phytochem.nal.usda.gov"
 
@@ -250,18 +250,18 @@ class PhytochemDatabase(Database):
         return (p for plants in results for p in plants)
 
     def lookup(self, *scientific_names):
-        tokens = [tokenize(n) for n in scientific_names]
+        tokens = [normalize(n) for n in scientific_names]
         return (
             DatabasePlant(link.get_plant())
             for token in tokens
             for link in self.model.search(q=token)
-            if tokenize(link.scientific_name) in tokens
+            if normalize(link.scientific_name) in tokens
         )
 
     def search(self, common_name):
-        token = tokenize(common_name)
+        token = normalize(common_name)
         return (
             DatabasePlant(link.get_plant())
             for link in self.model.search(q=token)
-            if token in map(tokenize, link.common_names)
+            if token in map(normalize, link.common_names)
         )

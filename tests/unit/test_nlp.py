@@ -1,12 +1,12 @@
-"""Unit tests for the tokenizer module."""
+"""Unit tests for the nlp module."""
 
 import pytest
 
-from permaculture.tokenizer import tokenize
+from permaculture.nlp import normalize
 
 
 @pytest.mark.parametrize(
-    "words, expected",
+    "text, expected",
     [
         pytest.param("foo", "foo", id="one word"),
         pytest.param("foô", "foo", id="accents"),
@@ -27,7 +27,7 @@ from permaculture.tokenizer import tokenize
         pytest.param(".foo..bar.", "foo bar", id="dot"),
     ],
 )
-def test_tokenize(words, expected):
-    """Tokenizing words should return the expected result."""
-    result = tokenize(words)
+def test_normalize(text, expected):
+    """Normalizing text should return the expected result."""
+    result = normalize(text)
     assert result == expected

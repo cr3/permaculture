@@ -3,7 +3,7 @@
 from http.cookiejar import Cookie, CookieJar
 
 from permaculture.database import DatabasePlant
-from permaculture.tokenizer import tokenize
+from permaculture.nlp import normalize
 
 
 def unique_cookie(unique):
@@ -68,4 +68,4 @@ def unique_plant(unique):
 
 def unique_token(unique):
     """Generate a unique token."""
-    return tokenize(unique("text"))
+    return normalize(unique("text"))

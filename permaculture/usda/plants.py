@@ -9,8 +9,8 @@ from permaculture.converter import Converter
 from permaculture.database import Database, DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
+from permaculture.nlp import normalize
 from permaculture.priority import LocationPriority, Priority
-from permaculture.tokenizer import tokenize
 from permaculture.unit import fahrenheit, feet, inches
 
 PLANTS_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
@@ -259,7 +259,7 @@ class PlantsDatabase(Database):
         )
 
     def lookup(self, *scientific_names):
-        tokens = [tokenize(n) for n in scientific_names]
+        tokens = [normalize(n) for n in scientific_names]
         return (
             DatabasePlant(plant, self.priority.weight)
             for token in tokens
