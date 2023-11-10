@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 from attrs import define, field
+from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
 from permaculture.database import Database, DatabasePlant
@@ -222,11 +223,15 @@ class PlantsModel:
         )
 
     def plant_search(self, text, field):
-        search = self.web.plant_search(
-            Field=field,
-            SortBy="sortSciName",
-            Text=text,
-        )
+        try:
+            search = self.web.plant_search(
+                Field=field,
+                SortBy="sortSciName",
+                Text=text,
+            )
+        except HTTPError:
+            return []
+
         for plant in search["PlantResults"]:
             yield self.plant_characteristics(plant)
 
