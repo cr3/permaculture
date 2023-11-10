@@ -47,6 +47,7 @@ class PFAFConverter(Converter):
             "Habitat": self.convert_ignore,
             "Height": self.convert_float,
             "Known hazards": self.convert_ignore,
+            "Latin name": self.convert_token,
             "Medicinal": self.convert_ignore,
             "Moisture": self.convert_letters,
             "Propagation": self.convert_ignore,
