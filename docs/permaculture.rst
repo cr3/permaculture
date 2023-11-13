@@ -9,6 +9,7 @@ Subpackages
 
    permaculture.locales
    permaculture.testing
+   permaculture.usda
 
 Submodules
 ----------
@@ -109,6 +110,14 @@ permaculture.nc module
    :undoc-members:
    :show-inheritance:
 
+permaculture.nlp module
+-----------------------
+
+.. automodule:: permaculture.nlp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.nominatim module
 -----------------------------
 
@@ -157,26 +166,10 @@ permaculture.storage module
    :undoc-members:
    :show-inheritance:
 
-permaculture.tokenizer module
------------------------------
-
-.. automodule:: permaculture.tokenizer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 permaculture.unit module
 ------------------------
 
 .. automodule:: permaculture.unit
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-permaculture.usda module
-------------------------
-
-.. automodule:: permaculture.usda
    :members:
    :undoc-members:
    :show-inheritance:

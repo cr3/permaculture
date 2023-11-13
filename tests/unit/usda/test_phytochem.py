@@ -233,7 +233,7 @@ def test_phytochem_database_lookup(unique):
     )
 
     database = PhytochemDatabase(model)
-    elements = list(database.lookup(scientific_name))
+    elements = list(database.lookup([scientific_name], 1.0))
     assert elements == [
         {
             "scientific name": scientific_name,

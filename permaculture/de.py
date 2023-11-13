@@ -140,8 +140,8 @@ class DEDatabase(Database):
         return cls(model, priority)
 
     def iterate(self):
-        return (
-            DatabasePlant(
+        for p in self.model.get_perenial_plants():
+            yield DatabasePlant(
                 {
                     "scientific name": f"{p.pop('genus')} {p.pop('species')}",
                     **{
@@ -154,5 +154,3 @@ class DEDatabase(Database):
                 },
                 self.priority.weight,
             )
-            for p in self.model.get_perenial_plants()
-        )

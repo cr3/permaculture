@@ -8,7 +8,7 @@ from operator import attrgetter, mul
 from attrs import define
 
 from permaculture.data import merge
-from permaculture.nlp import normalize
+from permaculture.nlp import Extractor, normalize, score
 from permaculture.registry import registry_load
 
 
@@ -31,6 +31,10 @@ class DatabasePlant(dict):
 
         return names
 
+    @property
+    def names(self):
+        return [self.scientific_name, *self.common_names]
+
     def with_database(self, name):
         """Add the database name to this plant."""
         self[f"database/{name}"] = True
@@ -42,6 +46,9 @@ DatabaseCompanion = tuple[DatabasePlant, DatabasePlant]
 
 @define(frozen=True)
 class Database:
+    def extract(self, query, choices):
+        return Extractor(query, normalize, score).extract_one(choices)[0]
+
     def companions(self, compatible: bool) -> Iterator[DatabaseCompanion]:
         """Plant companions list."""
         return []
@@ -50,20 +57,16 @@ class Database:
         """Iterate over all plants."""
         return []
 
-    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+    def lookup(self, names: str, score: float) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names."""
-        normalized_names = [normalize(n) for n in scientific_names]
         for plant in self.iterate():
-            if plant.scientific_name in normalized_names:
+            if self.extract(plant.scientific_name, names) >= score:
                 yield plant
 
-    def search(self, common_name: str) -> Iterator[DatabasePlant]:
+    def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name."""
         for plant in self.iterate():
-            if any(
-                re.search(common_name, normalize(n), re.I)
-                for n in plant.common_names
-            ):
+            if self.extract(name, plant.names) >= score:
                 yield plant
 
 
@@ -91,25 +94,25 @@ class Databases(dict):
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over plants."""
         return self.merge_all(
-            plant.with_database(name)
-            for name, database in self.items()
+            plant.with_database(database_name)
+            for database_name, database in self.items()
             for plant in database.iterate()
         )
 
-    def lookup(self, *scientific_names: str) -> Iterator[DatabasePlant]:
+    def lookup(self, names: str, score=1.0) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names in all databases."""
         return self.merge_all(
-            plant.with_database(name)
-            for name, database in self.items()
-            for plant in database.lookup(*scientific_names)
+            plant.with_database(database_name)
+            for database_name, database in self.items()
+            for plant in database.lookup(names, score)
         )
 
-    def search(self, common_name: str) -> Iterator[DatabasePlant]:
+    def search(self, name: str, score=0.5) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name in all databases."""
         return self.merge_all(
-            plant.with_database(name)
-            for name, database in self.items()
-            for plant in database.search(common_name)
+            plant.with_database(database_name)
+            for database_name, database in self.items()
+            for plant in database.search(name, score)
         )
 
     def merge_all(

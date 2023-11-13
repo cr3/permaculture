@@ -50,12 +50,14 @@ class PFAFConverter(Converter):
             "Latin name": self.convert_token,
             "Medicinal": self.convert_ignore,
             "Moisture": self.convert_letters,
+            "Pollinators": self.convert_list,
             "Propagation": self.convert_ignore,
             "Range": self.convert_ignore,
             "Shade": self.convert_letters,
             "Soil": self.convert_letters,
             "Uses notes": self.convert_ignore,
             "Width": self.convert_float,
+            "Wildlife": self.convert_ignore,
             "pH": self.convert_letters,
         }
         return dispatchers.get(key, self.convert_string)(key, value)
@@ -103,7 +105,5 @@ class PFAFDatabase(Database):
         return cls(model, priority)
 
     def iterate(self):
-        return (
-            DatabasePlant(p, self.priority.weight)
-            for p in self.model.all_plants()
-        )
+        for p in self.model.all_plants():
+            yield DatabasePlant(p, self.priority.weight)

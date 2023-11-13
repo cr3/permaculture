@@ -263,17 +263,18 @@ class PlantsDatabase(Database):
             for c in self.model.all_characteristics()
         )
 
-    def lookup(self, *scientific_names):
-        tokens = [normalize(n) for n in scientific_names]
-        return (
-            DatabasePlant(plant, self.priority.weight)
-            for token in tokens
-            for plant in self.model.plant_search(token, "Scientific Name")
-            if plant["scientific name"] in tokens
-        )
+    def lookup(self, names, score):
+        for name in names:
+            normalized_name = normalize(name)
+            for plant in self.model.plant_search(
+                normalized_name, "Scientific Name"
+            ):
+                if self.extract(plant["scientific name"], names) >= score:
+                    yield DatabasePlant(plant, self.priority.weight)
 
-    def search(self, common_name):
-        return (
-            DatabasePlant(plant, self.priority.weight)
-            for plant in self.model.plant_search(common_name, "Common Name")
-        )
+    def search(self, name, score):
+        normalized_name = normalize(name)
+        for plant in self.model.plant_search(normalized_name, "Common Name"):
+            plant = DatabasePlant(plant, self.priority.weight)
+            if self.extract(name, plant.names) >= score:
+                yield plant

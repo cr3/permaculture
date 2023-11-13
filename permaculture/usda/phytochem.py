@@ -247,21 +247,18 @@ class PhytochemDatabase(Database):
         with ThreadPoolExecutor() as executor:
             results = executor.map(get_plants, ("E", "P"))
 
-        return (p for plants in results for p in plants)
+        for plants in results:
+            yield from plants
 
-    def lookup(self, *scientific_names):
-        tokens = [normalize(n) for n in scientific_names]
-        return (
-            DatabasePlant(link.get_plant())
-            for token in tokens
-            for link in self.model.search(q=token)
-            if normalize(link.scientific_name) in tokens
-        )
+    def lookup(self, names, score):
+        for name in names:
+            normalized_name = normalize(name)
+            for link in self.model.search(q=normalized_name):
+                if self.extract(link.scientific_name, names) >= score:
+                    yield DatabasePlant(link.get_plant())
 
-    def search(self, common_name):
-        token = normalize(common_name)
-        return (
-            DatabasePlant(link.get_plant())
-            for link in self.model.search(q=token)
-            if token in map(normalize, link.common_names)
-        )
+    def search(self, name, score):
+        normalized_name = normalize(name)
+        for link in self.model.search(q=normalized_name):
+            if self.extract(name, link.common_names) >= score:
+                yield DatabasePlant(link.get_plant())

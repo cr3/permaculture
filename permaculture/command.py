@@ -21,6 +21,7 @@ from permaculture.logger import (
     LoggerLevelAction,
     setup_logger,
 )
+from permaculture.nlp import score_type
 from permaculture.serializer import SerializerAction
 from permaculture.storage import StorageAction
 
@@ -80,6 +81,12 @@ def make_args_parser():
         action="append",
         help="only include these characteristics",
     )
+    lookup.add_argument(
+        "--score",
+        default=1.0,
+        type=score_type,
+        help="cutoff score (default %(default)s for exact match)",
+    )
     search = command.add_parser(
         "search",
         help="search for the scentific name by common name",
@@ -87,6 +94,12 @@ def make_args_parser():
     search.add_argument(
         "name",
         help="common name to search",
+    )
+    search.add_argument(
+        "--score",
+        default=0.7,
+        type=score_type,
+        help="cutoff score (default %(default)s for partial match)",
     )
     store = command.add_parser(
         "store",
@@ -201,12 +214,12 @@ def main(argv=None):
                     for k, v in f(plant).items()
                     if include.match(k) and not exclude.match(k)
                 }
-                for plant in databases.lookup(*names)
+                for plant in databases.lookup(names, args.score)
             ]
         case "search":
             data = [
                 {plant.scientific_name: plant.common_names}
-                for plant in databases.search(args.name)
+                for plant in databases.search(args.name, args.score)
             ]
         case "store":
             storage = evolve(

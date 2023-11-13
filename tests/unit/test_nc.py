@@ -434,7 +434,7 @@ def test_nc_database_lookup(unique):
     )
 
     database = NCDatabase(model)
-    elements = list(database.lookup(scientific_name))
+    elements = list(database.lookup([scientific_name], 1.0))
     assert elements == [
         {
             "scientific name": scientific_name,
@@ -466,7 +466,7 @@ def test_nc_database_search(unique):
     )
 
     database = NCDatabase(model)
-    elements = list(database.search(common_name))
+    elements = list(database.search(common_name, 1.0))
     assert elements == [
         {
             "scientific name": scientific_name,

@@ -383,38 +383,38 @@ class NCDatabase(Database):
         with ThreadPoolExecutor() as executor:
             results = executor.map(get_plants, range(0, total, 50))
 
-        return (plant for plants in results for plant in plants)
+        for plants in results:
+            yield from plants
 
-    def lookup(self, *scientific_names):
+    def lookup(self, names, score):
         # The search in the web interface concatenates words, so
         # searching for "symphytum officinale" actually searches for
         # "symphytumofficinale" which doesn't match anything. This
         # workaround searches each word and the iterates over all
         # the matches for the plants that match the full name.
         seen = set()
-        tokens = [normalize(n) for n in scientific_names]
-        for sci_name in tokens:
-            for part in sci_name.split():
+        for name in names:
+            normalized_name = normalize(name)
+            for part in normalized_name.split():
                 for plant in self.model.get_plants(sci_name=part):
-                    name = plant["scientific name"]
-                    if name not in seen and name in tokens:
-                        seen.add(name)
+                    n = plant["scientific name"]
+                    if n not in seen and self.extract(n, names) >= score:
+                        seen.add(n)
                         yield DatabasePlant(
                             self.model.get_plant(plant["plant name"].Id),
                             self.priority.weight,
                         )
 
-    def search(self, common_name):
+    def search(self, name, score):
         # Same comment as in the `lookup` method.
         seen = set()
-        for part in common_name.split():
+        for part in name.split():
             for plant in self.model.get_plants(sort_name=part):
-                name = plant["plant name"].text
-                if name not in seen and all(
-                    re.search(n, name, re.I) for n in common_name.split()
-                ):
-                    seen.add(name)
-                    yield DatabasePlant(
-                        self.model.get_plant(plant["plant name"].Id),
-                        self.priority.weight,
-                    )
+                n = plant["plant name"].text
+                plant = DatabasePlant(
+                    self.model.get_plant(plant["plant name"].Id),
+                    self.priority.weight,
+                )
+                if n not in seen and self.extract(n, [name]) >= score:
+                    seen.add(n)
+                    yield plant
