@@ -1,21 +1,20 @@
 VENV := .venv
 
-PYTHON := poetry run python
+RUN := uv run
+PYTHON := $(RUN) python
 TOUCH := $(PYTHON) -c 'import sys; from pathlib import Path; Path(sys.argv[1]).touch()'
 
 # Find all the .po we want to format into .mo files.
 PO_FILES := $(shell find permaculture/locales -name '*.po')
 MO_FILES := $(PO_FILES:.po=.mo)
 
-poetry.lock: pyproject.toml
-	poetry lock
+uv.lock: pyproject.toml
+	uv lock
 
-# Build venv with both conda and python deps.
-$(VENV): environment.yml
-	@echo Installing Conda environment
-	@conda env update --prefix $@ --prune --file $^
-	@echo Installing Poetry environment
-	@poetry install
+# Build .venv with deps.
+$(VENV): uv.lock
+	@echo "==> Installing environment..."
+	@uv sync --frozen --all-extras
 	@$(TOUCH) $@
 
 # Convenience target to build venv.
@@ -24,15 +23,15 @@ setup: $(VENV)
 
 .PHONY: check
 check: $(VENV)
-	@echo Checking Poetry lock: Running poetry check --lock
-	@poetry check --lock
-	@echo Linting code: Running pre-commit
-	@poetry run pre-commit run -a
+	@echo "==> Checking uv lock..."
+	@uv lock --check
+	@echo "==> Linting Python code..."
+	@$(RUN) ruff check .
 
 %.po: $(VENV)
 
 %.mo: %.po
-	@poetry run scripts/msgfmt.py --output-file $@ $^
+	@$(RUN) scripts/msgfmt.py --output-file $@ $^
 
 # Convenience target to build locales.
 .PHONY: locales
@@ -40,38 +39,38 @@ locales: $(MO_FILES)
 
 .PHONY: test
 test: locales
-	@echo Testing code: Running pytest
-	@poetry run coverage run -p -m pytest
+	@echo "==> Testing Python code..."
+	@$(RUN) coverage run -p -m pytest
 
 .PHONY: coverage
 coverage: $(VENV)
-	@echo Testing covarage: Running coverage
-	@poetry run coverage combine
-	@poetry run coverage html --skip-covered --skip-empty
-	@poetry run coverage report
+	@echo "==> Checking coverage..."
+	@$(RUN) coverage combine
+	@$(RUN) coverage html --skip-covered --skip-empty
+	@$(RUN) coverage report
 
 .PHONY: docs
 docs: $(VENV)
-	@echo Building docs: Running sphinx-build
-	@poetry run sphinx-build -W -d build/doctrees docs build/html
+	@echo "==> Building docs..."
+	@$(RUN) sphinx-build -W -d build/doctrees docs build/html
 
 .PHONY: build
 build: locales
-	@echo Creating wheel file
-	@poetry build
+	@echo "==> Creating wheel..."
+	@$(PYTHON) -m build
 
 .PHONY: publish
 publish:
-	@echo Publishing: Dry run
-	@poetry config repositories.test-pypi https://test.pypi.org/legacy/
-	@poetry config pypi-token.test-pypi $(PYPI_TOKEN)
-	@poetry publish --repository test-pypi --dry-run
-	@echo Publishing
-	@poetry publish --repository test-pypi
+	@echo "==> Publishing: Dry run..."
+	@TWINE_USERNAME=__token__ TWINE_PASSWORD=$(PYPI_TOKEN) \
+	  $(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ --dry-run dist/*
+	@echo "==> Publishing..."
+	@TWINE_USERNAME=__token__ TWINE_PASSWORD=$(PYPI_TOKEN) \
+	  $(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
 .PHONY: clean
 clean:
-	@echo Cleaning ignored files
+	@echo "==> Cleaning ignored files..."
 	@git clean -Xfd
 
 .DEFAULT_GOAL := test

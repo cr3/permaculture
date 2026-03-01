@@ -11,43 +11,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
-      - uses: actions/cache@v3
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-uv-env
         with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-
-      - name: Set up the environment
-        uses: ./.github/actions/setup-poetry-env
-        with:
-          poetry-options: --only check
+          extras: check
 
       - name: Run check target
         run: make check
 
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11']
-      fail-fast: false
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set up the environment
-        uses: ./.github/actions/setup-poetry-env
+        uses: ./.github/actions/setup-uv-env
         with:
-          python-version: ${{ matrix.python-version }}
+          extras: test
 
       - name: Run test target
         run: make test
 
       - name: "Upload coverage data"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: coverage-data-${{ matrix.python-version }}
+          name: coverage-data
           path: .coverage.*
           if-no-files-found: ignore
           include-hidden-files: true
@@ -58,25 +49,23 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set up the environment
-        uses: ./.github/actions/setup-poetry-env
+        uses: ./.github/actions/setup-uv-env
         with:
-          python-version: "3.11"
-          poetry-options: --only test
+          extras: test
 
       - name: Download coverage data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
-          pattern: coverage-data-*
-          merge-multiple: true
+          pattern: coverage-data
 
       - name: Run coverage target
         run: make coverage
 
       - name: Upload HTML report if check failed.
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: html-report
           path: htmlcov
@@ -86,12 +75,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set up the environment
-        uses: ./.github/actions/setup-poetry-env
+        uses: ./.github/actions/setup-uv-env
         with:
-          poetry-options: --with docs
+          extras: docs,test
 
       - name: Run docs target
         run: make docs
