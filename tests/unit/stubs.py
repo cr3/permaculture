@@ -11,7 +11,7 @@ class StubRequestsPreparedRequest:
     """Stub Requests PreparedRequest object."""
 
     method: str = "GET"
-    headers: dict = {}
+    headers: dict = field(factory=dict)
     body: str = ""
     url: str = "http://www.test.com/"
 
@@ -24,7 +24,7 @@ class StubRequestsResponse:
     """Stub Requests Response object."""
 
     status_code: int = 200
-    headers: dict = {}
+    headers: dict = field(factory=dict)
     json: Callable[[], dict] = lambda: {}
     url: str = "http://www.test.com/"
     reason: str = ""

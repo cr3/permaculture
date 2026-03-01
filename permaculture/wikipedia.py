@@ -55,7 +55,7 @@ def parse_table(table):
             if names != [v[-1] for v in headers.values()]:
                 headers = {
                     i: (*headers.get(i, ()), name)
-                    for i, name in zip(count(), names)  # noqa: B905
+                    for i, name in zip(count(), names)
                 }
 
         for i, td in enumerate(tr.find_all("td")):

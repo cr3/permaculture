@@ -165,8 +165,7 @@ def make(filename, outfile):  # noqa: C901
         elif line.startswith("msgid_plural"):
             if section != ID:
                 print(
-                    "msgid_plural not preceded by msgid on %s:%d"
-                    % (infile, lno),
+                    f"msgid_plural not preceded by msgid on {infile}:{lno}",
                     file=sys.stderr,
                 )
                 sys.exit(1)
@@ -179,7 +178,7 @@ def make(filename, outfile):  # noqa: C901
             if line.startswith("msgstr["):
                 if not is_plural:
                     print(
-                        "plural without msgid_plural on %s:%d" % (infile, lno),
+                        f"plural without msgid_plural on {infile}:{lno}",
                         file=sys.stderr,
                     )
                     sys.exit(1)
@@ -189,8 +188,7 @@ def make(filename, outfile):  # noqa: C901
             else:
                 if is_plural:
                     print(
-                        "indexed msgstr required for plural on  %s:%d"
-                        % (infile, lno),
+                        f"indexed msgstr required for plural on {infile}:{lno}",
                         file=sys.stderr,
                     )
                     sys.exit(1)
@@ -208,7 +206,7 @@ def make(filename, outfile):  # noqa: C901
             msgstr += line.encode(encoding)
         else:
             print(
-                "Syntax error on %s:%d" % (infile, lno),
+                f"Syntax error on {infile}:{lno}",
                 "before:",
                 file=sys.stderr,
             )
