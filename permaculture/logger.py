@@ -51,12 +51,13 @@ The log level and log file can then be used to setup the root logger like this:
 
     >>> logger = setup_logger(args.log_level, args.log_file)
 """
-import contextvars
 import json
 import logging
 import sys
 from contextlib import contextmanager
-from datetime import datetime
+from contextvars import ContextVar
+from datetime import UTC, datetime
+from typing import ClassVar
 
 from permaculture.action import SingleAction
 
@@ -66,7 +67,7 @@ DEFAULT_LEVEL = logging.INFO
 class LoggerFormatter(logging.Formatter):
     """Logger formatter with sensible defaults."""
 
-    converter = datetime.utcfromtimestamp
+    converter = lambda _, t: datetime.fromtimestamp(t, UTC)
 
     def __init__(self, fmt=None, datefmt=None):
         """Initialize a formatter with default fmt and datefmt."""
@@ -147,9 +148,9 @@ class LoggerLevelAction(SingleAction):
     Return a numeric value for the log level.
     """
 
-    choices = ["debug", "info", "warning", "error", "critical"]
-    default = DEFAULT_LEVEL
-    metavar = "LEVEL"
+    choices: ClassVar[list[str]] = ["debug", "info", "warning", "error", "critical"]
+    default: ClassVar[int] = DEFAULT_LEVEL
+    metavar: ClassVar[str] = "LEVEL"
 
     def __init__(self, option_strings, **kwargs):
         """Initialize logger level defaults."""
@@ -196,7 +197,7 @@ def setup_logger(level=DEFAULT_LEVEL, handler=None, formatter=None, name=None):
     return logger
 
 
-log_context_var = contextvars.ContextVar("log_context_var", default={})
+log_context_var = ContextVar("log_context_var", default=None)
 
 
 def _log_context_cls(cls):
@@ -220,6 +221,9 @@ def _log_context_cls(cls):
 
 def _ensure_log_uses_context():
     """Ensure the set log record factory includes context information."""
+    if log_context_var.get() is None:
+        log_context_var.set({})
+
     log_factory = logging.getLogRecordFactory()
     logging.setLogRecordFactory(_log_context_cls(log_factory))
 

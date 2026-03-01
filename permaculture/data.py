@@ -49,7 +49,7 @@ def unflatten(data, sep="/"):
         else:
             s = d
 
-        indexed_tokens = zip(tokens, tokens[1:] + [value], strict=True)
+        indexed_tokens = zip(tokens, [*tokens[1:], value], strict=True)
         for count, (index, next_token) in enumerate(indexed_tokens, 1):
             if count == len(tokens):
                 value = next_token
