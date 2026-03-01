@@ -1,0 +1,50 @@
+name: "setup-uv-env"
+description: "Composite action to setup the Python and uv virtual environment."
+
+inputs:
+  python-version:
+    required: false
+    description: "Python version to use"
+    default: "3.13"
+  uv-version:
+    required: false
+    description: "uv version to use (empty = use required-version or latest)"
+    default: ""
+  extras:
+    required: false
+    description: "Include optional dependencies"
+    default: ""
+  working-directory:
+    required: false
+    description: "Working directory"
+    default: "."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        version: ${{ inputs.uv-version }}
+        python-version: ${{ inputs.python-version }}
+        working-directory: ${{ inputs.working-directory }}
+        enable-cache: true
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        EXTRA_ARGS=()
+        if [ -n "${{ inputs.extras }}" ]; then
+          IFS=',' read -ra EXTRAS <<< "${{ inputs.extras }}"
+          for e in "${EXTRAS[@]}"; do
+            e="$(echo "$e" | xargs)" # trim
+            [ -n "$e" ] && EXTRA_ARGS+=(--extra "$e")
+          done
+        fi
+        uv sync "${EXTRA_ARGS[@]}"
