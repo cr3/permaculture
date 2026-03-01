@@ -5,6 +5,7 @@ import string
 from argparse import ArgumentTypeError
 
 from attrs import define, field
+from more_itertools import windowed
 from unidecode import unidecode
 
 
@@ -37,7 +38,7 @@ def normalize(text):
     return text
 
 
-def score(s1, s2, sort=True):
+def lev(s1, s2, sort=True):
     """Calculates the normalized Levenshtein distance between two strings.
 
     https://en.wikipedia.org/wiki/Levenshtein_distance
@@ -68,6 +69,13 @@ def score(s1, s2, sort=True):
 
     distance = float(matrix[l2][l1])
     return 1.0 - distance / max(l1, l2)
+
+
+def score(s1, s2):
+    return max(
+        lev(s1, " ".join(filter(None, w2)))
+        for w2 in windowed(s2.split(), len(s1.split()))
+    )
 
 
 def score_type(x):
