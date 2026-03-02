@@ -2,7 +2,6 @@
 
 import logging
 import re
-from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 from attrs import define, field
@@ -316,18 +315,10 @@ class NCIngestor:
         return cls(model, priority)
 
     def fetch_all(self):
-        def get_plants(limit_start):
-            return [
-                DatabasePlant(
+        total = self.model.get_plant_total()
+        for limit_start in range(0, total, 50):
+            for plant in self.model.get_plants(limit_start=limit_start):
+                yield DatabasePlant(
                     self.model.get_plant(plant["plant name"].Id),
                     self.priority.weight,
                 )
-                for plant in self.model.get_plants(limit_start=limit_start)
-            ]
-
-        total = self.model.get_plant_total()
-        with ThreadPoolExecutor() as executor:
-            results = executor.map(get_plants, range(0, total, 50))
-
-        for plants in results:
-            yield from plants
