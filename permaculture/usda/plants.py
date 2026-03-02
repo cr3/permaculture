@@ -1,6 +1,5 @@
 """USDA Plants database."""
 
-from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 from attrs import define, field
@@ -237,11 +236,8 @@ class PlantsModel:
     def all_characteristics(self):
         """Return the characteristics for all plants."""
         search = self.web.characteristics_search()
-        with ThreadPoolExecutor() as executor:
-            return executor.map(
-                self.plant_characteristics,
-                search["PlantResults"],
-            )
+        for plant in search["PlantResults"]:
+            yield self.plant_characteristics(plant)
 
 
 @define(frozen=True)
