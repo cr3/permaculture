@@ -13,10 +13,9 @@ from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
-from permaculture.nlp import normalize
 
 PHYTOCHEM_ORIGIN = "https://phytochem.nal.usda.gov"
 
@@ -218,22 +217,22 @@ class PhytochemPlant(PhytochemLink):
 
 
 @define(frozen=True)
-class PhytochemDatabase(Database):
+class PhytochemIngestor:
     model: PhytochemModel = field(factory=PhytochemModel)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate PhytochemDatabase from config."""
+        """Instantiate PhytochemIngestor from config."""
         model = PhytochemModel().with_cache(config.storage)
         return cls(model)
 
-    def iterate(self):
+    def fetch_all(self):
         def get_plants(et):
             return [
                 DatabasePlant(
                     self.model.converter.convert(
                         {
-                            "scientific name": link.scientific_name,
+                            **link.get_plant(),
                             **{
                                 f"common name/{n}": True
                                 for n in link.common_names
@@ -249,16 +248,3 @@ class PhytochemDatabase(Database):
 
         for plants in results:
             yield from plants
-
-    def lookup(self, names, score):
-        for name in names:
-            normalized_name = normalize(name)
-            for link in self.model.search(q=normalized_name):
-                if self.extract(link.scientific_name, names) >= score:
-                    yield DatabasePlant(link.get_plant())
-
-    def search(self, name, score):
-        normalized_name = normalize(name)
-        for link in self.model.search(q=normalized_name):
-            if self.extract(name, link.common_names) >= score:
-                yield DatabasePlant(link.get_plant())

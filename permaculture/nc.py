@@ -4,7 +4,7 @@ import logging
 import re
 import string
 from concurrent.futures import ThreadPoolExecutor
-from functools import cache, partial
+from functools import partial
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -12,10 +12,9 @@ from requests import Session
 from yarl import URL
 
 from permaculture.converter import FLOAT_RE, Converter
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import DatabasePlant
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
-from permaculture.nlp import normalize
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import null_storage
 from permaculture.unit import feet, inches
@@ -332,13 +331,13 @@ class NCLink:
 
 
 @define(frozen=True)
-class NCDatabase(Database):
+class NCIngestor:
     model: NCModel = field(factory=NCModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate NCDatabase from config."""
+        """Instantiate NCIngestor from config."""
         model = NCModel().with_authentication(
             config.nc_username,
             config.nc_password,
@@ -347,29 +346,7 @@ class NCDatabase(Database):
         priority = LocationPriority("United States").with_cache(config.storage)
         return cls(model, priority)
 
-    def companions(self, compatible):
-        # Additional cache to speedup getting the same plants.
-        get_plant = cache(self.model.get_plant)
-
-        def get_element(companion):
-            plant = get_plant(companion["plant"].Id)
-            related = get_plant(companion["related"].Id)
-            return (
-                DatabasePlant(plant, self.priority.weight),
-                DatabasePlant(related, self.priority.weight),
-            )
-
-        with ThreadPoolExecutor() as executor:
-            yield from executor.map(
-                get_element,
-                (
-                    c
-                    for c in self.model.get_all_plant_companions()
-                    if "related" in c and c["compatible"] == compatible
-                ),
-            )
-
-    def iterate(self):
+    def fetch_all(self):
         def get_plants(limit_start):
             return [
                 DatabasePlant(
@@ -385,36 +362,3 @@ class NCDatabase(Database):
 
         for plants in results:
             yield from plants
-
-    def lookup(self, names, score):
-        # The search in the web interface concatenates words, so
-        # searching for "symphytum officinale" actually searches for
-        # "symphytumofficinale" which doesn't match anything. This
-        # workaround searches each word and the iterates over all
-        # the matches for the plants that match the full name.
-        seen = set()
-        for name in names:
-            normalized_name = normalize(name)
-            for part in normalized_name.split():
-                for plant in self.model.get_plants(sci_name=part):
-                    n = plant["scientific name"]
-                    if n not in seen and self.extract(n, names) >= score:
-                        seen.add(n)
-                        yield DatabasePlant(
-                            self.model.get_plant(plant["plant name"].Id),
-                            self.priority.weight,
-                        )
-
-    def search(self, name, score):
-        # Same comment as in the `lookup` method.
-        seen = set()
-        for part in name.split():
-            for plant in self.model.get_plants(sort_name=part):
-                n = plant["plant name"].text
-                plant = DatabasePlant(
-                    self.model.get_plant(plant["plant name"].Id),
-                    self.priority.weight,
-                )
-                if n not in seen and self.extract(n, [name]) >= score:
-                    seen.add(n)
-                    yield plant

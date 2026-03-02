@@ -4,7 +4,6 @@ import logging
 import re
 import sys
 from argparse import ArgumentParser, FileType
-from itertools import groupby
 from pathlib import Path
 
 from appdirs import user_cache_dir
@@ -16,13 +15,16 @@ from permaculture.data import (
     unflatten,
 )
 from permaculture.database import Databases
+from permaculture.ingestor import Ingestors
 from permaculture.logger import (
     LoggerHandlerAction,
     LoggerLevelAction,
     setup_logger,
 )
 from permaculture.nlp import score_type
+from permaculture.runner import Runner
 from permaculture.serializer import SerializerAction
+from permaculture.sink import SQLiteSink
 from permaculture.storage import StorageAction
 
 logger = logging.getLogger(__name__)
@@ -36,12 +38,24 @@ def make_args_parser():
         help="permaculture command",
     )
     command.add_parser(
-        "companions",
-        help="plant companions list",
-    )
-    command.add_parser(
         "help",
         help="show configuration help",
+    )
+    ingest = command.add_parser(
+        "ingest",
+        help="ingest plant data into local database",
+    )
+    ingest.add_argument(
+        "--concurrency",
+        type=int,
+        default=4,
+        help="maximum parallel source ingestions (default %(default)s)",
+    )
+    ingest.add_argument(
+        "--retries",
+        type=int,
+        default=3,
+        help="maximum retry attempts per source (default %(default)s)",
     )
     command.add_parser(
         "iterate",
@@ -180,17 +194,21 @@ def main(argv=None):
     databases = Databases.load(config)
 
     match args.command:
-        case "companions":
-            data = {
-                key: [related.scientific_name for _, related in pairs]
-                for key, pairs in groupby(
-                    databases.companions(),
-                    lambda pair: pair[0].scientific_name,
-                )
-            }
         case "help":
             config_parser.print_help()
             sys.exit(0)
+        case "ingest":
+            ingestors = Ingestors.load(config)
+            db_path = Path(config.storage.base_dir) / "permaculture.db"
+            sink = SQLiteSink(db_path)
+            runner = Runner(
+                sources=dict(ingestors),
+                sink=sink,
+                max_concurrency=args.concurrency,
+                max_retries=args.retries,
+            )
+            runner.run()
+            return
         case "iterate":
             data = [plant.scientific_name for plant in databases.iterate()]
         case "list":

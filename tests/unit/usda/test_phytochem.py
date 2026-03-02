@@ -7,7 +7,6 @@ import pytest
 
 from permaculture.usda.phytochem import (
     PhytochemConverter,
-    PhytochemDatabase,
     PhytochemEthnoplant,
     PhytochemLink,
     PhytochemModel,
@@ -129,34 +128,40 @@ def test_phytochem_model_download_csv():
     "text, expected",
     [
         pytest.param(
-            dedent("""\
+            dedent(
+                """\
             <div class="entity etE">
               <a href="/phytochem/ethnoplants/show/21069">Test</a>
             </div>
-            """),
+            """
+            ),
             [
                 PhytochemEthnoplant(21069, "ethnoplants", "Test", [], ANY),
             ],
             id="ethnoplants",
         ),
         pytest.param(
-            dedent("""\
+            dedent(
+                """\
             <div class="entity etP">
               <a href="/phytochem/plants/show/6843">Test</a>
             </div>
-            """),
+            """
+            ),
             [
                 PhytochemPlant(6843, "plants", "Test", [], ANY),
             ],
             id="plants",
         ),
         pytest.param(
-            dedent("""\
+            dedent(
+                """\
             <div class="entity etP">
               <a href="/phytochem/plants/show/6843">Test</a>
               (a; b)
             </div>
-            """),
+            """
+            ),
             [
                 PhytochemPlant(6843, "plants", "Test", ["a", "b"], ANY),
             ],
@@ -210,33 +215,3 @@ def test_phytochem_link_from_url(url, expected):
     """A Phytochem link should parse the url to return the expected type."""
     result = PhytochemLink.from_url(url, "test")
     assert result == expected
-
-
-def test_phytochem_database_lookup(unique):
-    """Looking up a scientific name should return a list of elements."""
-    scientific_name, activity = unique("token"), unique("integer")
-    link = Mock(
-        scientific_name=scientific_name,
-        get_plant=Mock(
-            return_value={
-                "scientific name": scientific_name,
-                "chemical/genistein": activity,
-            },
-        ),
-    )
-    model = Mock(
-        search=Mock(
-            return_value=[
-                link,
-            ],
-        ),
-    )
-
-    database = PhytochemDatabase(model)
-    elements = list(database.lookup([scientific_name], 1.0))
-    assert elements == [
-        {
-            "scientific name": scientific_name,
-            "chemical/genistein": activity,
-        },
-    ]

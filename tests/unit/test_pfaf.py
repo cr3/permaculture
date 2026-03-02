@@ -7,8 +7,8 @@ import pytest
 
 from permaculture.pfaf import (
     PFAFConverter,
-    PFAFDatabase,
     PFAFFile,
+    PFAFIngestor,
     PFAFModel,
 )
 from permaculture.storage import FileStorage
@@ -128,8 +128,8 @@ def test_pfaf_model_all_plants_error(storage):
     assert plants == []
 
 
-def test_pfaf_database_iterate():
-    """Iterating over the database should return a list of elements."""
+def test_pfaf_ingestor_fetch_all():
+    """Fetching all should return a list of elements."""
     model = Mock(
         all_plants=Mock(
             return_value=[
@@ -141,8 +141,8 @@ def test_pfaf_database_iterate():
         )
     )
 
-    database = PFAFDatabase(model)
-    elements = list(database.iterate())
+    ingestor = PFAFIngestor(model)
+    elements = list(ingestor.fetch_all())
     assert elements == [
         {
             "scientific name": "a",

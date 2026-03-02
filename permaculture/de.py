@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from yarl import URL
 
 from permaculture.converter import Converter
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import DatabasePlant
 from permaculture.google import GoogleSpreadsheet
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
@@ -128,18 +128,18 @@ class DEModel:
 
 
 @define(frozen=True)
-class DEDatabase(Database):
+class DEIngestor:
     model: DEModel = field(factory=DEModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate DEDatabase from config."""
+        """Instantiate DEIngestor from config."""
         model = DEModel().with_cache(config.storage)
         priority = LocationPriority("Quebec").with_cache(config.storage)
         return cls(model, priority)
 
-    def iterate(self):
+    def fetch_all(self):
         for p in self.model.get_perenial_plants():
             yield DatabasePlant(
                 {
