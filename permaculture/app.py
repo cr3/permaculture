@@ -1,5 +1,7 @@
 """FastAPI application for plant lookup."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from appdirs import user_cache_dir
@@ -9,8 +11,6 @@ from fastapi.responses import HTMLResponse
 
 from permaculture.data import unflatten
 from permaculture.database import Database
-
-app = FastAPI(title="Permaculture", docs_url="/api/docs")
 
 
 def _default_db_path():
@@ -27,12 +27,16 @@ class State:
 state = State()
 
 
-@app.on_event("startup")
-def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Open the local database on startup."""
     db_path = _default_db_path()
     if db_path.exists():
         state.database = Database(db_path)
+    yield
+
+
+app = FastAPI(title="Permaculture", docs_url="/api/docs", lifespan=lifespan)
 
 
 @app.get("/", response_class=HTMLResponse)
