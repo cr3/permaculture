@@ -14,7 +14,7 @@ from permaculture.data import (
     flatten,
     unflatten,
 )
-from permaculture.database import Database, Databases
+from permaculture.database import Database
 from permaculture.ingestor import Ingestors
 from permaculture.logger import (
     LoggerHandlerAction,
@@ -190,7 +190,7 @@ def main(argv=None):
     config = config_parser.parse_args(remaining)
 
     setup_logger(config.log_level, config.log_file, name="permaculture")
-    databases = Databases.load(config)
+    database = Database.load(config)
 
     match args.command:
         case "help":
@@ -199,19 +199,22 @@ def main(argv=None):
         case "ingest":
             ingestors = Ingestors.load(config)
             db_path = Path(config.storage.base_dir) / "permaculture.db"
-            database = Database(db_path)
+            db = Database(db_path)
             runner = Runner(
                 sources=dict(ingestors),
-                database=database,
+                database=db,
                 max_concurrency=args.concurrency,
                 max_retries=args.retries,
             )
             runner.run()
             return
         case "iterate":
-            data = [plant.scientific_name for plant in databases.iterate()]
+            data = [
+                plant.scientific_name
+                for plant in database.iterate()
+            ] if database else []
         case "list":
-            data = list(databases)
+            data = database.sources() if database else []
         case "lookup":
             content_type = config.serializer.default_content_type
             exclude = re.compile("|".join(args.excludes), re.I)
@@ -231,13 +234,13 @@ def main(argv=None):
                     for k, v in f(plant).items()
                     if include.match(k) and not exclude.match(k)
                 }
-                for plant in databases.lookup(names, args.score)
-            ]
+                for plant in database.lookup(names, args.score)
+            ] if database else []
         case "search":
             data = [
                 {plant.scientific_name: plant.common_names}
-                for plant in databases.search(args.name, args.score)
-            ]
+                for plant in database.search(args.name, args.score)
+            ] if database else []
         case "store":
             storage = evolve(
                 config.storage,
