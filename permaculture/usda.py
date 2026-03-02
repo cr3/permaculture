@@ -12,14 +12,14 @@ from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
 from permaculture.unit import fahrenheit, feet, inches
 
-PLANTS_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
+USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
 
 
 @define(frozen=True)
-class PlantsWeb:
+class USDAWeb:
     """USDA Plants web interface."""
 
-    session: HTTPSession = field(factory=partial(HTTPSession, PLANTS_ORIGIN))
+    session: HTTPSession = field(factory=partial(HTTPSession, USDA_ORIGIN))
 
     def characteristics_search(self, **kwargs):
         """Search characteristics."""
@@ -110,7 +110,7 @@ class PlantsWeb:
 
 
 @define(frozen=True)
-class PlantsConverter(Converter):
+class USDAConverter(Converter):
     locales: Locales = field(
         factory=partial(Locales.from_domain, "usda-plants")
     )
@@ -198,11 +198,11 @@ class PlantsConverter(Converter):
 
 
 @define(frozen=True)
-class PlantsModel:
+class USDAModel:
     """USDA Plants model."""
 
-    web: PlantsWeb = field(factory=PlantsWeb)
-    converter: PlantsConverter = field(factory=PlantsConverter)
+    web: USDAWeb = field(factory=USDAWeb)
+    converter: USDAConverter = field(factory=USDAConverter)
 
     def with_cache(self, storage):
         self.web.session.with_cache(storage)
@@ -241,14 +241,14 @@ class PlantsModel:
 
 
 @define(frozen=True)
-class PlantsIngestor:
-    model: PlantsModel = field(factory=PlantsModel)
+class USDAIngestor:
+    model: USDAModel = field(factory=USDAModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate PlantsIngestor from config."""
-        model = PlantsModel().with_cache(config.storage)
+        """Instantiate USDAIngestor from config."""
+        model = USDAModel().with_cache(config.storage)
         priority = LocationPriority("United States").with_cache(config.storage)
         return cls(model, priority)
 
