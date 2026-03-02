@@ -5,17 +5,22 @@ import logging
 
 from attrs import define, field
 
+from permaculture.database import DatabasePlant
 from permaculture.ingestor import Ingestor
 from permaculture.sink import Sink
 
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 500
+QUEUE_SIZE = 5000
 
 
 @define(frozen=True)
 class Runner:
     """Orchestrates ingestion from multiple sources into a sink.
+
+    Writes are serialized through a bounded async queue so that only
+    one coroutine touches the database, avoiding SQLite lock errors.
 
     :param sources: Mapping of name to ingestor.
     :param sink: Destination sink for plant records.
@@ -23,6 +28,7 @@ class Runner:
     :param max_retries: Maximum retry attempts per source.
     :param backoff_base: Base for exponential backoff in seconds.
     :param batch_size: Records per batch write.
+    :param queue_size: Maximum pending observations before backpressure.
     """
 
     sources: dict[str, Ingestor] = field(factory=dict)
@@ -31,6 +37,7 @@ class Runner:
     max_retries: int = field(default=3)
     backoff_base: float = field(default=2.0)
     batch_size: int = field(default=BATCH_SIZE)
+    queue_size: int = field(default=QUEUE_SIZE)
 
     def run(self):
         """Run ingestion synchronously."""
@@ -38,9 +45,16 @@ class Runner:
         asyncio.run(self._run_async())
 
     async def _run_async(self):
+        queue: asyncio.Queue[tuple[str, DatabasePlant] | None] = asyncio.Queue(
+            maxsize=self.queue_size
+        )
+        loop = asyncio.get_running_loop()
+
+        writer_task = asyncio.create_task(self._writer(queue))
+
         sem = asyncio.Semaphore(self.max_concurrency)
         tasks = [
-            self._ingest_source(name, source, sem)
+            self._ingest_source(name, source, sem, queue, loop)
             for name, source in self.sources.items()
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -51,11 +65,41 @@ class Runner:
                     {"name": name, "error": result},
                 )
 
-    async def _ingest_source(self, name, source, sem):
+        await queue.put(None)
+        await writer_task
+
+    async def _writer(self, queue):
+        """Drain the queue and write batches to the sink."""
+        buffer: list[tuple[str, DatabasePlant]] = []
+        while True:
+            item = await queue.get()
+            if item is None:
+                break
+
+            buffer.append(item)
+            if len(buffer) >= self.batch_size:
+                self._flush(buffer)
+                buffer = []
+
+        if buffer:
+            self._flush(buffer)
+
+    def _flush(self, buffer):
+        """Write buffered records grouped by source."""
+        by_source: dict[str, list[DatabasePlant]] = {}
+        for source, record in buffer:
+            by_source.setdefault(source, []).append(record)
+
+        for source, records in by_source.items():
+            self.sink.write_batch(source, records)
+
+    async def _ingest_source(self, name, source, sem, queue, loop):
         async with sem:
             for attempt in range(self.max_retries):
                 try:
-                    await asyncio.to_thread(self._ingest_sync, name, source)
+                    await asyncio.to_thread(
+                        self._ingest_sync, name, source, queue, loop
+                    )
                     logger.info(
                         "Finished ingesting %(name)s",
                         {"name": name},
@@ -76,13 +120,8 @@ class Runner:
 
             raise RuntimeError(f"Failed ingesting {name}")
 
-    def _ingest_sync(self, name, source):
-        batch = []
+    def _ingest_sync(self, name, source, queue, loop):
         for record in source.fetch_all():
-            batch.append(record)
-            if len(batch) >= self.batch_size:
-                self.sink.write_batch(name, batch)
-                batch.clear()
-
-        if batch:
-            self.sink.write_batch(name, batch)
+            asyncio.run_coroutine_threadsafe(
+                queue.put((name, record)), loop
+            ).result()
