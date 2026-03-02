@@ -5,9 +5,20 @@ from unittest.mock import Mock
 import pytest
 
 from permaculture.database import (
+    Database,
     DatabasePlant,
     Databases,
 )
+from permaculture.sink import SQLiteSink
+
+
+@pytest.fixture
+def db_path(tmp_path):
+    """Create a temporary SQLite database with test data."""
+    path = tmp_path / "permaculture.db"
+    sink = SQLiteSink(path)
+    sink.initialize()
+    return path
 
 
 def test_database_plant_with_database(unique):
@@ -17,36 +28,91 @@ def test_database_plant_with_database(unique):
     assert plant["database/a"]
 
 
-def test_database_load_all():
+def test_database_load_empty(tmp_path):
+    """Loading should return empty when no database exists."""
+    storage = Mock(base_dir=tmp_path)
+    config = Mock(databases=[], storage=storage)
+    databases = Databases.load(config)
+    assert len(databases) == 0
+
+
+def test_database_load_all(db_path):
     """Loading should instantiate all databases by default."""
-    config = Mock(databases=[])
-    registry = {
-        "databases": {
-            "a": Mock(),
-            "b": Mock(),
-        },
-    }
-    databases = Databases.load(config, registry)
+    sink = SQLiteSink(db_path)
+    sink.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    sink.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+
+    storage = Mock(base_dir=db_path.parent)
+    config = Mock(databases=[], storage=storage)
+    databases = Databases.load(config)
     assert "a" in databases
     assert "b" in databases
 
 
-def test_database_load_one():
-    """Loading can instantiate a single database from the config."""
-    config = Mock(databases=["A"])
-    registry = {
-        "databases": {
-            "a": Mock(),
-            "b": Mock(),
-        },
-    }
-    databases = Databases.load(config, registry)
+def test_database_load_one(db_path):
+    """Loading can filter databases from the config."""
+    sink = SQLiteSink(db_path)
+    sink.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    sink.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+
+    storage = Mock(base_dir=db_path.parent)
+    config = Mock(databases=["a"], storage=storage)
+    databases = Databases.load(config)
     assert "a" in databases
     assert "b" not in databases
 
 
-def test_database_iterate(unique):
-    """Iterating should iterate over all databases in the registry."""
+def test_database_iterate(db_path):
+    """Iterating should return all plants from the local database."""
+    sink = SQLiteSink(db_path)
+    sink.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+
+    database = Database(db_path)
+    result = list(database.iterate())
+    assert len(result) == 1
+    assert result[0]["scientific name"] == "x"
+
+
+def test_database_lookup(db_path):
+    """Lookup should return plants matching scientific names."""
+    sink = SQLiteSink(db_path)
+    sink.write_batch(
+        "a",
+        [
+            DatabasePlant({"scientific name": "symphytum officinale"}),
+            DatabasePlant({"scientific name": "achillea millefolium"}),
+        ],
+    )
+
+    database = Database(db_path)
+    result = list(database.lookup(["symphytum officinale"], 1.0))
+    assert len(result) == 1
+    assert result[0]["scientific name"] == "symphytum officinale"
+
+
+def test_database_search(db_path):
+    """Search should return plants matching common name."""
+    sink = SQLiteSink(db_path)
+    sink.write_batch(
+        "a",
+        [
+            DatabasePlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                }
+            ),
+        ],
+    )
+
+    database = Database(db_path)
+    result = list(database.search("comfrey", 0.5))
+    assert len(result) == 1
+    assert result[0]["scientific name"] == "symphytum officinale"
+
+
+def test_databases_iterate(unique):
+    """Iterating should iterate over all databases."""
     a, b = unique("plant"), unique("plant")
     databases = Databases(
         {
@@ -60,8 +126,8 @@ def test_database_iterate(unique):
     assert b["database/b"]
 
 
-def test_database_lookup(unique):
-    """Looking up should iterate over all databases in the registry."""
+def test_databases_lookup(unique):
+    """Looking up should iterate over all databases."""
     a, b = unique("plant"), unique("plant")
     databases = Databases(
         {
@@ -75,8 +141,8 @@ def test_database_lookup(unique):
     assert b["database/b"]
 
 
-def test_database_search(unique):
-    """Searching should iterate over all databases in the registry."""
+def test_databases_search(unique):
+    """Searching should iterate over all databases."""
     a, b = unique("plant"), unique("plant")
     databases = Databases(
         {

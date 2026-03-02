@@ -1,15 +1,17 @@
 """Database utilities."""
 
+import json
 import re
+import sqlite3
 from collections.abc import Iterator
 from itertools import groupby, starmap
 from operator import attrgetter, mul
+from pathlib import Path
 
-from attrs import define
+from attrs import define, field
 
 from permaculture.data import merge
 from permaculture.nlp import Extractor, normalize, score
-from permaculture.registry import registry_load
 
 
 class DatabasePlant(dict):
@@ -46,50 +48,83 @@ DatabaseCompanion = tuple[DatabasePlant, DatabasePlant]
 
 @define(frozen=True)
 class Database:
-    def extract(self, query, choices):
-        return Extractor(query, normalize, score).extract_one(choices)[0]
+    """Local database backed by a SQLite sink."""
 
-    def companions(self, compatible: bool) -> Iterator[DatabaseCompanion]:
-        """Plant companions list."""
-        return []
+    db_path: Path = field(converter=Path)
+
+    def _connect(self):
+        return sqlite3.connect(self.db_path)
+
+    def _extract(self, query, choices):
+        return Extractor(query, normalize, score).extract_one(choices)[0]
 
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over all plants."""
-        return []
+        with self._connect() as conn:
+            for data, weight in conn.execute(
+                "SELECT data, weight FROM plants"
+            ):
+                yield DatabasePlant(json.loads(data), weight)
 
-    def lookup(self, names: str, score: float) -> Iterator[DatabasePlant]:
+    def lookup(
+        self, names: list[str], score: float
+    ) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names."""
-        for plant in self.iterate():
-            if self.extract(plant.scientific_name, names) >= score:
-                yield plant
+        if not names:
+            return
+
+        with self._connect() as conn:
+            placeholders = ",".join("?" * len(names))
+            for data, weight in conn.execute(
+                "SELECT data, weight FROM plants"
+                f" WHERE scientific_name IN ({placeholders})",
+                names,
+            ):
+                yield DatabasePlant(json.loads(data), weight)
 
     def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
         """Search for the scientific name by common name."""
-        for plant in self.iterate():
-            if self.extract(name, plant.names) >= score:
-                yield plant
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT DISTINCT p.data, p.weight"
+                " FROM common_names cn"
+                " JOIN plants p ON cn.plant_id = p.id"
+                " WHERE cn.name LIKE ?",
+                (f"%{name}%",),
+            )
+            for data, weight in rows:
+                plant = DatabasePlant(json.loads(data), weight)
+                if self._extract(name, plant.names) >= score:
+                    yield plant
 
 
 class Databases(dict):
     @classmethod
     def load(cls, config=None, registry=None):
-        """Load databases from registry."""
-        if registry is None or "databases" not in registry:
-            registry = registry_load("databases", registry)
+        """Load databases from a local SQLite sink.
+
+        Each database entry points to a Database backed by the same
+        SQLite file, filtered by source name.
+        """
+        db_path = Path(config.storage.base_dir) / "permaculture.db"
+        if not db_path.exists():
+            return cls({})
 
         include = re.compile("|".join(config.databases), re.I)
+
+        with sqlite3.connect(db_path) as conn:
+            sources = [
+                row[0]
+                for row in conn.execute("SELECT DISTINCT source FROM plants")
+            ]
+
         databases = {
-            k: v.from_config(config)
-            for k, v in registry.get("databases", {}).items()
-            if include.match(k)
+            source: Database(db_path)
+            for source in sources
+            if include.match(source)
         }
 
         return cls(databases)
-
-    def companions(self, compatible=True) -> Iterator[DatabaseCompanion]:
-        """Plant companions list."""
-        for database in self.values():
-            yield from database.companions(compatible)
 
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over plants."""
