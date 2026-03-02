@@ -89,8 +89,9 @@ def test_lookup_found(client):
     response = client.get("/api/plants/symphytum officinale")
     assert response.status_code == 200
     data = response.json()
-    assert "scientific name" in data
     assert data["scientific name"] == "symphytum officinale"
+    assert data["common name"] == ["comfrey"]
+    assert data["height"] == {"max": 1.2}
 
 
 def test_lookup_not_found(client):

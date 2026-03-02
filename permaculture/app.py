@@ -13,6 +13,27 @@ from permaculture.data import unflatten
 from permaculture.database import Database
 
 
+def group_characteristics(data):
+    """Group flat characteristics into a presentation-friendly structure.
+
+    Sub-keys where all values are True are collected into a list:
+    ``{"sun/partial": True, "sun/full": True}`` becomes ``{"sun": ["partial", "full"]}``.
+    """
+    nested = unflatten(data)
+    if not isinstance(nested, dict):
+        return nested
+
+    return {
+        key: (
+            sorted(value)
+            if isinstance(value, dict)
+            and all(v is True for v in value.values())
+            else value
+        )
+        for key, value in nested.items()
+    }
+
+
 def _default_db_path():
     return Path(user_cache_dir("permaculture")) / "permaculture.db"
 
@@ -68,4 +89,4 @@ def get_plant(scientific_name: str):
     if not plants:
         return {}
 
-    return unflatten(dict(plants[0].items()))
+    return group_characteristics(dict(plants[0].items()))
