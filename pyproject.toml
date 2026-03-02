@@ -84,7 +84,7 @@ source = "vcs"
 target-version = "py313"
 line-length = 79
 fix = true
-select = [
+lint.select = [
     # flake8-2020
     "YTT",
     # flake8-bandit
@@ -116,7 +116,7 @@ select = [
     # tryceratops
     "TRY",
 ]
-ignore = [
+lint.ignore = [
     # LineTooLong
     "E501",
     # DoNotAssignLambda
@@ -127,8 +127,8 @@ ignore = [
     "TRY003",
 ]
 
-[tool.ruff.per-file-ignores]
-"tests/*" = ["S101"]
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]
 
 # Pytest options:
 #   https://docs.pytest.org/en/6.2.x/reference.html#ini-options-ref
