@@ -43,9 +43,6 @@ class DatabasePlant(dict):
         return self
 
 
-DatabaseCompanion = tuple[DatabasePlant, DatabasePlant]
-
-
 @define(frozen=True)
 class Database:
     """Local database backed by a SQLite sink."""
