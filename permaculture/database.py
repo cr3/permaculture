@@ -3,7 +3,7 @@
 import json
 import re
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from itertools import groupby, starmap
 from operator import attrgetter, mul
 from pathlib import Path
@@ -14,24 +14,24 @@ from permaculture.data import merge
 from permaculture.nlp import Extractor, normalize, score
 
 
-class DatabasePlant(dict):
-    def __init__(self, data, weight=1.0):
-        super().__init__(data)
-        self.weight = weight
+@define(frozen=True, hash=False)
+class DatabasePlant(Mapping):
+    """Plant record with structured data and weight."""
+
+    data: dict = field(factory=dict)
+    weight: float = 1.0
 
     @property
     def scientific_name(self):
-        return self["scientific name"]
+        return self.data.get("scientific name", "")
 
     @property
     def common_names(self):
-        names = []
-        for key in self:
-            if m := re.match(r"common name/(?P<name>.+)", key):
-                name = m.group("name")
-                names.append(name)
-
-        return names
+        return [
+            key.removeprefix("common name/")
+            for key in self.data
+            if key.startswith("common name/")
+        ]
 
     @property
     def names(self):
@@ -39,8 +39,17 @@ class DatabasePlant(dict):
 
     def with_database(self, name):
         """Add the database name to this plant."""
-        self[f"database/{name}"] = True
+        self.data[f"database/{name}"] = True
         return self
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self):
+        return len(self.data)
 
 
 @define(frozen=True)
@@ -153,7 +162,7 @@ class Databases(dict):
         """Group plants by scientific name, merging numbers and strings."""
         keyfunc = attrgetter("scientific_name")
         return (
-            DatabasePlant(self.merge(p))
+            self.merge(p)
             for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
         )
 
@@ -173,4 +182,4 @@ class Databases(dict):
 
             return value
 
-        return merge(plants, resolve)
+        return DatabasePlant(merge(plants, resolve))
