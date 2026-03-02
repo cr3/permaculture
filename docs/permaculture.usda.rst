@@ -4,14 +4,6 @@ permaculture.usda package
 Submodules
 ----------
 
-permaculture.usda.phytochem module
-----------------------------------
-
-.. automodule:: permaculture.usda.phytochem
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 permaculture.usda.plants module
 -------------------------------
 

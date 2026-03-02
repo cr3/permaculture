@@ -22,7 +22,6 @@ Supported plant databases.
    de
    nc
    pfaf
-   usda-phytochem
    usda-plants
 
 Books

@@ -48,7 +48,6 @@ permaculture = "permaculture.testing.fixtures"
 
 [project.entry-points."permaculture.ingestors"]
 "usda/plants" = "permaculture.usda.plants:PlantsIngestor"
-"usda/phytochem" = "permaculture.usda.phytochem:PhytochemIngestor"
 "de" = "permaculture.de:DEIngestor"
 "nc" = "permaculture.nc:NCIngestor"
 "pfaf" = "permaculture.pfaf:PFAFIngestor"
