@@ -1,4 +1,4 @@
-"""Runner for orchestrating ingestion from sources into a sink."""
+"""Runner for orchestrating ingestion from sources into a database."""
 
 import asyncio
 import logging
@@ -6,9 +6,8 @@ import random
 
 from attrs import define, field
 
-from permaculture.database import DatabasePlant
+from permaculture.database import Database, DatabasePlant
 from permaculture.ingestor import Ingestor
-from permaculture.sink import Sink
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +17,13 @@ QUEUE_SIZE = 5000
 
 @define(frozen=True)
 class Runner:
-    """Orchestrates ingestion from multiple sources into a sink.
+    """Orchestrates ingestion from multiple sources into a database.
 
     Writes are serialized through a bounded async queue so that only
     one coroutine touches the database, avoiding SQLite lock errors.
 
     :param sources: Mapping of name to ingestor.
-    :param sink: Destination sink for plant records.
+    :param database: Destination database for plant records.
     :param max_concurrency: Maximum parallel source ingestions.
     :param max_retries: Maximum retry attempts per source.
     :param backoff_base: Base for exponential backoff in seconds.
@@ -34,7 +33,7 @@ class Runner:
     """
 
     sources: dict[str, Ingestor] = field(factory=dict)
-    sink: Sink = field(factory=dict)
+    database: Database = field(factory=dict)
     max_concurrency: int = field(default=4)
     max_retries: int = field(default=3)
     backoff_base: float = field(default=0.25)
@@ -44,7 +43,7 @@ class Runner:
 
     def run(self):
         """Run ingestion synchronously."""
-        self.sink.initialize()
+        self.database.initialize()
         asyncio.run(self._run_async())
 
     async def _run_async(self):
@@ -72,7 +71,7 @@ class Runner:
         await writer_task
 
     async def _writer(self, queue):
-        """Drain the queue and write batches to the sink."""
+        """Drain the queue and write batches to the database."""
         buffer: list[tuple[str, DatabasePlant]] = []
         while True:
             item = await queue.get()
@@ -94,7 +93,7 @@ class Runner:
             by_source.setdefault(source, []).append(record)
 
         for source, records in by_source.items():
-            self.sink.write_batch(source, records)
+            self.database.write_batch(source, records)
 
     async def _ingest_source(self, name, source, sem, queue, loop):
         async with sem:

@@ -9,15 +9,14 @@ from permaculture.database import (
     DatabasePlant,
     Databases,
 )
-from permaculture.sink import SQLiteSink
 
 
 @pytest.fixture
 def db_path(tmp_path):
     """Create a temporary SQLite database with test data."""
     path = tmp_path / "permaculture.db"
-    sink = SQLiteSink(path)
-    sink.initialize()
+    database = Database(path)
+    database.initialize()
     return path
 
 
@@ -38,9 +37,9 @@ def test_database_load_empty(tmp_path):
 
 def test_database_load_all(db_path):
     """Loading should instantiate all databases by default."""
-    sink = SQLiteSink(db_path)
-    sink.write_batch("a", [DatabasePlant({"scientific name": "x"})])
-    sink.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+    database = Database(db_path)
+    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
 
     storage = Mock(base_dir=db_path.parent)
     config = Mock(databases=[], storage=storage)
@@ -51,9 +50,9 @@ def test_database_load_all(db_path):
 
 def test_database_load_one(db_path):
     """Loading can filter databases from the config."""
-    sink = SQLiteSink(db_path)
-    sink.write_batch("a", [DatabasePlant({"scientific name": "x"})])
-    sink.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+    database = Database(db_path)
+    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
 
     storage = Mock(base_dir=db_path.parent)
     config = Mock(databases=["a"], storage=storage)
@@ -64,8 +63,8 @@ def test_database_load_one(db_path):
 
 def test_database_iterate(db_path):
     """Iterating should return all plants from the local database."""
-    sink = SQLiteSink(db_path)
-    sink.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    database = Database(db_path)
+    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
 
     database = Database(db_path)
     result = list(database.iterate())
@@ -75,8 +74,8 @@ def test_database_iterate(db_path):
 
 def test_database_lookup(db_path):
     """Lookup should return plants matching scientific names."""
-    sink = SQLiteSink(db_path)
-    sink.write_batch(
+    database = Database(db_path)
+    database.write_batch(
         "a",
         [
             DatabasePlant({"scientific name": "symphytum officinale"}),
@@ -92,8 +91,8 @@ def test_database_lookup(db_path):
 
 def test_database_search(db_path):
     """Search should return plants matching common name."""
-    sink = SQLiteSink(db_path)
-    sink.write_batch(
+    database = Database(db_path)
+    database.write_batch(
         "a",
         [
             DatabasePlant(
@@ -226,3 +225,71 @@ def test_database_merge(plants, expected):
     """Merging plants should merge numbers and strings."""
     result = Databases({}).merge(plants)
     assert result == expected
+
+
+def test_database_initialize_idempotent(db_path):
+    """Initializing twice should be idempotent."""
+    database = Database(db_path)
+    database.initialize()
+
+
+def test_database_write_batch_and_iterate(db_path):
+    """Writing a batch should persist records retrievable via iterate."""
+    database = Database(db_path)
+    records = [
+        DatabasePlant(
+            {
+                "scientific name": "symphytum officinale",
+                "common name/comfrey": True,
+            }
+        ),
+        DatabasePlant(
+            {
+                "scientific name": "achillea millefolium",
+                "common name/yarrow": True,
+            }
+        ),
+    ]
+    database.write_batch("pfaf", records)
+    result = list(database.iterate())
+    assert len(result) == 2
+    names = {p["scientific name"] for p in result}
+    assert names == {"symphytum officinale", "achillea millefolium"}
+
+
+def test_database_search_no_match(db_path):
+    """Searching for a non-existent name should return empty."""
+    database = Database(db_path)
+    database.write_batch(
+        "pfaf",
+        [
+            DatabasePlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                }
+            ),
+        ],
+    )
+    result = list(database.search("nonexistent", 0.5))
+    assert result == []
+
+
+def test_database_lookup_empty(db_path):
+    """Lookup with empty names should return empty."""
+    database = Database(db_path)
+    result = list(database.lookup([], 1.0))
+    assert result == []
+
+
+def test_database_weight_preserved(db_path):
+    """Weight should be preserved through write and read."""
+    database = Database(db_path)
+    database.write_batch(
+        "pfaf",
+        [
+            DatabasePlant({"scientific name": "test"}, weight=2.5),
+        ],
+    )
+    result = list(database.iterate())
+    assert result[0].weight == 2.5
