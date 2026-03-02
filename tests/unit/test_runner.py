@@ -4,34 +4,33 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.database import DatabasePlant
+from permaculture.database import Database, DatabasePlant
 from permaculture.runner import Runner
-from permaculture.sink import SQLiteSink
 
 
 @pytest.fixture
-def sink(tmp_path):
-    """Create a SQLiteSink backed by a temporary database."""
-    s = SQLiteSink(tmp_path / "test.db")
-    s.initialize()
-    return s
+def database(tmp_path):
+    """Create a Database backed by a temporary file."""
+    db = Database(tmp_path / "test.db")
+    db.initialize()
+    return db
 
 
-def test_runner_ingest_single_source(sink):
+def test_runner_ingest_single_source(database):
     """Running with a single source should write all records."""
     records = [
         DatabasePlant({"scientific name": "symphytum officinale"}),
         DatabasePlant({"scientific name": "achillea millefolium"}),
     ]
     source = Mock(fetch_all=Mock(return_value=iter(records)))
-    runner = Runner(sources={"test": source}, sink=sink)
+    runner = Runner(sources={"test": source}, database=database)
     runner.run()
 
-    result = sink.read_all()
+    result = list(database.iterate())
     assert len(result) == 2
 
 
-def test_runner_ingest_multiple_sources(sink):
+def test_runner_ingest_multiple_sources(database):
     """Running with multiple sources should write all records."""
     source_a = Mock(
         fetch_all=Mock(
@@ -53,39 +52,39 @@ def test_runner_ingest_multiple_sources(sink):
     )
     runner = Runner(
         sources={"a": source_a, "b": source_b},
-        sink=sink,
+        database=database,
     )
     runner.run()
 
-    result = sink.read_all()
+    result = list(database.iterate())
     assert len(result) == 2
 
 
 def test_runner_batching(tmp_path):
     """Records should be written in batches of the configured size."""
-    mock_sink = Mock()
+    mock_database = Mock()
     records = [
         DatabasePlant({"scientific name": f"plant-{i}"}) for i in range(5)
     ]
     source = Mock(fetch_all=Mock(return_value=iter(records)))
     runner = Runner(
         sources={"test": source},
-        sink=mock_sink,
+        database=mock_database,
         batch_size=2,
     )
     runner.run()
 
     total_written = sum(
-        len(call.args[1]) for call in mock_sink.write_batch.call_args_list
+        len(call.args[1]) for call in mock_database.write_batch.call_args_list
     )
     assert total_written == 5
-    for call in mock_sink.write_batch.call_args_list:
+    for call in mock_database.write_batch.call_args_list:
         assert len(call.args[1]) <= 2
 
 
 def test_runner_retries_on_failure(tmp_path):
     """Runner should retry a source that fails."""
-    mock_sink = Mock()
+    mock_database = Mock()
     source = Mock(
         fetch_all=Mock(
             side_effect=[
@@ -100,7 +99,7 @@ def test_runner_retries_on_failure(tmp_path):
     )
     runner = Runner(
         sources={"test": source},
-        sink=mock_sink,
+        database=mock_database,
         backoff_base=0.01,
     )
     runner.run()
@@ -108,11 +107,11 @@ def test_runner_retries_on_failure(tmp_path):
     assert source.fetch_all.call_count == 2
 
 
-def test_runner_empty_source(sink):
+def test_runner_empty_source(database):
     """Running with an empty source should succeed without errors."""
     source = Mock(fetch_all=Mock(return_value=iter([])))
-    runner = Runner(sources={"test": source}, sink=sink)
+    runner = Runner(sources={"test": source}, database=database)
     runner.run()
 
-    result = sink.read_all()
+    result = list(database.iterate())
     assert result == []

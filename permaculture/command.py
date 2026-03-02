@@ -14,7 +14,7 @@ from permaculture.data import (
     flatten,
     unflatten,
 )
-from permaculture.database import Databases
+from permaculture.database import Database, Databases
 from permaculture.ingestor import Ingestors
 from permaculture.logger import (
     LoggerHandlerAction,
@@ -24,7 +24,6 @@ from permaculture.logger import (
 from permaculture.nlp import score_type
 from permaculture.runner import Runner
 from permaculture.serializer import SerializerAction
-from permaculture.sink import SQLiteSink
 from permaculture.storage import StorageAction
 
 logger = logging.getLogger(__name__)
@@ -200,10 +199,10 @@ def main(argv=None):
         case "ingest":
             ingestors = Ingestors.load(config)
             db_path = Path(config.storage.base_dir) / "permaculture.db"
-            sink = SQLiteSink(db_path)
+            database = Database(db_path)
             runner = Runner(
                 sources=dict(ingestors),
-                sink=sink,
+                database=database,
                 max_concurrency=args.concurrency,
                 max_retries=args.retries,
             )
