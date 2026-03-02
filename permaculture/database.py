@@ -1,7 +1,6 @@
 """Database utilities."""
 
 import json
-import re
 import sqlite3
 from collections.abc import Iterator, Mapping
 from itertools import groupby, starmap
@@ -58,6 +57,18 @@ class Database:
 
     db_path: Path = field(converter=Path)
 
+    @classmethod
+    def load(cls, config):
+        """Load a database from the config storage directory.
+
+        Returns None if the database file does not exist.
+        """
+        db_path = Path(config.storage.base_dir) / "permaculture.db"
+        if not db_path.exists():
+            return None
+
+        return cls(db_path)
+
     def _connect(self):
         return sqlite3.connect(self.db_path)
 
@@ -113,122 +124,102 @@ class Database:
                     [(pid, n) for n in record.common_names],
                 )
 
-    def iterate(self) -> Iterator[DatabasePlant]:
-        """Iterate over all plants."""
+    def sources(self, include=None) -> list[str]:
+        """Return the distinct source names in the database.
+
+        :param include: Optional regex to filter sources.
+        """
         with self._connect() as conn:
-            for data, weight in conn.execute(
-                "SELECT data, weight FROM plants"
+            all_sources = [
+                row[0]
+                for row in conn.execute("SELECT DISTINCT source FROM plants")
+            ]
+
+        if include is None:
+            return all_sources
+
+        return [s for s in all_sources if include.match(s)]
+
+    def iterate(self) -> Iterator[DatabasePlant]:
+        """Iterate over all plants, merging across sources."""
+        return _merge_all(
+            plant.with_database(source)
+            for source, plant in self._iterate_raw()
+        )
+
+    def _iterate_raw(self):
+        """Yield (source, plant) pairs for all rows."""
+        with self._connect() as conn:
+            for source, data, weight in conn.execute(
+                "SELECT source, data, weight FROM plants"
             ):
-                yield DatabasePlant(json.loads(data), weight)
+                yield source, DatabasePlant(json.loads(data), weight)
 
     def lookup(
         self, names: list[str], score: float
     ) -> Iterator[DatabasePlant]:
-        """Lookup characteristics by scientific names."""
+        """Lookup characteristics by scientific names, merging across sources."""
         if not names:
             return
 
         with self._connect() as conn:
             placeholders = ",".join("?" * len(names))
-            for data, weight in conn.execute(
-                "SELECT data, weight FROM plants"  # noqa: S608
+            rows = conn.execute(
+                "SELECT source, data, weight FROM plants"  # noqa: S608
                 f" WHERE scientific_name IN ({placeholders})",
                 names,
-            ):
-                yield DatabasePlant(json.loads(data), weight)
+            )
+            yield from _merge_all(
+                DatabasePlant(json.loads(data), weight).with_database(src)
+                for src, data, weight in rows
+            )
 
     def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
-        """Search for the scientific name by common name."""
+        """Search for the scientific name by common name, merging across sources."""
         with self._connect() as conn:
             rows = conn.execute(
-                "SELECT DISTINCT p.data, p.weight"
+                "SELECT DISTINCT p.source, p.data, p.weight"
                 " FROM common_names cn"
                 " JOIN plants p ON cn.plant_id = p.id"
                 " WHERE cn.name LIKE ?",
                 (f"%{name}%",),
             )
-            for data, weight in rows:
-                plant = DatabasePlant(json.loads(data), weight)
-                if self._extract(name, plant.names) >= score:
-                    yield plant
+            yield from _merge_all(
+                plant.with_database(src)
+                for src, data, weight in rows
+                if self._extract(
+                    name,
+                    (plant := DatabasePlant(json.loads(data), weight)).names,
+                )
+                >= score
+            )
 
 
-class Databases(dict):
-    @classmethod
-    def load(cls, config=None, registry=None):
-        """Load databases from a local SQLite sink.
+def _merge_all(
+    plants: Iterator[DatabasePlant],
+) -> Iterator[DatabasePlant]:
+    """Group plants by scientific name, merging numbers and strings."""
+    keyfunc = attrgetter("scientific_name")
+    return (
+        _merge(p) for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
+    )
 
-        Each database entry points to a Database backed by the same
-        SQLite file, filtered by source name.
-        """
-        db_path = Path(config.storage.base_dir) / "permaculture.db"
-        if not db_path.exists():
-            return cls({})
 
-        include = re.compile("|".join(config.databases), re.I)
+def _merge(plants: Iterator[DatabasePlant]) -> DatabasePlant:
+    """Merge plants with the same scientific name using weighted resolution."""
+    plants = list(plants)
 
-        with sqlite3.connect(db_path) as conn:
-            sources = [
-                row[0]
-                for row in conn.execute("SELECT DISTINCT source FROM plants")
-            ]
+    def resolve(key, values):
+        weights = [p.weight for p in plants if key in p]
+        if isinstance(values[0], float | int):
+            value = sum(starmap(mul, zip(weights, values, strict=True))) / sum(
+                weights
+            )
+        else:
+            _, value = max(zip(weights, values, strict=True))
 
-        databases = {
-            source: Database(db_path)
-            for source in sources
-            if include.match(source)
-        }
+        return value
 
-        return cls(databases)
-
-    def iterate(self) -> Iterator[DatabasePlant]:
-        """Iterate over plants."""
-        return self.merge_all(
-            plant.with_database(database_name)
-            for database_name, database in self.items()
-            for plant in database.iterate()
-        )
-
-    def lookup(self, names: str, score=1.0) -> Iterator[DatabasePlant]:
-        """Lookup characteristics by scientific names in all databases."""
-        return self.merge_all(
-            plant.with_database(database_name)
-            for database_name, database in self.items()
-            for plant in database.lookup(names, score)
-        )
-
-    def search(self, name: str, score=0.5) -> Iterator[DatabasePlant]:
-        """Search for the scientific name by common name in all databases."""
-        return self.merge_all(
-            plant.with_database(database_name)
-            for database_name, database in self.items()
-            for plant in database.search(name, score)
-        )
-
-    def merge_all(
-        self, plants: Iterator[DatabasePlant]
-    ) -> Iterator[DatabasePlant]:
-        """Group plants by scientific name, merging numbers and strings."""
-        keyfunc = attrgetter("scientific_name")
-        return (
-            self.merge(p)
-            for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
-        )
-
-    def merge(self, plants: Iterator[DatabasePlant]) -> DatabasePlant:
-        """Group plants by scientific name, merging numbers and strings."""
-        plants = list(plants)
-
-        # Resolve collisions using plant weights.
-        def resolve(key, values):
-            weights = [p.weight for p in plants if key in p]
-            if isinstance(values[0], float | int):
-                value = sum(
-                    starmap(mul, zip(weights, values, strict=True))
-                ) / sum(weights)
-            else:
-                _, value = max(zip(weights, values, strict=True))
-
-            return value
-
-        return DatabasePlant(merge(plants, resolve))
+    weights = [p.weight for p in plants]
+    avg_weight = sum(weights) / len(weights) if weights else 1.0
+    return DatabasePlant(merge(plants, resolve), avg_weight)

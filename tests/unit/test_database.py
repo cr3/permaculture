@@ -7,7 +7,8 @@ import pytest
 from permaculture.database import (
     Database,
     DatabasePlant,
-    Databases,
+    _merge,
+    _merge_all,
 )
 
 
@@ -28,37 +29,41 @@ def test_database_plant_with_database(unique):
 
 
 def test_database_load_empty(tmp_path):
-    """Loading should return empty when no database exists."""
+    """Loading should return None when no database exists."""
     storage = Mock(base_dir=tmp_path)
     config = Mock(databases=[], storage=storage)
-    databases = Databases.load(config)
-    assert len(databases) == 0
+    database = Database.load(config)
+    assert database is None
 
 
-def test_database_load_all(db_path):
-    """Loading should instantiate all databases by default."""
-    database = Database(db_path)
-    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
-    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
-
+def test_database_load(db_path):
+    """Loading should return a Database when the file exists."""
     storage = Mock(base_dir=db_path.parent)
     config = Mock(databases=[], storage=storage)
-    databases = Databases.load(config)
-    assert "a" in databases
-    assert "b" in databases
+    database = Database.load(config)
+    assert database is not None
+    assert database.db_path == db_path
 
 
-def test_database_load_one(db_path):
-    """Loading can filter databases from the config."""
+def test_database_sources(db_path):
+    """Sources should list distinct source names."""
     database = Database(db_path)
     database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
     database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
 
-    storage = Mock(base_dir=db_path.parent)
-    config = Mock(databases=["a"], storage=storage)
-    databases = Databases.load(config)
-    assert "a" in databases
-    assert "b" not in databases
+    assert sorted(database.sources()) == ["a", "b"]
+
+
+def test_database_sources_filtered(db_path):
+    """Sources should filter by regex when provided."""
+    database = Database(db_path)
+    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+
+    import re
+
+    include = re.compile("a", re.I)
+    assert database.sources(include) == ["a"]
 
 
 def test_database_iterate(db_path):
@@ -110,47 +115,25 @@ def test_database_search(db_path):
     assert result[0]["scientific name"] == "symphytum officinale"
 
 
-def test_databases_iterate(unique):
-    """Iterating should iterate over all databases."""
-    a, b = unique("plant"), unique("plant")
-    databases = Databases(
-        {
-            "a": Mock(iterate=Mock(return_value=[a])),
-            "b": Mock(iterate=Mock(return_value=[b])),
-        },
-    )
-    result = list(databases.iterate())
-    assert result == [a, b]
-    assert a["database/a"]
-    assert b["database/b"]
+def test_database_iterate_merges_sources(db_path):
+    """Iterating should merge plants from multiple sources."""
+    database = Database(db_path)
+    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+
+    result = list(database.iterate())
+    assert len(result) == 2
+    names = {p.scientific_name for p in result}
+    assert names == {"x", "y"}
 
 
-def test_databases_lookup(unique):
-    """Looking up should iterate over all databases."""
-    a, b = unique("plant"), unique("plant")
-    databases = Databases(
-        {
-            "a": Mock(lookup=Mock(return_value=[a])),
-            "b": Mock(lookup=Mock(return_value=[b])),
-        },
-    )
-    result = list(databases.lookup(None))
-    assert result == [a, b]
-    assert a["database/a"]
-    assert b["database/b"]
+def test_database_iterate_tags_source(db_path):
+    """Iterating should tag each plant with its source."""
+    database = Database(db_path)
+    database.write_batch("pfaf", [DatabasePlant({"scientific name": "x"})])
 
-
-def test_databases_search(unique):
-    """Searching should iterate over all databases."""
-    a, b = unique("plant"), unique("plant")
-    databases = Databases(
-        {
-            "a": Mock(search=Mock(return_value=[a])),
-            "b": Mock(search=Mock(return_value=[b])),
-        },
-    )
-    result = list(databases.search(None))
-    assert result == [a, b]
+    result = list(database.iterate())
+    assert result[0]["database/pfaf"]
 
 
 @pytest.mark.parametrize(
@@ -178,7 +161,7 @@ def test_databases_search(unique):
 )
 def test_database_merge_all(plants, expected):
     """Merging all plants should group by scientific name."""
-    result = list(Databases({}).merge_all(plants))
+    result = list(_merge_all(plants))
     assert result == expected
 
 
@@ -208,7 +191,7 @@ def test_database_merge_all(plants, expected):
                 DatabasePlant({"scientific name": "a", "x": 1}, 2.0),
                 DatabasePlant({"scientific name": "a", "x": 4}, 1.0),
             ],
-            DatabasePlant({"scientific name": "a", "x": 2.0}),
+            DatabasePlant({"scientific name": "a", "x": 2.0}, 1.5),
             id="merge numbers",
         ),
         pytest.param(
@@ -216,14 +199,14 @@ def test_database_merge_all(plants, expected):
                 DatabasePlant({"scientific name": "a", "x": "b"}, 2.0),
                 DatabasePlant({"scientific name": "a", "x": "c"}, 1.0),
             ],
-            DatabasePlant({"scientific name": "a", "x": "b"}),
+            DatabasePlant({"scientific name": "a", "x": "b"}, 1.5),
             id="merge strings",
         ),
     ],
 )
 def test_database_merge(plants, expected):
     """Merging plants should merge numbers and strings."""
-    result = Databases({}).merge(plants)
+    result = _merge(plants)
     assert result == expected
 
 
