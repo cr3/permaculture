@@ -1,5 +1,6 @@
 """USDA Plants database."""
 
+import logging
 from functools import partial
 
 from attrs import define, field
@@ -13,6 +14,8 @@ from permaculture.priority import LocationPriority, Priority
 from permaculture.unit import fahrenheit, feet, inches
 
 USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
+
+logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -253,7 +256,10 @@ class USDAIngestor:
         return cls(model, priority)
 
     def fetch_all(self):
-        return (
-            DatabasePlant(c, self.priority.weight)
-            for c in self.model.all_characteristics()
-        )
+        count = 0
+        for c in self.model.all_characteristics():
+            count += 1
+            if count % 100 == 0:
+                logger.info("USDA: ingested %d plants", count)
+            yield DatabasePlant(c, self.priority.weight)
+        logger.info("USDA: ingested %d plants total", count)
