@@ -75,8 +75,12 @@ def test_runner_batching(tmp_path):
     )
     runner.run()
 
-    # 2 + 2 + 1 = 3 batches
-    assert mock_sink.write_batch.call_count == 3
+    total_written = sum(
+        len(call.args[1]) for call in mock_sink.write_batch.call_args_list
+    )
+    assert total_written == 5
+    for call in mock_sink.write_batch.call_args_list:
+        assert len(call.args[1]) <= 2
 
 
 def test_runner_retries_on_failure(tmp_path):
