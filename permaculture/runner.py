@@ -61,7 +61,7 @@ class Runner:
             for name, source in self.sources.items()
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        for name, result in zip(self.sources, results):
+        for name, result in zip(self.sources, results, strict=False):
             if isinstance(result, Exception):
                 logger.error(
                     "Failed ingesting %(name)s: %(error)s",
@@ -103,11 +103,6 @@ class Runner:
                     await asyncio.to_thread(
                         self._ingest_sync, name, source, queue, loop
                     )
-                    logger.info(
-                        "Finished ingesting %(name)s",
-                        {"name": name},
-                    )
-                    return
                 except Exception:
                     wait = self._backoff_seconds(attempt + 1)
                     logger.warning(
@@ -120,6 +115,12 @@ class Runner:
                         },
                     )
                     await asyncio.sleep(wait)
+                else:
+                    logger.info(
+                        "Finished ingesting %(name)s",
+                        {"name": name},
+                    )
+                    return
 
             raise RuntimeError(f"Failed ingesting {name}")
 
