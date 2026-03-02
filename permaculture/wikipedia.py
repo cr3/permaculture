@@ -1,11 +1,8 @@
 """Wikipedia API."""
 
-import re
 from collections import defaultdict
-from functools import partial
 from itertools import count
 
-import pandas as pd
 from attrs import define
 from bs4 import BeautifulSoup
 
@@ -69,22 +66,3 @@ def parse_tables(text, **kwargs):
     """Parse HTML text into a list of tables."""
     soup = BeautifulSoup(text, "html.parser")
     return [parse_table(table) for table in soup.find_all("table", **kwargs)]
-
-
-def get_companion_plants(wikipedia):
-    """Get companion plants from Wikipedia and return a DataFrame."""
-    text = wikipedia.get_text("List_of_companion_plants")
-    tables = parse_tables(text, class_=lambda x: not x)
-    multi_dfs = [pd.DataFrame(t) for t in tables]
-    dfs = [
-        df[category].assign(Category=category)
-        for df in multi_dfs
-        for category in [df.columns[0][0]]
-    ]
-    df = pd.concat(dfs, ignore_index=True)
-    df["Helps"] = (
-        df["Helps"]
-        .apply(partial(re.sub, r"\[.+?\]", ""))
-        .apply(partial(re.sub, r"\W+$", ""))
-    )
-    return df

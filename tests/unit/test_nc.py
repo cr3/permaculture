@@ -1,8 +1,7 @@
 """Unit tests for the Natural Capital module."""
 
-import string
 from textwrap import dedent
-from unittest.mock import Mock, call, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from yarl import URL
@@ -70,19 +69,6 @@ def test_nc_authentication_authenticate_with_cookies(unique):
         cookie = authentication.authenticate(request)
 
     assert cookie == "test"
-
-
-def test_nc_web_view_complist():
-    """Viewing the companion list should GET with the start letter."""
-    session = Mock(get=Mock(return_value=StubRequestsResponse()))
-    NCWeb(session).view_complist("A")
-    session.get.assert_called_once_with(
-        "/plant-database/plant-companions-list",
-        params={
-            "vw": "complist",
-            "start": "A",
-        },
-    )
 
 
 def test_nc_web_view_detail():
@@ -274,130 +260,6 @@ def test_nc_model_parse_detail(text, expected):
     model = NCModel(None)
     result = model.parse_detail(text)
     assert result == expected
-
-
-@pytest.mark.parametrize(
-    "text, expected",
-    [
-        pytest.param(
-            dedent(
-                """\
-            <table width="100%">
-              <tr>
-                <td class="plantList">Plant</td>
-                <td class="plantList">Related Plant</td>
-              </tr>
-        """
-            ),
-            [],
-            id="no plants",
-        ),
-        pytest.param(
-            dedent(
-                """\
-            <table width="100%">
-              <tr>
-                <td class="plantList">Plant</td>
-                <td class="plantList">Related Plant</td>
-              </tr>
-              <tr>
-                <td>a</td>
-                <td><a href="http://example.com/?id=0"></a></td>
-              </tr>
-            </table>
-        """
-            ),
-            [
-                {
-                    "plant": "a",
-                },
-            ],
-            id="one plant, no related",
-        ),
-        pytest.param(
-            dedent(
-                """\
-            <table width="100%">
-              <tr>
-                <td class="plantList">Plant</td>
-                <td class="plantList">Related Plant</td>
-              </tr>
-              <tr>
-                <td>a</td>
-                <td><a href="http://example.com/?id=1">b</a></td>
-              </tr>
-            </table>
-        """
-            ),
-            [
-                {
-                    "plant": "a",
-                    "related": NCLink("b", "http://example.com/?id=1"),
-                },
-            ],
-            id="one plant, one related",
-        ),
-        pytest.param(
-            dedent(
-                """\
-            <table width="100%">
-              <tr>
-                <td class="plantList">Plant</td>
-                <td class="plantList">Related Plant</td>
-              </tr>
-              <tr>
-                <td>a</td>
-                <td><a href="http://example.com/?id=1">b</a></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td><a href="http://example.com/?id=2">c</a></td>
-              </tr>
-            </table>
-        """
-            ),
-            [
-                {
-                    "plant": "a",
-                    "related": NCLink("b", "http://example.com/?id=1"),
-                },
-                {
-                    "plant": "a",
-                    "related": NCLink("c", "http://example.com/?id=2"),
-                },
-            ],
-            id="one plant, two related",
-        ),
-    ],
-)
-def test_nc_model_get_plant_companions(text, expected):
-    """Getting plant companions should return the expected plants."""
-    with patch.object(NCWeb, "view_complist") as mock_complist:
-        mock_complist.return_value = text
-        web = NCWeb(None)
-        model = NCModel(web)
-        companions = list(model.get_plant_companions(None))
-
-        assert companions == expected
-
-
-def test_nc_model_get_all_plant_companions():
-    """Getting all plant companions should call each letter."""
-    with patch.object(NCWeb, "view_complist") as mock_complist:
-        mock_complist.return_value = dedent(
-            """\
-            <table width="100%">
-              <tr></tr>
-            </table>
-        """
-        )
-        web = NCWeb(None)
-        model = NCModel(web)
-        list(model.get_all_plant_companions())
-
-        assert mock_complist.call_args_list == [
-            call(letter) for letter in string.ascii_uppercase
-        ]
 
 
 @pytest.mark.parametrize(

@@ -2,7 +2,6 @@
 
 import logging
 import re
-import string
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
@@ -80,17 +79,6 @@ class NCAdapter(HTTPCacheAdapter):
 @define(frozen=True)
 class NCWeb:
     session: HTTPSession = field(factory=partial(HTTPSession, NC_ORIGIN))
-
-    def view_complist(self, start):
-        """View companion list."""
-        response = self.session.get(
-            "/plant-database/plant-companions-list",
-            params={
-                "vw": "complist",
-                "start": start,
-            },
-        )
-        return response.text
 
     def view_detail(self, Id):
         """View plant detail."""
@@ -222,25 +210,6 @@ class NCModel:
         for table in tables:
             if table.find("td", attrs={"class": "plantList"}):
                 yield from self.parse_table(table)
-
-    def get_plant_companions(self, letter):
-        """Get plant companions for a single letter."""
-        last_plant = None
-        for plant in self.parse_plant_list(self.web.view_complist(letter)):
-            if not plant["Plant"]:
-                plant["Plant"] = last_plant["Plant"]
-            else:
-                last_plant = plant
-
-            if not plant["Related Plant"].Id:
-                plant["Related Plant"] = None
-
-            yield self.converter.convert(plant)
-
-    def get_all_plant_companions(self):
-        """Get plant companions for all letters."""
-        for letter in string.ascii_uppercase:
-            yield from self.get_plant_companions(letter)
 
     def parse_items(self, table):
         """Parse the items total inside a bold tag."""
