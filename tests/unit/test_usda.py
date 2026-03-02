@@ -5,20 +5,20 @@ from unittest.mock import ANY, Mock
 import pytest
 
 from permaculture.database import DatabasePlant
-from permaculture.usda.plants import (
-    PlantsConverter,
-    PlantsIngestor,
-    PlantsModel,
-    PlantsWeb,
+from permaculture.usda import (
+    USDAConverter,
+    USDAIngestor,
+    USDAModel,
+    USDAWeb,
 )
 
-from ..stubs import StubRequestsResponse
+from .stubs import StubRequestsResponse
 
 
 def test_plants_web_characteristics_search():
     """CharacteristicsSearch should POST a JSON payload."""
     session = Mock(post=Mock(return_value=StubRequestsResponse()))
-    PlantsWeb(session).characteristics_search()
+    USDAWeb(session).characteristics_search()
     session.post.assert_called_once_with(
         "/api/CharacteristicsSearch",
         json=ANY,
@@ -28,7 +28,7 @@ def test_plants_web_characteristics_search():
 def test_plants_web_plant_profile():
     """PlantProfile should GET with the symbol query param."""
     session = Mock(get=Mock(return_value=StubRequestsResponse()))
-    PlantsWeb(session).plant_profile("test")
+    USDAWeb(session).plant_profile("test")
     session.get.assert_called_once_with(
         "/api/PlantProfile",
         params={"symbol": "test"},
@@ -38,7 +38,7 @@ def test_plants_web_plant_profile():
 def test_plants_web_plant_characteristics():
     """PlantCharacteristics should GET with the id in the URL."""
     session = Mock(get=Mock(return_value=StubRequestsResponse()))
-    PlantsWeb(session).plant_characteristics(1234)
+    USDAWeb(session).plant_characteristics(1234)
     session.get.assert_called_once_with("/api/PlantCharacteristics/1234")
 
 
@@ -144,7 +144,7 @@ def test_plants_web_plant_characteristics():
 )
 def test_plants_converter_convert_item(item, expected):
     """Converting an item should consider types."""
-    result = PlantsConverter().convert_item(*item)
+    result = USDAConverter().convert_item(*item)
     assert result == expected
 
 
@@ -165,7 +165,7 @@ def test_plants_model_all_characteristics(unique):
             }
         ),
     )
-    characteristics = list(PlantsModel(web).all_characteristics())
+    characteristics = list(USDAModel(web).all_characteristics())
     assert characteristics == [
         {
             "scientific name": scientific_name,
@@ -188,7 +188,7 @@ def test_plants_ingestor_fetch_all(unique):
         )
     )
 
-    ingestor = PlantsIngestor(model)
+    ingestor = USDAIngestor(model)
     elements = list(ingestor.fetch_all())
     assert elements == [
         DatabasePlant(
