@@ -316,9 +316,15 @@ class NCIngestor:
 
     def fetch_all(self):
         total = self.model.get_plant_total()
+        logger.info("NC: found %d plants total", total)
+        count = 0
         for limit_start in range(0, total, 50):
             for plant in self.model.get_plants(limit_start=limit_start):
+                count += 1
+                if count % 100 == 0:
+                    logger.info("NC: ingested %d/%d plants", count, total)
                 yield DatabasePlant(
                     self.model.get_plant(plant["plant name"].Id),
                     self.priority.weight,
                 )
+        logger.info("NC: ingested %d plants total", count)

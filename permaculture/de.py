@@ -1,5 +1,6 @@
 """Design Ecologique database."""
 
+import logging
 import re
 import string
 from csv import reader
@@ -19,6 +20,8 @@ from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import Storage, null_storage
 
 DE_ORIGIN = "https://designecologique.ca"
+
+logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -140,7 +143,11 @@ class DEIngestor:
         return cls(model, priority)
 
     def fetch_all(self):
+        count = 0
         for p in self.model.get_perenial_plants():
+            count += 1
+            if count % 100 == 0:
+                logger.info("DE: ingested %d plants", count)
             yield DatabasePlant(
                 {
                     "scientific name": f"{p.pop('genus')} {p.pop('species')}",
@@ -154,3 +161,4 @@ class DEIngestor:
                 },
                 self.priority.weight,
             )
+        logger.info("DE: ingested %d plants total", count)
