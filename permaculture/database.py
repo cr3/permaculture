@@ -73,7 +73,7 @@ class Database:
         with self._connect() as conn:
             placeholders = ",".join("?" * len(names))
             for data, weight in conn.execute(
-                "SELECT data, weight FROM plants"
+                "SELECT data, weight FROM plants"  # noqa: S608
                 f" WHERE scientific_name IN ({placeholders})",
                 names,
             ):
