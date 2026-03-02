@@ -82,29 +82,18 @@ class SQLiteSink:
         """Persist a batch of plant records."""
         with self._connect() as conn:
             for record in records:
-                sci = record.get("scientific name", "")
-                data_json = json.dumps(dict(record))
-                weight = getattr(record, "weight", 1.0)
+                data_json = json.dumps(record.data)
                 cur = conn.execute(
                     "INSERT INTO plants"
                     " (source, scientific_name, data, weight)"
                     " VALUES (?, ?, ?, ?)",
-                    (source, sci, data_json, weight),
+                    (source, record.scientific_name, data_json, record.weight),
                 )
                 pid = cur.lastrowid
-                names = [
-                    (
-                        record[k]
-                        if isinstance(record[k], str)
-                        else k.removeprefix("common name/")
-                    )
-                    for k in record
-                    if k.startswith("common name/")
-                ]
                 conn.executemany(
                     "INSERT INTO common_names (plant_id, name)"
                     " VALUES (?, ?)",
-                    [(pid, n) for n in names],
+                    [(pid, n) for n in record.common_names],
                 )
 
     def read_all(self):
