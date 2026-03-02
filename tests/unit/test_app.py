@@ -5,16 +5,15 @@ from fastapi.testclient import TestClient
 
 from permaculture.app import app, state
 from permaculture.database import Database, DatabasePlant
-from permaculture.sink import SQLiteSink
 
 
 @pytest.fixture
 def client(tmp_path):
     """Create a test client backed by a temporary database."""
     db_path = tmp_path / "permaculture.db"
-    sink = SQLiteSink(db_path)
-    sink.initialize()
-    sink.write_batch(
+    database = Database(db_path)
+    database.initialize()
+    database.write_batch(
         "test",
         [
             DatabasePlant(
