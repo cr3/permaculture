@@ -6,7 +6,7 @@ import pytest
 
 from permaculture.de import (
     DEConverter,
-    DEDatabase,
+    DEIngestor,
     DEModel,
     DEWeb,
 )
@@ -337,8 +337,8 @@ def test_de_model_get_perenial_plants():
     ]
 
 
-def test_de_database_iterate():
-    """Iterating over the database should return a list of elements."""
+def test_de_ingestor_fetch_all():
+    """Fetching all should return a list of elements."""
     model = Mock(
         get_perenial_plants=Mock(
             return_value=[
@@ -352,8 +352,8 @@ def test_de_database_iterate():
         )
     )
 
-    database = DEDatabase(model)
-    elements = list(database.iterate())
+    ingestor = DEIngestor(model)
+    elements = list(ingestor.fetch_all())
     assert elements == [
         {
             "scientific name": "a b",
