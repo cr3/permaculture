@@ -13,11 +13,16 @@ class Locales:
     translations: gettext.GNUTranslations = field()
 
     @classmethod
-    def from_domain(cls, domain: str, locales_dir: Path = LOCALES_DIR):
+    def from_domain(
+        cls,
+        domain: str,
+        locales_dir: Path = LOCALES_DIR,
+        language: str = "en",
+    ):
         translations = gettext.translation(
             domain,
             localedir=locales_dir,
-            languages=["en"],
+            languages=[language],
         )
         return cls(translations)
 

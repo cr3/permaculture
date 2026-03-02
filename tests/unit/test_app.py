@@ -3,8 +3,9 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from permaculture.app import app, state
+from permaculture.app import app, group_characteristics, state, translate_keys
 from permaculture.database import Database, DatabasePlant
+from permaculture.locales import Locales
 
 
 @pytest.fixture
@@ -117,3 +118,54 @@ def test_lookup_no_database():
     response = client.get("/api/plants/test")
     assert response.status_code == 200
     assert response.json() == {}
+
+
+def test_translate_keys_flat():
+    """Translate keys should translate top-level keys."""
+    locales = Locales.from_domain("display", language="fr")
+    data = {"scientific name": "test", "height": 1.2}
+    result = translate_keys(data, locales)
+    assert result == {"nom scientifique": "test", "hauteur": 1.2}
+
+
+def test_translate_keys_nested():
+    """Translate keys should recurse into nested dicts."""
+    locales = Locales.from_domain("display", language="fr")
+    data = {"height": {"max": 1.2}}
+    result = translate_keys(data, locales)
+    assert result == {"hauteur": {"max": 1.2}}
+
+
+def test_translate_keys_passthrough():
+    """Untranslated keys should pass through unchanged."""
+    locales = Locales.from_domain("display", language="fr")
+    data = {"unknown key": 42}
+    result = translate_keys(data, locales)
+    assert result == {"unknown key": 42}
+
+
+def test_lookup_french(client):
+    """Lookup with French Accept-Language should translate keys."""
+    response = client.get(
+        "/api/plants/symphytum officinale",
+        headers={"Accept-Language": "fr-CA,fr;q=0.9,en;q=0.8"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["nom scientifique"] == "symphytum officinale"
+    assert data["nom commun"] == ["comfrey"]
+    assert data["hauteur"] == {"max": 1.2}
+
+
+def test_group_characteristics_bool_subkeys():
+    """Boolean sub-keys should be grouped into a sorted list."""
+    data = {"sun/partial": True, "sun/full": True}
+    result = group_characteristics(data)
+    assert result == {"sun": ["full", "partial"]}
+
+
+def test_group_characteristics_mixed_subkeys():
+    """Non-boolean sub-keys should remain as dicts."""
+    data = {"height/max": 1.2, "height/min": 0.5}
+    result = group_characteristics(data)
+    assert result == {"height": {"max": 1.2, "min": 0.5}}

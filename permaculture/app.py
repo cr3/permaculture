@@ -6,11 +6,12 @@ from pathlib import Path
 
 from appdirs import user_cache_dir
 from attrs import define, field
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Header, Query
 from fastapi.responses import HTMLResponse
 
 from permaculture.data import unflatten
 from permaculture.database import Database
+from permaculture.locales import Locales
 
 
 def group_characteristics(data):
@@ -31,6 +32,21 @@ def group_characteristics(data):
             else value
         )
         for key, value in nested.items()
+    }
+
+
+def translate_keys(data, locales):
+    """Recursively translate dictionary keys using locales."""
+    if not isinstance(data, dict):
+        return data
+
+    return {
+        locales.translate(key): (
+            translate_keys(value, locales)
+            if isinstance(value, dict)
+            else value
+        )
+        for key, value in data.items()
     }
 
 
@@ -80,7 +96,10 @@ def suggest(
 
 
 @app.get("/api/plants/{scientific_name}")
-def get_plant(scientific_name: str):
+def get_plant(
+    scientific_name: str,
+    accept_language: str = Header(default="en"),
+):
     """Return full characteristics for a scientific name."""
     if state.database is None:
         return {}
@@ -89,4 +108,7 @@ def get_plant(scientific_name: str):
     if not plants:
         return {}
 
-    return group_characteristics(dict(plants[0].items()))
+    lang = accept_language.split(",")[0].split("-")[0].strip()
+    locales = Locales.from_domain("display", language=lang)
+    data = group_characteristics(dict(plants[0].items()))
+    return translate_keys(data, locales)

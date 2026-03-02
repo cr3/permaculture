@@ -146,7 +146,9 @@ function esc(s) {
 async function select(name) {
   close();
   input.value = name;
-  const res = await fetch('/api/plants/' + encodeURIComponent(name));
+  const res = await fetch('/api/plants/' + encodeURIComponent(name), {
+    headers: {'Accept-Language': navigator.language || 'en'}
+  });
   const data = await res.json();
   showDetail(name, data);
 }
