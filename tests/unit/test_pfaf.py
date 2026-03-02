@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from permaculture.database import DatabasePlant
 from permaculture.pfaf import (
     PFAFConverter,
     PFAFFile,
@@ -144,8 +145,10 @@ def test_pfaf_ingestor_fetch_all():
     ingestor = PFAFIngestor(model)
     elements = list(ingestor.fetch_all())
     assert elements == [
-        {
-            "scientific name": "a",
-            "common name": "b",
-        },
+        DatabasePlant(
+            {
+                "scientific name": "a",
+                "common name": "b",
+            }
+        ),
     ]
