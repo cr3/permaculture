@@ -9,7 +9,6 @@ Subpackages
 
    permaculture.locales
    permaculture.testing
-   permaculture.usda
 
 Submodules
 ----------
@@ -74,6 +73,14 @@ permaculture.http module
 ------------------------
 
 .. automodule:: permaculture.http
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.ingestor module
+----------------------------
+
+.. automodule:: permaculture.ingestor
    :members:
    :undoc-members:
    :show-inheritance:
@@ -150,6 +157,22 @@ permaculture.registry module
    :undoc-members:
    :show-inheritance:
 
+permaculture.runner module
+--------------------------
+
+.. automodule:: permaculture.runner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.sdp module
+-----------------------
+
+.. automodule:: permaculture.sdp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.serializer module
 ------------------------------
 
@@ -170,6 +193,14 @@ permaculture.unit module
 ------------------------
 
 .. automodule:: permaculture.unit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.usda module
+------------------------
+
+.. automodule:: permaculture.usda
    :members:
    :undoc-members:
    :show-inheritance:
