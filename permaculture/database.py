@@ -103,6 +103,34 @@ class Database:
                 if self._extract(name, plant.names) >= score:
                     yield plant
 
+    def suggest(self, prefix: str, limit: int = 10) -> list[dict]:
+        """Return typeahead suggestions matching a prefix.
+
+        Searches both scientific names and common names, returning
+        a list of {scientific_name, common_names, match} dicts.
+        """
+        pattern = f"%{prefix}%"
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT DISTINCT p.scientific_name, p.data"
+                " FROM plants p"
+                " LEFT JOIN common_names cn ON cn.plant_id = p.id"
+                " WHERE p.scientific_name LIKE ?"
+                " OR cn.name LIKE ?"
+                " LIMIT ?",
+                (pattern, pattern, limit),
+            )
+            results = []
+            for scientific_name, data in rows:
+                plant = DatabasePlant(json.loads(data))
+                results.append(
+                    {
+                        "scientific_name": scientific_name,
+                        "common_names": plant.common_names,
+                    }
+                )
+            return results
+
 
 class Databases(dict):
     @classmethod

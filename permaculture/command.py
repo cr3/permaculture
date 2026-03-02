@@ -115,6 +115,21 @@ def make_args_parser():
         type=score_type,
         help="cutoff score (default %(default)s for partial match)",
     )
+    serve = command.add_parser(
+        "serve",
+        help="start the web UI for plant search",
+    )
+    serve.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="bind address (default %(default)s)",
+    )
+    serve.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="bind port (default %(default)s)",
+    )
     store = command.add_parser(
         "store",
         help="store a file for a storage key",
@@ -239,6 +254,21 @@ def main(argv=None):
                 {plant.scientific_name: plant.common_names}
                 for plant in databases.search(args.name, args.score)
             ]
+        case "serve":
+            import uvicorn
+
+            from permaculture.app import state
+            from permaculture.database import Database
+
+            db_path = Path(config.storage.base_dir) / "permaculture.db"
+            if db_path.exists():
+                state.database = Database(db_path)
+            uvicorn.run(
+                "permaculture.app:app",
+                host=args.host,
+                port=args.port,
+            )
+            return
         case "store":
             storage = evolve(
                 config.storage,
