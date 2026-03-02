@@ -7,7 +7,7 @@ import xlrd
 from attrs import define, field
 
 from permaculture.converter import Converter
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import DatabasePlant
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import FileStorage
@@ -91,19 +91,19 @@ class PFAFModel:
 
 
 @define(frozen=True)
-class PFAFDatabase(Database):
+class PFAFIngestor:
     model: PFAFModel
     priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate PFAFDatabase from config."""
+        """Instantiate PFAFIngestor from config."""
         model = PFAFModel.from_storage(config.storage)
         priority = LocationPriority("United Kingdom").with_cache(
             config.storage
         )
         return cls(model, priority)
 
-    def iterate(self):
+    def fetch_all(self):
         for p in self.model.all_plants():
             yield DatabasePlant(p, self.priority.weight)
