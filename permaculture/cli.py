@@ -14,7 +14,7 @@ from permaculture.data import (
     flatten,
     unflatten,
 )
-from permaculture.database import Database
+from permaculture.database import Database, DatabaseNotFoundError
 from permaculture.ingestor import Ingestors
 from permaculture.logger import (
     LoggerHandlerAction,
@@ -190,6 +190,77 @@ def make_config_parser(config_files):
     return config
 
 
+def command_ingest(args, config):
+    """Ingest plant data into local database."""
+    ingestors = Ingestors.load(config).select(args.ingestors)
+    db = Database.from_config(config)
+    Runner(
+        sources=dict(ingestors),
+        database=db,
+        max_concurrency=args.concurrency,
+        max_retries=args.retries,
+    ).run()
+
+
+def command_iterate(database):
+    """Iterate over all scientific names."""
+    return [plant.scientific_name for plant in database.iterate()]
+
+
+def command_list(database):
+    """List available databases."""
+    return database.sources()
+
+
+def command_lookup(args, config, database):
+    """Lookup characteristics by scientific name."""
+    content_type = config.serializer.default_content_type
+    exclude = re.compile("|".join(args.excludes), re.I)
+    include = re.compile("|".join(args.includes), re.I)
+    f = flatten if content_type == "text/csv" else unflatten
+    if args.file:
+        names = [
+            name
+            for file in args.names
+            for name in Path(file).read_text().splitlines()
+        ]
+    else:
+        names = args.names
+    return [
+        {
+            k: v
+            for k, v in f(plant).items()
+            if include.match(k) and not exclude.match(k)
+        }
+        for plant in database.lookup(names, args.score)
+    ]
+
+
+def command_search(args, database):
+    """Search for the scientific name by common name."""
+    return [
+        {plant.scientific_name: plant.common_names}
+        for plant in database.search(args.name, args.score)
+    ]
+
+
+def command_store(args, config):
+    """Store a file for a storage key."""
+    storage = evolve(
+        config.storage,
+        serializer="application/octet-stream",
+    )
+    storage[args.key] = args.file.read()
+
+
+def load_database(config, args_parser):
+    """Load the database, exiting with an error if not found."""
+    try:
+        return Database.load(config)
+    except DatabaseNotFoundError as e:
+        args_parser.error(f"database not found: {e}")
+
+
 def main(argv=None):
     """Entry point to the permaculture command."""
     config_parser = make_config_parser(["~/.permaculture", ".permaculture"])
@@ -199,84 +270,31 @@ def main(argv=None):
     config = config_parser.parse_args(remaining)
 
     setup_logger(config.log_level, config.log_file, name="permaculture")
-    database = Database.load(config)
 
     match args.command:
         case "help":
             config_parser.print_help()
             sys.exit(0)
         case "ingest":
-            ingestors = Ingestors.load(config)
-            if args.ingestors:
-                unknown = set(args.ingestors) - ingestors.keys()
-                if unknown:
-                    args_parser.error(
-                        f"unknown ingestor(s): {', '.join(sorted(unknown))}"
-                        f" (available: {', '.join(sorted(ingestors))})"
-                    )
-                ingestors = {
-                    k: v
-                    for k, v in ingestors.items()
-                    if k in args.ingestors
-                }
-            db_path = Path(config.storage.base_dir) / "permaculture.db"
-            db = Database(db_path)
-            runner = Runner(
-                sources=dict(ingestors),
-                database=db,
-                max_concurrency=args.concurrency,
-                max_retries=args.retries,
-            )
-            runner.run()
+            try:
+                command_ingest(args, config)
+            except ValueError as e:
+                args_parser.error(str(e))
             return
         case "iterate":
-            data = (
-                [plant.scientific_name for plant in database.iterate()]
-                if database
-                else []
-            )
+            database = load_database(config, args_parser)
+            data = command_iterate(database)
         case "list":
-            data = database.sources() if database else []
+            database = load_database(config, args_parser)
+            data = command_list(database)
         case "lookup":
-            content_type = config.serializer.default_content_type
-            exclude = re.compile("|".join(args.excludes), re.I)
-            include = re.compile("|".join(args.includes), re.I)
-            f = flatten if content_type == "text/csv" else unflatten
-            if args.file:
-                names = [
-                    name
-                    for file in args.names
-                    for name in Path(file).read_text().splitlines()
-                ]
-            else:
-                names = args.names
-            data = (
-                [
-                    {
-                        k: v
-                        for k, v in f(plant).items()
-                        if include.match(k) and not exclude.match(k)
-                    }
-                    for plant in database.lookup(names, args.score)
-                ]
-                if database
-                else []
-            )
+            database = load_database(config, args_parser)
+            data = command_lookup(args, config, database)
         case "search":
-            data = (
-                [
-                    {plant.scientific_name: plant.common_names}
-                    for plant in database.search(args.name, args.score)
-                ]
-                if database
-                else []
-            )
+            database = load_database(config, args_parser)
+            data = command_search(args, database)
         case "store":
-            storage = evolve(
-                config.storage,
-                serializer="application/octet-stream",
-            )
-            storage[args.key] = args.file.read()
+            command_store(args, config)
             return
         case command:
             args_parser.error(f"Programming error for command: {command}")

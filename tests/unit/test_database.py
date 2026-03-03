@@ -6,6 +6,7 @@ import pytest
 
 from permaculture.database import (
     Database,
+    DatabaseNotFoundError,
     DatabasePlant,
     _merge,
     _merge_all,
@@ -29,11 +30,11 @@ def test_database_plant_with_database(unique):
 
 
 def test_database_load_empty(tmp_path):
-    """Loading should return None when no database exists."""
+    """Loading should raise when no database exists."""
     storage = Mock(base_dir=tmp_path)
     config = Mock(databases=[], storage=storage)
-    database = Database.load(config)
-    assert database is None
+    with pytest.raises(DatabaseNotFoundError):
+        Database.load(config)
 
 
 def test_database_load(db_path):

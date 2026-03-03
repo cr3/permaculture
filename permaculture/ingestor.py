@@ -35,3 +35,21 @@ class Ingestors(dict):
         }
 
         return cls(ingestors)
+
+    def select(self, names):
+        """Select ingestors by name.
+
+        Returns all ingestors when names is empty.
+        Raises ValueError on unknown names.
+        """
+        if not names:
+            return self
+
+        unknown = set(names) - self.keys()
+        if unknown:
+            raise ValueError(
+                f"unknown ingestor(s): {', '.join(sorted(unknown))}"
+                f" (available: {', '.join(sorted(self))})"
+            )
+
+        return type(self)({k: v for k, v in self.items() if k in names})
