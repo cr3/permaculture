@@ -561,7 +561,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "appdirs", specifier = ">=1.4.4,<2.0.0" },
-    { name = "attrs", specifier = ">=23.1.0,<24.0.0" },
+    { name = "attrs", specifier = ">=23.1.0" },
     { name = "beautifulsoup4", specifier = ">=4.12.2,<5.0.0" },
     { name = "configargparse", specifier = ">=1.7,<2.0" },
     { name = "coverage", marker = "extra == 'test'", specifier = ">=7.2.3,<8.0.0" },
