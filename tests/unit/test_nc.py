@@ -10,12 +10,54 @@ from permaculture.nc import (
     NCAuthentication,
     NCAuthenticationError,
     NCConverter,
+    NCIngestor,
     NCLink,
     NCModel,
     NCWeb,
 )
 
 from .stubs import StubRequestsPreparedRequest, StubRequestsResponse
+
+
+def test_nc_ingestor_from_config_password_file(tmpdir, unique):
+    """Instantiating from config should read password from file."""
+    password = unique("password")
+    password_file = tmpdir / "secret"
+    password_file.write_text(password, encoding="utf8")
+    config = Mock(
+        nc_username=unique("text"),
+        nc_password=None,
+        nc_password_file=str(password_file),
+        storage=None,
+    )
+    with patch.object(NCModel, "with_authentication") as mock_auth:
+        mock_auth.return_value = NCModel()
+        NCIngestor.from_config(config)
+        mock_auth.assert_called_once_with(
+            config.nc_username,
+            password,
+            config.storage,
+        )
+
+
+def test_nc_ingestor_from_config_password(unique):
+    """Instantiating from config should use password when no file."""
+    password = unique("password")
+    config = Mock(
+        nc_username=unique("text"),
+        nc_password=password,
+        nc_password_file=None,
+        storage=None,
+    )
+    with patch.object(NCModel, "with_authentication") as mock_auth:
+        mock_auth.return_value = NCModel()
+        NCIngestor.from_config(config)
+        mock_auth.assert_called_once_with(
+            config.nc_username,
+            password,
+            config.storage,
+        )
+
 
 
 def test_nc_authentication_get_payload(unique):
