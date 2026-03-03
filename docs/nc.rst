@@ -15,4 +15,12 @@ home directory:
 Where ``<my username>``  and ``<my password>`` should be replaced with
 your actual username and password.
 
+Alternatively, you can provide the password via a file, which is useful
+for `Docker secrets`_:
+
+.. code-block:: text
+
+    nc-password-file: /run/secrets/nc_password
+
 .. _Natural Capital: https://permacultureplantdata.com/
+.. _Docker secrets: https://docs.docker.com/engine/swarm/secrets/

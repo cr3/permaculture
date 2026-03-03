@@ -99,12 +99,9 @@ class Database:
             """
             )
             conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_sci"
-                " ON plants(scientific_name)"
+                "CREATE INDEX IF NOT EXISTS idx_sci" " ON plants(scientific_name)"
             )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_cn" " ON common_names(name)"
-            )
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_cn" " ON common_names(name)")
 
     def write_batch(self, source, records):
         """Persist a batch of plant records."""
@@ -119,8 +116,7 @@ class Database:
                 )
                 pid = cur.lastrowid
                 conn.executemany(
-                    "INSERT INTO common_names (plant_id, name)"
-                    " VALUES (?, ?)",
+                    "INSERT INTO common_names (plant_id, name)" " VALUES (?, ?)",
                     [(pid, n) for n in record.common_names],
                 )
 
@@ -131,8 +127,7 @@ class Database:
         """
         with self._connect() as conn:
             all_sources = [
-                row[0]
-                for row in conn.execute("SELECT DISTINCT source FROM plants")
+                row[0] for row in conn.execute("SELECT DISTINCT source FROM plants")
             ]
 
         if include is None:
@@ -143,8 +138,7 @@ class Database:
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over all plants, merging across sources."""
         return _merge_all(
-            plant.with_database(source)
-            for source, plant in self._iterate_raw()
+            plant.with_database(source) for source, plant in self._iterate_raw()
         )
 
     def _iterate_raw(self):
@@ -155,9 +149,7 @@ class Database:
             ):
                 yield source, DatabasePlant(json.loads(data), weight)
 
-    def lookup(
-        self, names: list[str], score: float
-    ) -> Iterator[DatabasePlant]:
+    def lookup(self, names: list[str], score: float) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names, merging across sources."""
         if not names:
             return
@@ -200,9 +192,7 @@ def _merge_all(
 ) -> Iterator[DatabasePlant]:
     """Group plants by scientific name, merging numbers and strings."""
     keyfunc = attrgetter("scientific_name")
-    return (
-        _merge(p) for _, p in groupby(sorted(plants, key=keyfunc), keyfunc)
-    )
+    return (_merge(p) for _, p in groupby(sorted(plants, key=keyfunc), keyfunc))
 
 
 def _merge(plants: Iterator[DatabasePlant]) -> DatabasePlant:
@@ -212,9 +202,7 @@ def _merge(plants: Iterator[DatabasePlant]) -> DatabasePlant:
     def resolve(key, values):
         weights = [p.weight for p in plants if key in p]
         if isinstance(values[0], float | int):
-            value = sum(starmap(mul, zip(weights, values, strict=True))) / sum(
-                weights
-            )
+            value = sum(starmap(mul, zip(weights, values, strict=True))) / sum(weights)
         else:
             _, value = max(zip(weights, values, strict=True))
 

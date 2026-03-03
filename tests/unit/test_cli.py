@@ -58,6 +58,23 @@ def test_make_config_parser_files(tmpdir):
     assert config.log_level == logging.DEBUG
 
 
+def test_make_config_parser_env(monkeypatch):
+    """Making a config parser should read PERMACULTURE_ env vars."""
+    monkeypatch.setenv("PERMACULTURE_NC_PASSWORD", "secret")
+    config_parser = make_config_parser([])
+    config = config_parser.parse_args([])
+    assert config.nc_password == "secret"  # noqa: S105
+
+
+def test_make_config_parser_nc_password_file(tmpdir):
+    """Making a config parser should accept --nc-password-file."""
+    config_parser = make_config_parser([])
+    password_file = tmpdir / "secret"
+    password_file.write_text("secret", encoding="utf8")
+    config = config_parser.parse_args([f"--nc-password-file={password_file}"])
+    assert config.nc_password_file == str(password_file)
+
+
 def test_main_store(tmpdir):
     """Storing a file should create a key under the storage directory."""
     storage = tmpdir.join("storage")
