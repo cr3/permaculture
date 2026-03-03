@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Natural Capital &mdash; permaculture 0.0.8 documentation</title>
+  <title>Natural Capital &mdash; permaculture 0.0.9 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.8
+                0.0.9
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -105,6 +105,11 @@ nc-password: &lt;my password&gt;
 </div>
 <p>Where <code class="docutils literal notranslate"><span class="pre">&lt;my</span> <span class="pre">username&gt;</span></code>  and <code class="docutils literal notranslate"><span class="pre">&lt;my</span> <span class="pre">password&gt;</span></code> should be replaced with
 your actual username and password.</p>
+<p>Alternatively, you can provide the password via a file, which is useful
+for <a class="reference external" href="https://docs.docker.com/engine/swarm/secrets/">Docker secrets</a>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>nc-password-file: /run/secrets/nc_password
+</pre></div>
+</div>
 </section>
 
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture package &mdash; permaculture 0.0.8 documentation</title>
+  <title>permaculture package &mdash; permaculture 0.0.9 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.8
+                0.0.9
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -72,10 +72,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.action.enum_action"><code class="docutils literal notranslate"><span class="pre">enum_action()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.command">permaculture.command module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.command.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.command.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.command.make_config_parser"><code class="docutils literal notranslate"><span class="pre">make_config_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.cli">permaculture.cli module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_config_parser"><code class="docutils literal notranslate"><span class="pre">make_config_parser()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.converter">permaculture.converter module</a><ul>
@@ -233,12 +233,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.usda.USDAWeb"><code class="docutils literal notranslate"><span class="pre">USDAWeb</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-permaculture.wikipedia">permaculture.wikipedia module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.Wikipedia"><code class="docutils literal notranslate"><span class="pre">Wikipedia</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.parse_table"><code class="docutils literal notranslate"><span class="pre">parse_table()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.wikipedia.parse_tables"><code class="docutils literal notranslate"><span class="pre">parse_tables()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture">Module contents</a></li>
 </ul>
 </li>
@@ -342,24 +336,24 @@
 </dd></dl>
 
 </section>
-<section id="module-permaculture.command">
-<span id="permaculture-command-module"></span><h2>permaculture.command module<a class="headerlink" href="#module-permaculture.command" title="Permalink to this heading"></a></h2>
-<p>Permaculture command.</p>
+<section id="module-permaculture.cli">
+<span id="permaculture-cli-module"></span><h2>permaculture.cli module<a class="headerlink" href="#module-permaculture.cli" title="Permalink to this heading"></a></h2>
+<p>Permaculture CLI.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="permaculture.command.main">
-<span class="sig-prename descclassname"><span class="pre">permaculture.command.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.command.main" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.cli.main">
+<span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.main" title="Permalink to this definition"></a></dt>
 <dd><p>Entry point to the permaculture command.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="permaculture.command.make_args_parser">
-<span class="sig-prename descclassname"><span class="pre">permaculture.command.</span></span><span class="sig-name descname"><span class="pre">make_args_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.command.make_args_parser" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.cli.make_args_parser">
+<span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">make_args_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.make_args_parser" title="Permalink to this definition"></a></dt>
 <dd><p>Make a parser for command-line arguments only.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="permaculture.command.make_config_parser">
-<span class="sig-prename descclassname"><span class="pre">permaculture.command.</span></span><span class="sig-name descname"><span class="pre">make_config_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.command.make_config_parser" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.cli.make_config_parser">
+<span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">make_config_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.make_config_parser" title="Permalink to this definition"></a></dt>
 <dd><p>Make a parser for configuration files and command-line arguments.</p>
 </dd></dl>
 
@@ -2511,50 +2505,6 @@ content type.</p>
 <span class="sig-name descname"><span class="pre">session</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPSession" title="permaculture.http.HTTPSession"><span class="pre">HTTPSession</span></a></em><a class="headerlink" href="#permaculture.usda.USDAWeb.session" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-</section>
-<section id="module-permaculture.wikipedia">
-<span id="permaculture-wikipedia-module"></span><h2>permaculture.wikipedia module<a class="headerlink" href="#module-permaculture.wikipedia" title="Permalink to this heading"></a></h2>
-<p>Wikipedia API.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="permaculture.wikipedia.Wikipedia">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.wikipedia.</span></span><span class="sig-name descname"><span class="pre">Wikipedia</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPSession" title="permaculture.http.HTTPSession"><span class="pre">HTTPSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.Wikipedia" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Wikipedia API.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.wikipedia.Wikipedia.from_url">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_NullStorage()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.Wikipedia.from_url" title="Permalink to this definition"></a></dt>
-<dd><p>Instantiate Wikipedia from URL.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.wikipedia.Wikipedia.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'query'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.Wikipedia.get" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.wikipedia.Wikipedia.get_text">
-<span class="sig-name descname"><span class="pre">get_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.Wikipedia.get_text" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.wikipedia.Wikipedia.session">
-<span class="sig-name descname"><span class="pre">session</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPSession" title="permaculture.http.HTTPSession"><span class="pre">HTTPSession</span></a></em><a class="headerlink" href="#permaculture.wikipedia.Wikipedia.session" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.wikipedia.parse_table">
-<span class="sig-prename descclassname"><span class="pre">permaculture.wikipedia.</span></span><span class="sig-name descname"><span class="pre">parse_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.parse_table" title="Permalink to this definition"></a></dt>
-<dd><p>Parse an HTML table into a dictionary of values.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.wikipedia.parse_tables">
-<span class="sig-prename descclassname"><span class="pre">permaculture.wikipedia.</span></span><span class="sig-name descname"><span class="pre">parse_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.wikipedia.parse_tables" title="Permalink to this definition"></a></dt>
-<dd><p>Parse HTML text into a list of tables.</p>
 </dd></dl>
 
 </section>
