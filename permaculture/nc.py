@@ -3,6 +3,7 @@
 import logging
 import re
 from functools import partial
+from pathlib import Path
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -306,9 +307,12 @@ class NCIngestor:
     @classmethod
     def from_config(cls, config):
         """Instantiate NCIngestor from config."""
+        password = config.nc_password
+        if config.nc_password_file:
+            password = Path(config.nc_password_file).read_text().strip()
         model = NCModel().with_authentication(
             config.nc_username,
-            config.nc_password,
+            password,
             config.storage,
         )
         priority = LocationPriority("United States").with_cache(config.storage)

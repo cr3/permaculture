@@ -135,6 +135,7 @@ def make_config_parser(config_files):
     """Make a parser for configuration files and command-line arguments."""
     config = ArgParser(
         default_config_files=config_files,
+        auto_env_var_prefix="PERMACULTURE_",
         add_help=False,
     )
     config.add_argument(
@@ -178,6 +179,9 @@ def make_config_parser(config_files):
     nc.add_argument(
         "--nc-password",
     )
+    nc.add_argument(
+        "--nc-password-file",
+    )
     return config
 
 
@@ -209,10 +213,11 @@ def main(argv=None):
             runner.run()
             return
         case "iterate":
-            data = [
-                plant.scientific_name
-                for plant in database.iterate()
-            ] if database else []
+            data = (
+                [plant.scientific_name for plant in database.iterate()]
+                if database
+                else []
+            )
         case "list":
             data = database.sources() if database else []
         case "lookup":
@@ -228,19 +233,27 @@ def main(argv=None):
                 ]
             else:
                 names = args.names
-            data = [
-                {
-                    k: v
-                    for k, v in f(plant).items()
-                    if include.match(k) and not exclude.match(k)
-                }
-                for plant in database.lookup(names, args.score)
-            ] if database else []
+            data = (
+                [
+                    {
+                        k: v
+                        for k, v in f(plant).items()
+                        if include.match(k) and not exclude.match(k)
+                    }
+                    for plant in database.lookup(names, args.score)
+                ]
+                if database
+                else []
+            )
         case "search":
-            data = [
-                {plant.scientific_name: plant.common_names}
-                for plant in database.search(args.name, args.score)
-            ] if database else []
+            data = (
+                [
+                    {plant.scientific_name: plant.common_names}
+                    for plant in database.search(args.name, args.score)
+                ]
+                if database
+                else []
+            )
         case "store":
             storage = evolve(
                 config.storage,
