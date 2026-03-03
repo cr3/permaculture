@@ -56,6 +56,11 @@ def make_args_parser():
         default=3,
         help="maximum retry attempts per source (default %(default)s)",
     )
+    ingest.add_argument(
+        "ingestors",
+        nargs="*",
+        help="ingestors to run (default: all)",
+    )
     command.add_parser(
         "iterate",
         help="iterate over all scientific names",
@@ -202,6 +207,18 @@ def main(argv=None):
             sys.exit(0)
         case "ingest":
             ingestors = Ingestors.load(config)
+            if args.ingestors:
+                unknown = set(args.ingestors) - ingestors.keys()
+                if unknown:
+                    args_parser.error(
+                        f"unknown ingestor(s): {', '.join(sorted(unknown))}"
+                        f" (available: {', '.join(sorted(ingestors))})"
+                    )
+                ingestors = {
+                    k: v
+                    for k, v in ingestors.items()
+                    if k in args.ingestors
+                }
             db_path = Path(config.storage.base_dir) / "permaculture.db"
             db = Database(db_path)
             runner = Runner(
