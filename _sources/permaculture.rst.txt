@@ -77,6 +77,30 @@ permaculture.http module
    :undoc-members:
    :show-inheritance:
 
+permaculture.ingestor module
+----------------------------
+
+.. automodule:: permaculture.ingestor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.ipinfo module
+--------------------------
+
+.. automodule:: permaculture.ipinfo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.location module
+----------------------------
+
+.. automodule:: permaculture.location
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.logger module
 --------------------------
 
@@ -93,6 +117,22 @@ permaculture.nc module
    :undoc-members:
    :show-inheritance:
 
+permaculture.nlp module
+-----------------------
+
+.. automodule:: permaculture.nlp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.nominatim module
+-----------------------------
+
+.. automodule:: permaculture.nominatim
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.pfaf module
 ------------------------
 
@@ -101,10 +141,34 @@ permaculture.pfaf module
    :undoc-members:
    :show-inheritance:
 
+permaculture.priority module
+----------------------------
+
+.. automodule:: permaculture.priority
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 permaculture.registry module
 ----------------------------
 
 .. automodule:: permaculture.registry
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.runner module
+--------------------------
+
+.. automodule:: permaculture.runner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+permaculture.sdp module
+-----------------------
+
+.. automodule:: permaculture.sdp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -121,14 +185,6 @@ permaculture.storage module
 ---------------------------
 
 .. automodule:: permaculture.storage
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-permaculture.tokenizer module
------------------------------
-
-.. automodule:: permaculture.tokenizer
    :members:
    :undoc-members:
    :show-inheritance:
