@@ -21,10 +21,10 @@ permaculture.action module
    :undoc-members:
    :show-inheritance:
 
-permaculture.command module
----------------------------
+permaculture.cli module
+-----------------------
 
-.. automodule:: permaculture.command
+.. automodule:: permaculture.cli
    :members:
    :undoc-members:
    :show-inheritance:

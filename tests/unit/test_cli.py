@@ -1,11 +1,11 @@
-"""Unit tests for the command module."""
+"""Unit tests for the cli module."""
 
 import logging
 from unittest.mock import patch
 
 import pytest
 
-from permaculture.command import (
+from permaculture.cli import (
     main,
     make_args_parser,
     make_config_parser,

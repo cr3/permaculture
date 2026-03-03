@@ -68,7 +68,7 @@ plant = "permaculture.testing.unique:unique_plant"
 token = "permaculture.testing.unique:unique_token"
 
 [project.scripts]
-permaculture = "permaculture.command:main"
+permaculture = "permaculture.cli:main"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
