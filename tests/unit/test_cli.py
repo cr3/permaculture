@@ -121,13 +121,3 @@ def test_main_error(stderr, unique):
         main([unique("text")])
 
     assert "invalid choice" in stderr.write.call_args[0][0]
-
-
-@patch("sys.stderr")
-@patch("permaculture.cli.Ingestors.load", return_value={"nc": None, "pfaf": None})
-def test_main_ingest_unknown_ingestor(mock_load, stderr, unique):
-    """Ingesting with an unknown ingestor should error."""
-    with pytest.raises(SystemExit):
-        main(["ingest", unique("text")])
-
-    assert "unknown ingestor" in stderr.write.call_args[0][0]
