@@ -54,20 +54,6 @@ docs: $(VENV)
 	@echo "==> Building docs..."
 	@$(RUN) sphinx-build -W -d build/doctrees docs build/html
 
-.PHONY: build
-build: locales
-	@echo "==> Creating wheel..."
-	@$(PYTHON) -m build
-
-.PHONY: publish
-publish:
-	@echo "==> Publishing: Dry run..."
-	@TWINE_USERNAME=__token__ TWINE_PASSWORD=$(PYPI_TOKEN) \
-	  $(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ --dry-run dist/*
-	@echo "==> Publishing..."
-	@TWINE_USERNAME=__token__ TWINE_PASSWORD=$(PYPI_TOKEN) \
-	  $(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-
 .PHONY: clean
 clean:
 	@echo "==> Cleaning ignored files..."
