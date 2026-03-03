@@ -205,14 +205,6 @@ permaculture.usda module
    :undoc-members:
    :show-inheritance:
 
-permaculture.wikipedia module
------------------------------
-
-.. automodule:: permaculture.wikipedia
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
