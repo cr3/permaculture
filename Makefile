@@ -31,7 +31,7 @@ check: $(VENV)
 %.po: $(VENV)
 
 %.mo: %.po
-	@$(RUN) scripts/msgfmt.py --output-file $@ $^
+	@python scripts/msgfmt.py --output-file $@ $^
 
 # Convenience target to build locales.
 .PHONY: locales
@@ -57,16 +57,7 @@ docs: $(VENV)
 .PHONY: build
 build: locales
 	@echo "==> Creating wheel..."
-	@$(PYTHON) -m build
-
-.PHONY: publish
-publish:
-	@echo "==> Publishing: Dry run..."
-	@TWINE_USERNAME=__token__ TWINE_PASSWORD=$(PYPI_TOKEN) \
-	  $(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ --dry-run dist/*
-	@echo "==> Publishing..."
-	@TWINE_USERNAME=__token__ TWINE_PASSWORD=$(PYPI_TOKEN) \
-	  $(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+	@python -m build
 
 .PHONY: clean
 clean:
