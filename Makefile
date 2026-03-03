@@ -5,7 +5,7 @@ PYTHON := $(RUN) python
 TOUCH := $(PYTHON) -c 'import sys; from pathlib import Path; Path(sys.argv[1]).touch()'
 
 # Find all the .po we want to format into .mo files.
-PO_FILES := $(shell find permaculture/locales -name '*.po')
+PO_FILES := $(wildcard permaculture/locales/*/LC_MESSAGES/*.po)
 MO_FILES := $(PO_FILES:.po=.mo)
 
 uv.lock: pyproject.toml

@@ -19,6 +19,20 @@ def test_make_args_parser_command(unique):
     assert args.command == "lookup"
 
 
+def test_make_args_parser_ingest_no_ingestors():
+    """Making an args parser should default to no ingestors."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["ingest"])
+    assert args.ingestors == []
+
+
+def test_make_args_parser_ingest_with_ingestors():
+    """Making an args parser should accept ingestor names."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["ingest", "nc", "pfaf"])
+    assert args.ingestors == ["nc", "pfaf"]
+
+
 def test_make_args_parser_command_error(unique):
     """Making an args parser should raise on unknown commands."""
     args_parser = make_args_parser()
@@ -107,3 +121,13 @@ def test_main_error(stderr, unique):
         main([unique("text")])
 
     assert "invalid choice" in stderr.write.call_args[0][0]
+
+
+@patch("sys.stderr")
+@patch("permaculture.cli.Ingestors.load", return_value={"nc": None, "pfaf": None})
+def test_main_ingest_unknown_ingestor(mock_load, stderr, unique):
+    """Ingesting with an unknown ingestor should error."""
+    with pytest.raises(SystemExit):
+        main(["ingest", unique("text")])
+
+    assert "unknown ingestor" in stderr.write.call_args[0][0]
