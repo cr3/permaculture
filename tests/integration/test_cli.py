@@ -1,4 +1,4 @@
-"""Integration tests for the command module."""
+"""Integration tests for the cli module."""
 
 from subprocess import check_output
 

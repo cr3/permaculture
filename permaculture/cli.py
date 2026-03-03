@@ -1,4 +1,4 @@
-"""Permaculture command."""
+"""Permaculture CLI."""
 
 import logging
 import re
