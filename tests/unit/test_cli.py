@@ -19,18 +19,11 @@ def test_make_args_parser_command(unique):
     assert args.command == "lookup"
 
 
-def test_make_args_parser_ingest_no_ingestors():
-    """Making an args parser should default to no ingestors."""
+def test_make_args_parser_ingest():
+    """Making an args parser should parse the ingest command."""
     args_parser = make_args_parser()
     args, _ = args_parser.parse_known_args(["ingest"])
-    assert args.ingestors == []
-
-
-def test_make_args_parser_ingest_with_ingestors():
-    """Making an args parser should accept ingestor names."""
-    args_parser = make_args_parser()
-    args, _ = args_parser.parse_known_args(["ingest", "nc", "pfaf"])
-    assert args.ingestors == ["nc", "pfaf"]
+    assert args.command == "ingest"
 
 
 def test_make_args_parser_command_error(unique):
