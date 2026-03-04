@@ -29,6 +29,16 @@ from permaculture.storage import StorageAction
 logger = logging.getLogger(__name__)
 
 
+def load_database(config):
+    """Load the database from the configured storage."""
+    db = Database.from_storage(config.storage)
+    if not Path(db.db_path).exists():
+        raise SystemExit(
+            f"Database not found: {db.db_path}\n" "Run 'permaculture ingest' first."
+        )
+    return db
+
+
 def make_args_parser():
     """Make a parser for command-line arguments only."""
     args_parser = ArgumentParser()
@@ -169,11 +179,6 @@ def make_config_parser(config_files):
         action=StorageAction,
         default=user_cache_dir("permaculture"),
     )
-    config.add_argument(
-        "--database",
-        type=Path,
-        default=Path(user_cache_dir("permaculture")) / "permaculture.db",
-    )
     nc = config.add_argument_group(
         "nc",
         "Natural Capital",
@@ -193,7 +198,7 @@ def make_config_parser(config_files):
 def command_ingest(args, config):
     """Ingest plant data into local database."""
     ingestors = Ingestors.load(config)
-    db = Database(config.database)
+    db = Database.from_storage(config.storage)
     Runner(
         sources=dict(ingestors),
         database=db,
@@ -268,16 +273,16 @@ def main(argv=None):
                 args_parser.error(str(e))
             return
         case "iterate":
-            database = Database(config.database)
+            database = load_database(config)
             data = command_iterate(database)
         case "list":
-            database = Database(config.database)
+            database = load_database(config)
             data = command_list(database)
         case "lookup":
-            database = Database(config.database)
+            database = load_database(config)
             data = command_lookup(args, config, database)
         case "search":
-            database = Database(config.database)
+            database = load_database(config)
             data = command_search(args, database)
         case "store":
             command_store(args, config)

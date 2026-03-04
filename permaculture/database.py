@@ -11,6 +11,7 @@ from attrs import define, field
 
 from permaculture.data import merge
 from permaculture.nlp import Extractor, normalize, score
+from permaculture.storage import FileStorage
 
 
 @define(frozen=True, hash=False)
@@ -56,6 +57,13 @@ class Database:
     """Local SQLite database for plant records."""
 
     db_path: Path = field(converter=Path)
+
+    @classmethod
+    def from_storage(cls, storage):
+        """Create a Database from a storage provider."""
+        if isinstance(storage, FileStorage):
+            return cls(storage.base_dir / "permaculture.db")
+        return cls(":memory:")
 
     def _connect(self):
         return sqlite3.connect(self.db_path)
