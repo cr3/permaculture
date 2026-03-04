@@ -116,6 +116,26 @@ def test_database_search(db_path):
     assert result[0]["scientific name"] == "symphytum officinale"
 
 
+def test_database_search_by_scientific_name(db_path):
+    """Search should also match on scientific name via FTS5."""
+    database = Database(db_path)
+    database.write_batch(
+        "a",
+        [
+            DatabasePlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                }
+            ),
+        ],
+    )
+
+    result = list(database.search("symphytum", 0.5))
+    assert len(result) == 1
+    assert result[0]["scientific name"] == "symphytum officinale"
+
+
 def test_database_iterate_merges_sources(db_path):
     """Iterating should merge plants from multiple sources."""
     database = Database(db_path)
