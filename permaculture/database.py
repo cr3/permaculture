@@ -51,33 +51,11 @@ class DatabasePlant(Mapping):
         return len(self.data)
 
 
-class DatabaseNotFoundError(Exception):
-    """Raised when the database file does not exist."""
-
-
 @define(frozen=True)
 class Database:
     """Local SQLite database for plant records."""
 
     db_path: Path = field(converter=Path)
-
-    @classmethod
-    def from_config(cls, config):
-        """Instantiate a Database from config."""
-        db_path = Path(config.storage.base_dir) / "permaculture.db"
-        return cls(db_path)
-
-    @classmethod
-    def load(cls, config):
-        """Load a database from the config storage directory.
-
-        Raises DatabaseNotFoundError if the database file does not exist.
-        """
-        database = cls.from_config(config)
-        if not database.db_path.exists():
-            raise DatabaseNotFoundError(database.db_path)
-
-        return database
 
     def _connect(self):
         return sqlite3.connect(self.db_path)
