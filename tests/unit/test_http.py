@@ -1,6 +1,6 @@
 """Unit tests for the http module."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
 import pytest
@@ -29,7 +29,7 @@ http_cache_all = pytest.fixture(lambda: HTTPCacheAll())
 
 def test_parse_http_expiry_with_max_age():
     """The expiry should be the current time + max-age (in seconds)."""
-    now = datetime.now()
+    now = datetime.now(UTC)
     expiry = parse_http_expiry("max-age=10", now)
     assert expiry == now + timedelta(seconds=10)
 
@@ -45,12 +45,12 @@ def test_parse_http_expiry_without_max_age():
     [
         pytest.param(
             "Sun, 01 Mar 2020 12:00:00 GMT",
-            datetime(2020, 3, 1, 12, 0),
+            datetime(2020, 3, 1, 12, 0, tzinfo=UTC),
             id="RFC 1123",
         ),
         pytest.param(
             "Sunday, 01-Mar-20 12:00:00 GMT",
-            datetime(2020, 3, 1, 12, 0),
+            datetime(2020, 3, 1, 12, 0, tzinfo=UTC),
             id="RFC 850",
         ),
     ],
@@ -153,8 +153,8 @@ def test_http_cache_expiry_of_expires(method, http_cache):
 
     http_cache.storage[resp.url] = HTTPEntry(
         resp,
-        datetime.utcnow() + much_earlier,
-        datetime.utcnow() + earlier,
+        datetime.now(UTC) + much_earlier,
+        datetime.now(UTC) + earlier,
     )
 
     assert http_cache.retrieve(req) is None
