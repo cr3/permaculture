@@ -1,5 +1,7 @@
 """Unit tests for the database module."""
 
+from pathlib import Path
+
 import pytest
 
 from permaculture.database import (
@@ -8,6 +10,7 @@ from permaculture.database import (
     _merge,
     _merge_all,
 )
+from permaculture.storage import FileStorage, MemoryStorage
 
 
 @pytest.fixture
@@ -17,6 +20,20 @@ def db_path(tmp_path):
     database = Database(path)
     database.initialize()
     return path
+
+
+def test_database_from_storage_file(tmp_path):
+    """Creating from FileStorage should use base_dir."""
+    storage = FileStorage(tmp_path)
+    db = Database.from_storage(storage)
+    assert db.db_path == tmp_path / "permaculture.db"
+
+
+def test_database_from_storage_memory():
+    """Creating from non-FileStorage should use in-memory database."""
+    storage = MemoryStorage()
+    db = Database.from_storage(storage)
+    assert db.db_path == Path(":memory:")
 
 
 def test_database_plant_with_database(unique):
