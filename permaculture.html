@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture package &mdash; permaculture 0.0.12 documentation</title>
+  <title>permaculture package &mdash; permaculture 0.0.13 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.12
+                0.0.13
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -79,6 +79,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_lookup"><code class="docutils literal notranslate"><span class="pre">command_lookup()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_search"><code class="docutils literal notranslate"><span class="pre">command_search()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_store"><code class="docutils literal notranslate"><span class="pre">command_store()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.load_database"><code class="docutils literal notranslate"><span class="pre">load_database()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_config_parser"><code class="docutils literal notranslate"><span class="pre">make_config_parser()</span></code></a></li>
@@ -382,6 +383,12 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="permaculture.cli.load_database">
+<span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">load_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.load_database" title="Permalink to this definition"></a></dt>
+<dd><p>Load the database from the configured storage.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="permaculture.cli.main">
 <span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.main" title="Permalink to this definition"></a></dt>
 <dd><p>Entry point to the permaculture command.</p>
@@ -542,6 +549,12 @@ by punctuation or whitespace.</p>
 <dt class="sig sig-object py" id="permaculture.database.Database.db_path">
 <span class="sig-name descname"><span class="pre">db_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#permaculture.database.Database.db_path" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="permaculture.database.Database.from_storage">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.from_storage" title="Permalink to this definition"></a></dt>
+<dd><p>Create a Database from a storage provider.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="permaculture.database.Database.initialize">
