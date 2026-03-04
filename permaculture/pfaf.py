@@ -2,6 +2,7 @@
 
 import logging
 from functools import partial
+from pathlib import Path
 
 import xlrd
 from attrs import define, field
@@ -10,18 +11,16 @@ from permaculture.converter import Converter
 from permaculture.database import DatabasePlant
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
-from permaculture.storage import FileStorage
 
 logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
 class PFAFFile:
-    storage: FileStorage
+    path: Path
 
     def main_database(self):
-        path = self.storage.key_to_path("plants-for-a-future")
-        wb = xlrd.open_workbook(path)
+        wb = xlrd.open_workbook(self.path)
         return wb.sheet_by_name("MAIN DATABASE")
 
 
@@ -69,17 +68,15 @@ class PFAFModel:
     converter: PFAFConverter = field(factory=PFAFConverter)
 
     @classmethod
-    def from_storage(cls, storage):
-        file = PFAFFile(storage)
+    def from_path(cls, path):
+        file = PFAFFile(Path(path))
         return cls(file)
 
     def all_plants(self):
         try:
             ws = self.file.main_database()
         except FileNotFoundError as error:
-            logger.info(
-                "Skipping Plants For A Future: %(error)s", {"error": error}
-            )
+            logger.info("Skipping Plants For A Future: %(error)s", {"error": error})
             return []
 
         rows = ws.get_rows()
@@ -98,10 +95,8 @@ class PFAFIngestor:
     @classmethod
     def from_config(cls, config):
         """Instantiate PFAFIngestor from config."""
-        model = PFAFModel.from_storage(config.storage)
-        priority = LocationPriority("United Kingdom").with_cache(
-            config.storage
-        )
+        model = PFAFModel.from_path(config.pfaf_file)
+        priority = LocationPriority("United Kingdom").with_cache(config.storage)
         return cls(model, priority)
 
     def fetch_all(self):
