@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture package &mdash; permaculture 0.0.11 documentation</title>
+  <title>permaculture package &mdash; permaculture 0.0.12 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.11
+                0.0.12
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -79,7 +79,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_lookup"><code class="docutils literal notranslate"><span class="pre">command_lookup()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_search"><code class="docutils literal notranslate"><span class="pre">command_search()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_store"><code class="docutils literal notranslate"><span class="pre">command_store()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.load_database"><code class="docutils literal notranslate"><span class="pre">load_database()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_config_parser"><code class="docutils literal notranslate"><span class="pre">make_config_parser()</span></code></a></li>
@@ -98,7 +97,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.database">permaculture.database module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.database.Database"><code class="docutils literal notranslate"><span class="pre">Database</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.database.DatabaseNotFoundError"><code class="docutils literal notranslate"><span class="pre">DatabaseNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.database.DatabasePlant"><code class="docutils literal notranslate"><span class="pre">DatabasePlant</span></code></a></li>
 </ul>
 </li>
@@ -384,12 +382,6 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="permaculture.cli.load_database">
-<span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">load_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_parser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.load_database" title="Permalink to this definition"></a></dt>
-<dd><p>Load the database, exiting with an error if not found.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="permaculture.cli.main">
 <span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.main" title="Permalink to this definition"></a></dt>
 <dd><p>Entry point to the permaculture command.</p>
@@ -552,12 +544,6 @@ by punctuation or whitespace.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.database.Database.from_config">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.from_config" title="Permalink to this definition"></a></dt>
-<dd><p>Instantiate a Database from config.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="permaculture.database.Database.initialize">
 <span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.initialize" title="Permalink to this definition"></a></dt>
 <dd><p>Create tables and indexes.</p>
@@ -567,13 +553,6 @@ by punctuation or whitespace.</p>
 <dt class="sig sig-object py" id="permaculture.database.Database.iterate">
 <span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#permaculture.database.DatabasePlant" title="permaculture.database.DatabasePlant"><span class="pre">DatabasePlant</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#permaculture.database.Database.iterate" title="Permalink to this definition"></a></dt>
 <dd><p>Iterate over all plants, merging across sources.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.database.Database.load">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.database.Database.load" title="Permalink to this definition"></a></dt>
-<dd><p>Load a database from the config storage directory.</p>
-<p>Raises DatabaseNotFoundError if the database file does not exist.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -605,13 +584,6 @@ by punctuation or whitespace.</p>
 <dd><p>Persist a batch of plant records.</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="permaculture.database.DatabaseNotFoundError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.database.</span></span><span class="sig-name descname"><span class="pre">DatabaseNotFoundError</span></span><a class="headerlink" href="#permaculture.database.DatabaseNotFoundError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Raised when the database file does not exist.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -991,14 +963,6 @@ HTTP caching.</p>
 <dt class="sig sig-object py" id="permaculture.ingestor.Ingestors.load">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.ingestor.Ingestors.load" title="Permalink to this definition"></a></dt>
 <dd><p>Load ingestors from registry.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="permaculture.ingestor.Ingestors.select">
-<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.ingestor.Ingestors.select" title="Permalink to this definition"></a></dt>
-<dd><p>Select ingestors by name.</p>
-<p>Returns all ingestors when names is empty.
-Raises ValueError on unknown names.</p>
 </dd></dl>
 
 </dd></dl>
