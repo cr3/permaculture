@@ -7,7 +7,7 @@ authors = [
 ]
 readme = "README.rst"
 repository = "https://github.com/cr3/permaculture"
-requires-python = ">=3.13,<4.0"
+requires-python = ">=3.12,<4.0"
 dependencies = [
   "appdirs>=1.4.4,<2.0.0",
   "attrs>=23.1.0",
@@ -83,7 +83,7 @@ artifacts = [
 source = "vcs"
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py312"
 line-length = 79
 fix = true
 lint.select = [
