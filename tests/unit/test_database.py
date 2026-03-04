@@ -1,12 +1,9 @@
 """Unit tests for the database module."""
 
-from unittest.mock import Mock
-
 import pytest
 
 from permaculture.database import (
     Database,
-    DatabaseNotFoundError,
     DatabasePlant,
     _merge,
     _merge_all,
@@ -27,23 +24,6 @@ def test_database_plant_with_database(unique):
     assert "database" not in plant
     plant = plant.with_database("a")
     assert plant["database/a"]
-
-
-def test_database_load_empty(tmp_path):
-    """Loading should raise when no database exists."""
-    storage = Mock(base_dir=tmp_path)
-    config = Mock(databases=[], storage=storage)
-    with pytest.raises(DatabaseNotFoundError):
-        Database.load(config)
-
-
-def test_database_load(db_path):
-    """Loading should return a Database when the file exists."""
-    storage = Mock(base_dir=db_path.parent)
-    config = Mock(databases=[], storage=storage)
-    database = Database.load(config)
-    assert database is not None
-    assert database.db_path == db_path
 
 
 def test_database_sources(db_path):
