@@ -1,7 +1,7 @@
 """HTTP module."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from hashlib import md5
 from urllib.parse import urlparse
 
@@ -30,10 +30,10 @@ def parse_http_expiry(header, current_time):
 def parse_http_timestamp(header, default=None):
     """Parse an HTTP timestamp as RFC 2616."""
     try:
-        return datetime.strptime(header, RFC_1123_FORMAT)
+        return datetime.strptime(header, RFC_1123_FORMAT).replace(tzinfo=UTC)
     except ValueError:
         try:
-            return datetime.strptime(header, RFC_850_FORMAT)
+            return datetime.strptime(header, RFC_850_FORMAT).replace(tzinfo=UTC)
         except ValueError:
             return default
 
@@ -79,7 +79,7 @@ class HTTPCache:
             return False
 
         # Parse the date timestamp.
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         creation = parse_http_timestamp(response.headers.get("Date", ""), now)
 
         # Parse the expiry timestamp.
@@ -135,7 +135,7 @@ class HTTPCache:
             return None
 
         # If we have an expiry time but it's later, remove from the cache.
-        if datetime.utcnow() > entry.expiry:
+        if datetime.now(UTC) > entry.expiry:
             del self.storage[url]
             return None
 
@@ -172,7 +172,7 @@ class HTTPCacheAll:
             return False
 
         # Parse the date timestamp.
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         creation = parse_http_timestamp(response.headers.get("Date", ""), now)
         self.storage[key] = HTTPEntry(response, creation)
 
