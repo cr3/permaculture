@@ -112,6 +112,10 @@ class Database:
                 "CREATE INDEX IF NOT EXISTS idx_sci" " ON plants(scientific_name)"
             )
             conn.execute("CREATE INDEX IF NOT EXISTS idx_cn" " ON common_names(name)")
+            conn.execute(
+                "CREATE VIRTUAL TABLE IF NOT EXISTS names_fts"
+                " USING fts5(name, plant_id UNINDEXED, tokenize='trigram')"
+            )
 
     def write_batch(self, source, records):
         """Persist a batch of plant records."""
@@ -125,9 +129,18 @@ class Database:
                     (source, record.scientific_name, data_json, record.weight),
                 )
                 pid = cur.lastrowid
+                common_names = record.common_names
                 conn.executemany(
                     "INSERT INTO common_names (plant_id, name)" " VALUES (?, ?)",
-                    [(pid, n) for n in record.common_names],
+                    [(pid, n) for n in common_names],
+                )
+                fts_rows = [
+                    (record.scientific_name, pid),
+                    *((n, pid) for n in common_names),
+                ]
+                conn.executemany(
+                    "INSERT INTO names_fts (name, plant_id)" " VALUES (?, ?)",
+                    fts_rows,
                 )
 
     def sources(self, include=None) -> list[str]:
@@ -177,14 +190,14 @@ class Database:
             )
 
     def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
-        """Search for the scientific name by common name, merging across sources."""
+        """Search for plants by name using FTS5 trigram matching."""
         with self._connect() as conn:
             rows = conn.execute(
                 "SELECT DISTINCT p.source, p.data, p.weight"
-                " FROM common_names cn"
-                " JOIN plants p ON cn.plant_id = p.id"
-                " WHERE cn.name LIKE ?",
-                (f"%{name}%",),
+                " FROM names_fts fts"
+                " JOIN plants p ON fts.plant_id = p.id"
+                " WHERE fts.name MATCH ?",
+                (f'"{name}"',),
             )
             yield from _merge_all(
                 plant.with_database(src)
