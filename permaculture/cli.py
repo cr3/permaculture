@@ -56,11 +56,6 @@ def make_args_parser():
         default=3,
         help="maximum retry attempts per source (default %(default)s)",
     )
-    ingest.add_argument(
-        "ingestors",
-        nargs="*",
-        help="ingestors to run (default: all)",
-    )
     command.add_parser(
         "iterate",
         help="iterate over all scientific names",
@@ -154,11 +149,11 @@ def make_config_parser(config_files):
         action=SerializerAction,
     )
     config.add_argument(
-        "--database",
-        dest="databases",
+        "--ingestor",
+        dest="ingestors",
         default=[],
         action="append",
-        help="regular on databases (default: all)",
+        help="regex on ingestors (default: all)",
     )
     config.add_argument(
         "--log-file",
@@ -192,7 +187,7 @@ def make_config_parser(config_files):
 
 def command_ingest(args, config):
     """Ingest plant data into local database."""
-    ingestors = Ingestors.load(config).select(args.ingestors)
+    ingestors = Ingestors.load(config)
     db = Database.from_config(config)
     Runner(
         sources=dict(ingestors),
