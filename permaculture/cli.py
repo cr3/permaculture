@@ -14,7 +14,7 @@ from permaculture.data import (
     flatten,
     unflatten,
 )
-from permaculture.database import Database, DatabaseNotFoundError
+from permaculture.database import Database
 from permaculture.ingestor import Ingestors
 from permaculture.logger import (
     LoggerHandlerAction,
@@ -169,6 +169,11 @@ def make_config_parser(config_files):
         action=StorageAction,
         default=user_cache_dir("permaculture"),
     )
+    config.add_argument(
+        "--database",
+        type=Path,
+        default=Path(user_cache_dir("permaculture")) / "permaculture.db",
+    )
     nc = config.add_argument_group(
         "nc",
         "Natural Capital",
@@ -188,7 +193,7 @@ def make_config_parser(config_files):
 def command_ingest(args, config):
     """Ingest plant data into local database."""
     ingestors = Ingestors.load(config)
-    db = Database.from_config(config)
+    db = Database(config.database)
     Runner(
         sources=dict(ingestors),
         database=db,
@@ -215,18 +220,12 @@ def command_lookup(args, config, database):
     f = flatten if content_type == "text/csv" else unflatten
     if args.file:
         names = [
-            name
-            for file in args.names
-            for name in Path(file).read_text().splitlines()
+            name for file in args.names for name in Path(file).read_text().splitlines()
         ]
     else:
         names = args.names
     return [
-        {
-            k: v
-            for k, v in f(plant).items()
-            if include.match(k) and not exclude.match(k)
-        }
+        {k: v for k, v in f(plant).items() if include.match(k) and not exclude.match(k)}
         for plant in database.lookup(names, args.score)
     ]
 
@@ -246,14 +245,6 @@ def command_store(args, config):
         serializer="application/octet-stream",
     )
     storage[args.key] = args.file.read()
-
-
-def load_database(config, args_parser):
-    """Load the database, exiting with an error if not found."""
-    try:
-        return Database.load(config)
-    except DatabaseNotFoundError as e:
-        args_parser.error(f"database not found: {e}")
 
 
 def main(argv=None):
@@ -277,16 +268,16 @@ def main(argv=None):
                 args_parser.error(str(e))
             return
         case "iterate":
-            database = load_database(config, args_parser)
+            database = Database(config.database)
             data = command_iterate(database)
         case "list":
-            database = load_database(config, args_parser)
+            database = Database(config.database)
             data = command_list(database)
         case "lookup":
-            database = load_database(config, args_parser)
+            database = Database(config.database)
             data = command_lookup(args, config, database)
         case "search":
-            database = load_database(config, args_parser)
+            database = Database(config.database)
             data = command_search(args, database)
         case "store":
             command_store(args, config)
