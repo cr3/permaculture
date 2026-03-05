@@ -216,7 +216,7 @@ class HTTPCacheAdapter(HTTPAdapter):
             },
         )
 
-        if response is None:
+        if not response:
             response = super().send(request, *args, **kwargs)
 
         return response
@@ -236,18 +236,43 @@ class HTTPCacheAdapter(HTTPAdapter):
 class HTTPSession(Session):
     """An HTTP session with origin."""
 
-    def __init__(self, origin, **kwargs):
+    def __init__(self, origin, headers=None, **kwargs):
         super().__init__(**kwargs)
         self.origin = origin
+
+        default_headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) "
+                "Gecko/20100101 Firefox/140.0"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-CA,en;q=0.8,fr-CA;q=0.7,fr;q=0.6",
+            "Accept-Encoding": "gzip, deflate",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+
+            # These often help with basic bot detection
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+        }
+
+        self.headers.update(default_headers)
+        if headers:
+            self.headers.update(headers)
 
     def with_cache(self, storage, cache_cls=HTTPCacheAll, **kwargs):
         cache = cache_cls(storage)
         adapter = HTTPCacheAdapter(cache, **kwargs)
         return self.with_adapter(adapter)
 
-    def with_adapter(self, adapter: HTTPAdapter):
-        self.mount("https://", adapter)
-        self.mount("http://", adapter)
+    def with_adapter(self, http_adapter: HTTPAdapter, https_adapter: HTTPAdapter | None = None):
+        if https_adapter is None:
+            https_adapter = http_adapter
+
+        self.mount("https://", https_adapter)
+        self.mount("http://", http_adapter)
         return self
 
     def request(self, method, path, **kwargs):
@@ -258,6 +283,7 @@ class HTTPSession(Session):
         :param \\**kwargs: Optional keyword arguments passed to the session.
         """
         url = str(self.origin) + path
+
         response = super().request(method, url, **kwargs)
         response.raise_for_status()
 
