@@ -22,7 +22,9 @@ logger = logging.getLogger(__name__)
 class USDAWeb:
     """USDA Plants web interface."""
 
-    session: HTTPSession = field(factory=partial(HTTPSession, USDA_ORIGIN))
+    session: HTTPSession = field(
+        factory=partial(HTTPSession, USDA_ORIGIN, headers={"Accept": "application/json"}),
+    )
 
     def characteristics_search(self, **kwargs):
         """Search characteristics."""
