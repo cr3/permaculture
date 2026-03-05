@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import random
 
 from attrs import define, field
 
@@ -27,6 +28,7 @@ class Runner:
     :param max_concurrency: Maximum parallel source ingestions.
     :param max_retries: Maximum retry attempts per source.
     :param backoff_base: Base for exponential backoff in seconds.
+    :param backoff_cap: Maximum backoff delay in seconds.
     :param batch_size: Records per batch write.
     :param queue_size: Maximum pending observations before backpressure.
     """
@@ -35,7 +37,8 @@ class Runner:
     sink: Sink = field(factory=dict)
     max_concurrency: int = field(default=4)
     max_retries: int = field(default=3)
-    backoff_base: float = field(default=2.0)
+    backoff_base: float = field(default=0.25)
+    backoff_cap: float = field(default=10.0)
     batch_size: int = field(default=BATCH_SIZE)
     queue_size: int = field(default=QUEUE_SIZE)
 
@@ -106,7 +109,7 @@ class Runner:
                     )
                     return
                 except Exception:
-                    wait = self.backoff_base**attempt
+                    wait = self._backoff_seconds(attempt + 1)
                     logger.warning(
                         "Retry %(attempt)s for %(name)s"
                         " (waiting %(wait)ss)",
@@ -119,6 +122,11 @@ class Runner:
                     await asyncio.sleep(wait)
 
             raise RuntimeError(f"Failed ingesting {name}")
+
+    def _backoff_seconds(self, attempt):
+        """Exponential backoff with jitter."""
+        exp = min(self.backoff_cap, self.backoff_base * (2 ** (attempt - 1)))
+        return random.random() * exp  # noqa: S311
 
     def _ingest_sync(self, name, source, queue, loop):
         for record in source.fetch_all():
