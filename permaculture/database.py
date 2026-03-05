@@ -66,6 +66,7 @@ class Database:
         return cls(":memory:")
 
     def _connect(self):
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         return sqlite3.connect(self.db_path)
 
     def _extract(self, query, choices):

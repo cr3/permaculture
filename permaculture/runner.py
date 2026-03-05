@@ -62,9 +62,15 @@ class Runner:
         results = await asyncio.gather(*tasks, return_exceptions=True)
         for name, result in zip(self.sources, results, strict=False):
             if isinstance(result, Exception):
+                error = result.__cause__ or result
                 logger.error(
                     "Failed ingesting %(name)s: %(error)s",
-                    {"name": name, "error": result},
+                    {"name": name, "error": error},
+                )
+                logger.debug(
+                    "Traceback for %(name)s",
+                    {"name": name},
+                    exc_info=result,
                 )
 
         await queue.put(None)
@@ -97,16 +103,17 @@ class Runner:
 
     async def _ingest_source(self, name, source, sem, queue, loop):
         async with sem:
+            last_exc = None
             for attempt in range(self.max_retries):
                 try:
                     await asyncio.to_thread(
                         self._ingest_sync, name, source, queue, loop
                     )
-                except Exception:
+                except Exception as exc:
+                    last_exc = exc
                     wait = self._backoff_seconds(attempt + 1)
                     logger.warning(
-                        "Retry %(attempt)s for %(name)s"
-                        " (waiting %(wait)ss)",
+                        "Retry %(attempt)s for %(name)s (waiting %(wait)ss)",
                         {
                             "attempt": attempt + 1,
                             "name": name,
@@ -121,7 +128,7 @@ class Runner:
                     )
                     return
 
-            raise RuntimeError(f"Failed ingesting {name}")
+            raise RuntimeError(f"Failed ingesting {name}") from last_exc
 
     def _backoff_seconds(self, attempt):
         """Exponential backoff with jitter."""
@@ -130,6 +137,4 @@ class Runner:
 
     def _ingest_sync(self, name, source, queue, loop):
         for record in source.fetch_all():
-            asyncio.run_coroutine_threadsafe(
-                queue.put((name, record)), loop
-            ).result()
+            asyncio.run_coroutine_threadsafe(queue.put((name, record)), loop).result()

@@ -11,10 +11,10 @@ from attrs import define, evolve, field
 from bs4 import BeautifulSoup
 from yarl import URL
 
+from permaculture.browser import BrowserClient
 from permaculture.converter import Converter
 from permaculture.database import DatabasePlant
 from permaculture.google import GoogleSpreadsheet
-from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import Storage, null_storage
@@ -28,19 +28,19 @@ logger = logging.getLogger(__name__)
 class DEWeb:
     """Design Ecologique web interface."""
 
-    session: HTTPSession = field(factory=partial(HTTPSession, DE_ORIGIN))
+    client: BrowserClient = field(factory=partial(BrowserClient, DE_ORIGIN))
     storage: Storage = field(default=null_storage)
 
     def with_cache(self, storage):
-        session = self.session.with_cache(storage)
-        return evolve(self, session=session, storage=storage)
+        client = self.client.with_cache(storage)
+        return evolve(self, client=client, storage=storage)
 
     def perenial_plants_list(self):
         """List of perenial plants useful for permaculture in Quebec.
 
         :returns: Google spreadsheet with plants.
         """
-        response = self.session.get("/liste-de-plantes-vivaces/")
+        response = self.client.get("/liste-de-plantes-vivaces/")
         soup = BeautifulSoup(response.text, "html.parser")
         element = soup.select_one("a[href*=spreadsheets]")
         if not element:
