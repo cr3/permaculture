@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture package &mdash; permaculture 0.0.14 documentation</title>
+  <title>permaculture package &mdash; permaculture 0.0.15 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.14
+                0.0.15
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -226,6 +226,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.storage.SqliteStorage"><code class="docutils literal notranslate"><span class="pre">SqliteStorage</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.storage.Storage"><code class="docutils literal notranslate"><span class="pre">Storage</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.storage.StorageAction"><code class="docutils literal notranslate"><span class="pre">StorageAction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permaculture.storage.hash_request"><code class="docutils literal notranslate"><span class="pre">hash_request()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-permaculture.unit">permaculture.unit module</a><ul>
@@ -360,7 +361,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="permaculture.cli.command_list">
 <span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">command_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.command_list" title="Permalink to this definition"></a></dt>
-<dd><p>List available databases.</p>
+<dd><p>List available ingestors.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -727,9 +728,14 @@ by punctuation or whitespace.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="permaculture.de.DEWeb">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">DEWeb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.http.HTTPSession" title="permaculture.http.HTTPSession"><span class="pre">HTTPSession</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.storage.Storage" title="permaculture.storage.Storage"><span class="pre">Storage</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_NullStorage()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEWeb" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.de.</span></span><span class="sig-name descname"><span class="pre">DEWeb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BrowserClient</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_Nothing.NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.storage.Storage" title="permaculture.storage.Storage"><span class="pre">Storage</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">_NullStorage()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEWeb" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Design Ecologique web interface.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="permaculture.de.DEWeb.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">BrowserClient</span></em><a class="headerlink" href="#permaculture.de.DEWeb.client" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="permaculture.de.DEWeb.perenial_plants_list">
 <span class="sig-name descname"><span class="pre">perenial_plants_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.de.DEWeb.perenial_plants_list" title="Permalink to this definition"></a></dt>
@@ -740,11 +746,6 @@ by punctuation or whitespace.</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.de.DEWeb.session">
-<span class="sig-name descname"><span class="pre">session</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.http.HTTPSession" title="permaculture.http.HTTPSession"><span class="pre">HTTPSession</span></a></em><a class="headerlink" href="#permaculture.de.DEWeb.session" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="permaculture.de.DEWeb.storage">
@@ -897,7 +898,7 @@ HTTP caching.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="permaculture.http.HTTPSession">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.http.</span></span><span class="sig-name descname"><span class="pre">HTTPSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPSession" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.http.</span></span><span class="sig-name descname"><span class="pre">HTTPSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPSession" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></p>
 <p>An HTTP session with origin.</p>
 <dl class="py method">
@@ -917,7 +918,7 @@ HTTP caching.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="permaculture.http.HTTPSession.with_adapter">
-<span class="sig-name descname"><span class="pre">with_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adapter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HTTPAdapter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPSession.with_adapter" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">with_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">http_adapter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HTTPAdapter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">https_adapter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HTTPAdapter</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.http.HTTPSession.with_adapter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2404,6 +2405,12 @@ content type.</p>
 <span class="sig-name descname"><span class="pre">metavar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PATH'</span></em><a class="headerlink" href="#permaculture.storage.StorageAction.metavar" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="permaculture.storage.hash_request">
+<span class="sig-prename descclassname"><span class="pre">permaculture.storage.</span></span><span class="sig-name descname"><span class="pre">hash_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.storage.hash_request" title="Permalink to this definition"></a></dt>
+<dd><p>Hash an HTTP-like request into a storage key.</p>
 </dd></dl>
 
 </section>
