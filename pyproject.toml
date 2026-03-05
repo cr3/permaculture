@@ -12,6 +12,7 @@ dependencies = [
   "appdirs>=1.4.4,<2.0.0",
   "attrs>=23.1.0",
   "beautifulsoup4>=4.12.2,<5.0.0",
+  "brotli>=1.2.0,<2.0.0",
   "configargparse>=1.7,<2.0",
   "defusedxml>=0.7.1,<1.0.0",
   "more-itertools>=10.1.0,<11.0.0",
