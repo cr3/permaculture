@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; permaculture 0.0.13 documentation</title>
+  <title>Index &mdash; permaculture 0.0.14 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -32,7 +32,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.13
+                0.0.14
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -180,8 +180,6 @@
       <li><a href="permaculture.html#permaculture.cli.command_lookup">command_lookup() (in module permaculture.cli)</a>
 </li>
       <li><a href="permaculture.html#permaculture.cli.command_search">command_search() (in module permaculture.cli)</a>
-</li>
-      <li><a href="permaculture.html#permaculture.cli.command_store">command_store() (in module permaculture.cli)</a>
 </li>
       <li><a href="permaculture.html#permaculture.database.DatabasePlant.common_names">common_names (permaculture.database.DatabasePlant property)</a>
 </li>
@@ -389,8 +387,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="permaculture.locales.html#permaculture.locales.Locales.from_domain">from_domain() (permaculture.locales.Locales class method)</a>
 </li>
-      <li><a href="permaculture.html#permaculture.storage.SqliteStorage.from_path">from_path() (permaculture.storage.SqliteStorage class method)</a>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.from_path">from_path() (permaculture.pfaf.PFAFModel class method)</a>
+
+      <ul>
+        <li><a href="permaculture.html#permaculture.storage.SqliteStorage.from_path">(permaculture.storage.SqliteStorage class method)</a>
 </li>
+      </ul></li>
       <li><a href="permaculture.html#permaculture.location.LocationPoint.from_point">from_point() (permaculture.location.LocationPoint class method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.location.LocationPolygon.from_points">from_points() (permaculture.location.LocationPolygon class method)</a>
@@ -398,11 +400,7 @@
       <li><a href="permaculture.html#permaculture.location.LocationMultiPolygon.from_polygons">from_polygons() (permaculture.location.LocationMultiPolygon class method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.database.Database.from_storage">from_storage() (permaculture.database.Database class method)</a>
-
-      <ul>
-        <li><a href="permaculture.html#permaculture.pfaf.PFAFModel.from_storage">(permaculture.pfaf.PFAFModel class method)</a>
 </li>
-      </ul></li>
       <li><a href="permaculture.html#permaculture.google.GoogleSpreadsheet.from_url">from_url() (permaculture.google.GoogleSpreadsheet class method)</a>
 </li>
   </ul></td>
@@ -769,6 +767,8 @@
       <li><a href="permaculture.html#permaculture.nc.NCModel.parse_tr">parse_tr() (permaculture.nc.NCModel method)</a>
 </li>
       <li><a href="permaculture.html#permaculture.nc.NCAuthentication.password">password (permaculture.nc.NCAuthentication attribute)</a>
+</li>
+      <li><a href="permaculture.html#permaculture.pfaf.PFAFFile.path">path (permaculture.pfaf.PFAFFile attribute)</a>
 </li>
       <li><a href="permaculture.html#permaculture.storage.FileStorage.path_to_key">path_to_key() (permaculture.storage.FileStorage method)</a>
 </li>
@@ -1172,8 +1172,6 @@
         <li><a href="permaculture.html#permaculture.http.HTTPCache.storage">(permaculture.http.HTTPCache attribute)</a>
 </li>
         <li><a href="permaculture.html#permaculture.http.HTTPCacheAll.storage">(permaculture.http.HTTPCacheAll attribute)</a>
-</li>
-        <li><a href="permaculture.html#permaculture.pfaf.PFAFFile.storage">(permaculture.pfaf.PFAFFile attribute)</a>
 </li>
       </ul></li>
       <li><a href="permaculture.html#permaculture.storage.StorageAction">StorageAction (class in permaculture.storage)</a>

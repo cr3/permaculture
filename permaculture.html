@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>permaculture package &mdash; permaculture 0.0.13 documentation</title>
+  <title>permaculture package &mdash; permaculture 0.0.14 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,7 +35,7 @@
             permaculture
           </a>
               <div class="version">
-                0.0.13
+                0.0.14
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -78,7 +78,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_list"><code class="docutils literal notranslate"><span class="pre">command_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_lookup"><code class="docutils literal notranslate"><span class="pre">command_lookup()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_search"><code class="docutils literal notranslate"><span class="pre">command_search()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.command_store"><code class="docutils literal notranslate"><span class="pre">command_store()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.load_database"><code class="docutils literal notranslate"><span class="pre">load_database()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permaculture.cli.make_args_parser"><code class="docutils literal notranslate"><span class="pre">make_args_parser()</span></code></a></li>
@@ -374,12 +373,6 @@
 <dt class="sig sig-object py" id="permaculture.cli.command_search">
 <span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">command_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.command_search" title="Permalink to this definition"></a></dt>
 <dd><p>Search for the scientific name by common name.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="permaculture.cli.command_store">
-<span class="sig-prename descclassname"><span class="pre">permaculture.cli.</span></span><span class="sig-name descname"><span class="pre">command_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.cli.command_store" title="Permalink to this definition"></a></dt>
-<dd><p>Store a file for a storage key.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1733,7 +1726,7 @@ HTTP caching.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">PFAFFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#permaculture.storage.FileStorage" title="permaculture.storage.FileStorage"><span class="pre">FileStorage</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFFile" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">permaculture.pfaf.</span></span><span class="sig-name descname"><span class="pre">PFAFFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFFile" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile.main_database">
@@ -1741,8 +1734,8 @@ HTTP caching.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile.storage">
-<span class="sig-name descname"><span class="pre">storage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#permaculture.storage.FileStorage" title="permaculture.storage.FileStorage"><span class="pre">FileStorage</span></a></em><a class="headerlink" href="#permaculture.pfaf.PFAFFile.storage" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFFile.path">
+<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#permaculture.pfaf.PFAFFile.path" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1794,8 +1787,8 @@ HTTP caching.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.from_storage">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFModel.from_storage" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="permaculture.pfaf.PFAFModel.from_path">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#permaculture.pfaf.PFAFModel.from_path" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1811,7 +1804,7 @@ HTTP caching.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="permaculture.priority.LocationPriority.weight">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weight</span></span><a class="headerlink" href="#permaculture.priority.LocationPriority.weight" title="Permalink to this definition"></a></dt>
-<dd><p>Convert a string or number to a floating-point number, if possible.</p>
+<dd><p>Convert a string or number to a floating point number, if possible.</p>
 </dd></dl>
 
 <dl class="py method">
