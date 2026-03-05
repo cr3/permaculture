@@ -6,7 +6,7 @@ from contextlib import contextmanager, suppress
 
 from attrs import define, evolve, field
 
-from permaculture.storage import Storage, null_storage
+from permaculture.storage import Storage, hash_request, null_storage
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +33,14 @@ class BrowserSession:
     def get(self, path):
         """Navigate to origin + path and return a ResponseAdapter."""
         url = self.origin + path
+        key = hash_request("GET", url)
         with suppress(KeyError):
-            return self.storage[url]
+            return self.storage[key]
 
         self.page.goto(url)
         response = BrowserResponse(self.page.content())
         try:
-            self.storage[url] = response
+            self.storage[key] = response
         except Exception:
             logger.warning("Failed to cache %(url)s", {"url": url})
 

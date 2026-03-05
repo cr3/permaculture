@@ -10,6 +10,7 @@ from permaculture.browser import (
     BrowserResponse,
     BrowserSession,
 )
+from permaculture.storage import hash_request
 
 
 def test_browser_session_get_navigates():
@@ -36,7 +37,7 @@ def test_browser_session_get_cached():
     """BrowserSession.get() should return cached response without navigating."""
     page = Mock()
     cached = BrowserResponse("cached")
-    storage = {"http://example.com/path": cached}
+    storage = {hash_request("GET", "http://example.com/path"): cached}
 
     assert_that(
         BrowserSession("http://example.com", page, storage).get("/path"), is_(cached)
@@ -50,7 +51,7 @@ def test_browser_session_get_stores_in_cache():
     storage = {}
     BrowserSession("http://example.com", page, storage).get("/path")
 
-    assert_that(storage["http://example.com/path"].text, equal_to("<html>new</html>"))
+    assert_that(storage[hash_request("GET", "http://example.com/path")].text, equal_to("<html>new</html>"))
 
 
 def test_browser_session_with_cache():
@@ -98,7 +99,7 @@ def test_browser_client_with_cache():
 
 def test_browser_client_open_passes_storage():
     """BrowserClient.open() should pass storage to BrowserSession."""
-    storage = {"http://example.com/cached": BrowserResponse("hit")}
+    storage = {hash_request("GET", "http://example.com/cached"): BrowserResponse("hit")}
     page = Mock()
     client = BrowserClient(
         "http://example.com", page_factory=lambda: page, storage=storage

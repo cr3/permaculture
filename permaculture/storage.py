@@ -3,15 +3,22 @@
 import logging
 import sqlite3
 from collections.abc import MutableMapping
+from hashlib import md5
 from pathlib import Path
 from urllib.parse import quote, unquote
 
 from attrs import define, field
 
 from permaculture.action import SingleAction
-from permaculture.serializer import Serializer
+from permaculture.serializer import Serializer, json_serializer
 
 logger = logging.getLogger(__name__)
+
+
+def hash_request(method, url, body=None):
+    """Hash an HTTP-like request into a storage key."""
+    data = json_serializer.encode({"method": method, "url": url, "body": body})
+    return md5(data).hexdigest()  # noqa: S324
 
 
 class StorageAction(SingleAction):

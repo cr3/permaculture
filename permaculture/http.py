@@ -2,7 +2,6 @@
 
 import logging
 from datetime import UTC, datetime, timedelta
-from hashlib import md5
 from urllib.parse import urlparse
 
 from attrs import define, field
@@ -10,7 +9,7 @@ from requests import Response, Session
 from requests.adapters import HTTPAdapter
 
 from permaculture.serializer import json_serializer
-from permaculture.storage import MemoryStorage, Storage
+from permaculture.storage import MemoryStorage, Storage, hash_request
 
 logger = logging.getLogger(__name__)
 
@@ -148,21 +147,15 @@ class HTTPCacheAll:
 
     storage: Storage = field(factory=MemoryStorage)
 
-    def _hash_request(self, request):
+    @staticmethod
+    def _hash_request(request):
         content_type = request.headers.get("content-type")
         if request.method == "POST" and content_type == "application/json":
             body = json_serializer.decode(request.body)
         else:
             body = request.body
 
-        data = json_serializer.encode(
-            {
-                "method": request.method,
-                "url": request.url,
-                "body": body,
-            }
-        )
-        return md5(data).hexdigest()  # noqa: S324
+        return hash_request(request.method, request.url, body)
 
     def store(self, response):
         """Store an HTTP response object in the cache."""
