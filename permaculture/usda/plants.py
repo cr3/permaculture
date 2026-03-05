@@ -7,10 +7,9 @@ from attrs import define, field
 from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import DatabasePlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
-from permaculture.nlp import normalize
 from permaculture.priority import LocationPriority, Priority
 from permaculture.unit import fahrenheit, feet, inches
 
@@ -246,35 +245,19 @@ class PlantsModel:
 
 
 @define(frozen=True)
-class PlantsDatabase(Database):
+class PlantsIngestor:
     model: PlantsModel = field(factory=PlantsModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
     def from_config(cls, config):
-        """Instantiate PlantsDatabase from config."""
+        """Instantiate PlantsIngestor from config."""
         model = PlantsModel().with_cache(config.storage)
         priority = LocationPriority("United States").with_cache(config.storage)
         return cls(model, priority)
 
-    def iterate(self):
+    def fetch_all(self):
         return (
             DatabasePlant(c, self.priority.weight)
             for c in self.model.all_characteristics()
         )
-
-    def lookup(self, names, score):
-        for name in names:
-            normalized_name = normalize(name)
-            for plant in self.model.plant_search(
-                normalized_name, "Scientific Name"
-            ):
-                if self.extract(plant["scientific name"], names) >= score:
-                    yield DatabasePlant(plant, self.priority.weight)
-
-    def search(self, name, score):
-        normalized_name = normalize(name)
-        for plant in self.model.plant_search(normalized_name, "Common Name"):
-            plant = DatabasePlant(plant, self.priority.weight)
-            if self.extract(name, plant.names) >= score:
-                yield plant

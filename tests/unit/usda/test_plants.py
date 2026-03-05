@@ -6,7 +6,7 @@ import pytest
 
 from permaculture.usda.plants import (
     PlantsConverter,
-    PlantsDatabase,
+    PlantsIngestor,
     PlantsModel,
     PlantsWeb,
 )
@@ -173,8 +173,8 @@ def test_plants_model_all_characteristics(unique):
     ]
 
 
-def test_plants_database_iterate(unique):
-    """Iterating over the database should return a list of elements."""
+def test_plants_ingestor_fetch_all(unique):
+    """Fetching all should return a list of elements."""
     scientific_name, common_name = unique("token"), unique("text")
     model = Mock(
         all_characteristics=Mock(
@@ -187,8 +187,8 @@ def test_plants_database_iterate(unique):
         )
     )
 
-    database = PlantsDatabase(model)
-    elements = list(database.iterate())
+    ingestor = PlantsIngestor(model)
+    elements = list(ingestor.fetch_all())
     assert elements == [
         {
             "scientific name": scientific_name,
