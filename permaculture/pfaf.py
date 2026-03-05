@@ -105,5 +105,10 @@ class PFAFIngestor:
         return cls(model, priority)
 
     def fetch_all(self):
+        count = 0
         for p in self.model.all_plants():
+            count += 1
+            if count % 100 == 0:
+                logger.info("PFAF: ingested %d plants", count)
             yield DatabasePlant(p, self.priority.weight)
+        logger.info("PFAF: ingested %d plants total", count)

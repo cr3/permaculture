@@ -224,5 +224,10 @@ class SDPIngestor:
         return cls(model, priority)
 
     def fetch_all(self):
+        count = 0
         for plant in self.model.all_plants():
+            count += 1
+            if count % 100 == 0:
+                logger.info("SDP: ingested %d plants", count)
             yield DatabasePlant(plant, self.priority.weight)
+        logger.info("SDP: ingested %d plants total", count)
