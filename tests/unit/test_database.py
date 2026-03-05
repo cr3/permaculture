@@ -188,7 +188,7 @@ def test_database_merge_all(plants, expected):
     [
         pytest.param(
             [],
-            {},
+            DatabasePlant(),
             id="empty",
         ),
         pytest.param(
