@@ -7,7 +7,6 @@ from argparse import ArgumentParser, FileType
 from pathlib import Path
 
 from appdirs import user_cache_dir
-from attrs import evolve
 from configargparse import ArgParser
 
 from permaculture.data import (
@@ -124,20 +123,6 @@ def make_args_parser():
         type=score_type,
         help="cutoff score (default %(default)s for partial match)",
     )
-    store = command.add_parser(
-        "store",
-        help="store a file for a storage key",
-    )
-    store.add_argument(
-        "key",
-        help="storage key",
-    )
-    store.add_argument(
-        "file",
-        type=FileType("rb"),
-        default=sys.stdin.buffer,
-        help="input file (default stdin)",
-    )
     return args_parser
 
 
@@ -192,6 +177,13 @@ def make_config_parser(config_files):
     nc.add_argument(
         "--nc-password-file",
     )
+    pfaf = config.add_argument_group(
+        "pfaf",
+        "Plants For A Future",
+    )
+    pfaf.add_argument(
+        "--pfaf-file",
+    )
     return config
 
 
@@ -243,15 +235,6 @@ def command_search(args, database):
     ]
 
 
-def command_store(args, config):
-    """Store a file for a storage key."""
-    storage = evolve(
-        config.storage,
-        serializer="application/octet-stream",
-    )
-    storage[args.key] = args.file.read()
-
-
 def main(argv=None):
     """Entry point to the permaculture command."""
     config_parser = make_config_parser(["~/.permaculture", ".permaculture"])
@@ -284,9 +267,6 @@ def main(argv=None):
         case "search":
             database = load_database(config)
             data = command_search(args, database)
-        case "store":
-            command_store(args, config)
-            return
         case command:
             args_parser.error(f"Programming error for command: {command}")
 

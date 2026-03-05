@@ -82,22 +82,6 @@ def test_make_config_parser_nc_password_file(tmpdir):
     assert config.nc_password_file == str(password_file)
 
 
-def test_main_store(tmpdir):
-    """Storing a file should create a key under the storage directory."""
-    storage = tmpdir.join("storage")
-    file = tmpdir.join("file").ensure()
-    main(
-        [
-            f"--storage={storage}",
-            "--log-level=debug",
-            "store",
-            "key",
-            str(file),
-        ]
-    )
-    assert storage.join("key").exists()
-
-
 @patch("sys.stdout")
 def test_main_help(stdout):
     """The main function should output usage when asked for --help."""
