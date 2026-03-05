@@ -627,7 +627,6 @@ dependencies = [
     { name = "configargparse" },
     { name = "defusedxml" },
     { name = "more-itertools" },
-    { name = "playwright" },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "unidecode" },
@@ -638,6 +637,9 @@ dependencies = [
 [package.optional-dependencies]
 check = [
     { name = "ruff" },
+]
+de = [
+    { name = "playwright" },
 ]
 docs = [
     { name = "sphinx" },
@@ -662,7 +664,7 @@ requires-dist = [
     { name = "coverage", marker = "extra == 'test'", specifier = ">=7.2.3,<8.0.0" },
     { name = "defusedxml", specifier = ">=0.7.1,<1.0.0" },
     { name = "more-itertools", specifier = ">=10.1.0,<11.0.0" },
-    { name = "playwright", specifier = ">=1.40.0,<2.0.0" },
+    { name = "playwright", marker = "extra == 'de'", specifier = ">=1.40.0,<2.0.0" },
     { name = "pyhamcrest", marker = "extra == 'test'", specifier = ">=2.1.0,<3.0.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=9.0.0,<10.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=1.3.0,<2.0.0" },
@@ -677,7 +679,7 @@ requires-dist = [
     { name = "xlrd", specifier = ">=2.0.1,<3.0.0" },
     { name = "yarl", specifier = ">=1.9.2,<2.0.0" },
 ]
-provides-extras = ["check", "docs", "test"]
+provides-extras = ["check", "de", "docs", "test"]
 
 [[package]]
 name = "playwright"
