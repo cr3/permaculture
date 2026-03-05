@@ -54,7 +54,7 @@ class DatabasePlant(Mapping):
 
 @define(frozen=True)
 class Database:
-    """Local database backed by a SQLite sink."""
+    """Local SQLite database for plant records."""
 
     db_path: Path = field(converter=Path)
 
@@ -63,6 +63,55 @@ class Database:
 
     def _extract(self, query, choices):
         return Extractor(query, normalize, score).extract_one(choices)[0]
+
+    def initialize(self):
+        """Create tables and indexes."""
+        with self._connect() as conn:
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS plants (
+                    id INTEGER PRIMARY KEY,
+                    source TEXT NOT NULL,
+                    scientific_name TEXT NOT NULL,
+                    data TEXT NOT NULL,
+                    weight REAL NOT NULL DEFAULT 1.0,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS common_names (
+                    plant_id INTEGER REFERENCES plants(id),
+                    name TEXT NOT NULL
+                )
+            """
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_sci"
+                " ON plants(scientific_name)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_cn" " ON common_names(name)"
+            )
+
+    def write_batch(self, source, records):
+        """Persist a batch of plant records."""
+        with self._connect() as conn:
+            for record in records:
+                data_json = json.dumps(record.data)
+                cur = conn.execute(
+                    "INSERT INTO plants"
+                    " (source, scientific_name, data, weight)"
+                    " VALUES (?, ?, ?, ?)",
+                    (source, record.scientific_name, data_json, record.weight),
+                )
+                pid = cur.lastrowid
+                conn.executemany(
+                    "INSERT INTO common_names (plant_id, name)"
+                    " VALUES (?, ?)",
+                    [(pid, n) for n in record.common_names],
+                )
 
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over all plants."""
