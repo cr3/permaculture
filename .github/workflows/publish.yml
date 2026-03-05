@@ -38,7 +38,7 @@ jobs:
       - name: Set up the environment
         uses: ./.github/actions/setup-uv-env
         with:
-          extras: docs
+          extras: docs,test
 
       - name: Export tag
         id: vars
