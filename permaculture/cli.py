@@ -71,7 +71,7 @@ def make_args_parser():
     )
     command.add_parser(
         "list",
-        help="list available databases",
+        help="list available ingestors",
     )
     lookup = command.add_parser(
         "lookup",
@@ -205,7 +205,7 @@ def command_iterate(database):
 
 
 def command_list(database):
-    """List available databases."""
+    """List available ingestors."""
     return database.sources()
 
 
