@@ -126,6 +126,7 @@ class DEModel:
         csv = reader(StringIO(data))
         next(csv)  # Skip groups
         header = [h.strip() for h in next(csv)]
+        next(csv)  # Skip blank row
         for row in csv:
             yield self.converter.convert(dict(zip(header, row, strict=True)))
 

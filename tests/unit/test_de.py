@@ -324,7 +324,7 @@ def test_de_converter_convert_item(item, expected):
 
 def test_de_model_get_perenial_plants():
     """All perenial plants should return a dictionary of characteristics."""
-    data = "TAXONOMIE\nGenre,Espèce \na,b\n"
+    data = "TAXONOMIE\nGenre,Espèce \n\na,b\n"
     export = Mock(return_value=data)
     perenial_plants_list = Mock(return_value=Mock(export=export))
     web = Mock(perenial_plants_list=perenial_plants_list)
