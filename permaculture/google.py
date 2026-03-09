@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from attrs import define
+from bs4 import BeautifulSoup
 from yarl import URL
 
 from permaculture.http import HTTPSession
@@ -21,6 +22,17 @@ class GoogleSpreadsheet:
         session = HTTPSession(url.origin()).with_cache(storage)
         doc_id = Path(url.path).parent.name
         return cls(session, doc_id)
+
+    def sheets(self):
+        """List sheets in the spreadsheet."""
+        response = self.session.get(
+            f"/spreadsheets/d/{self.doc_id}/htmlview",
+        )
+        soup = BeautifulSoup(response.text, "html.parser")
+        return {
+            tag.get_text(): int(tag["id"].removeprefix("sheet-button-"))
+            for tag in soup.select("[id^=sheet-button-]")
+        }
 
     def export(self, gid=1, fmt="csv"):
         response = self.session.get(

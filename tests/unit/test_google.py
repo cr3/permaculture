@@ -17,6 +17,22 @@ def test_google_spreadsheet_from_url(unique):
     assert gs.doc_id == doc_id
 
 
+def test_google_spreadsheet_sheets(unique):
+    """Listing sheets should GET htmlview and parse sheet buttons."""
+    doc_id = unique("text")
+    gid = unique("integer")
+    name = unique("text")
+    session = Mock()
+    session.get.return_value = StubRequestsResponse(
+        text=f'<li id="sheet-button-{gid}">{name}</li>',
+    )
+    result = GoogleSpreadsheet(session, doc_id).sheets()
+    session.get.assert_called_once_with(
+        f"/spreadsheets/d/{doc_id}/htmlview",
+    )
+    assert result == {name: gid}
+
+
 def test_google_spreadsheet_export(unique):
     """Exporting should GET with gid and format params."""
     doc_id, gid, fmt = unique("text"), unique("text"), unique("text")
