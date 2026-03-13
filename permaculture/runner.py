@@ -32,8 +32,8 @@ class Runner:
     :param queue_size: Maximum pending observations before backpressure.
     """
 
+    database: Database = field()
     sources: dict[str, Ingestor] = field(factory=dict)
-    database: Database = field(factory=dict)
     max_concurrency: int = field(default=4)
     max_retries: int = field(default=3)
     backoff_base: float = field(default=0.25)
