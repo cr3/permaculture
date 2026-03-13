@@ -48,9 +48,7 @@ def lev(s1, s2, sort=True):
         s2 = " ".join(sorted(s2.split()))
 
     l1, l2 = len(s1), len(s2)
-    matrix = [*range(l1 + 1)] * (l2 + 1)
-    for zz in range(l2 + 1):
-        matrix[zz] = [*range(zz, zz + l1 + 1)]
+    matrix = [[*range(zz, zz + l1 + 1)] for zz in range(l2 + 1)]
 
     for zz in range(l2):
         for sz in range(l1):
@@ -110,7 +108,7 @@ class Extractor:
             yield (score, choice)
 
     def extract_one(self, choices):
-        """Extract the beschoice with the best score.
+        """Extract the best choice with the best score.
 
         :raises ValueError: When there are no choices.
         """
