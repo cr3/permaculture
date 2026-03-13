@@ -2,9 +2,10 @@
 
 import json
 import sqlite3
+from collections import defaultdict
 from collections.abc import Iterator, Mapping
-from itertools import groupby, starmap
-from operator import attrgetter, mul
+from itertools import starmap
+from operator import mul
 from pathlib import Path
 
 from attrs import define, field
@@ -201,8 +202,10 @@ def _merge_all(
     plants: Iterator[DatabasePlant],
 ) -> Iterator[DatabasePlant]:
     """Group plants by scientific name, merging numbers and strings."""
-    keyfunc = attrgetter("scientific_name")
-    return (_merge(p) for _, p in groupby(sorted(plants, key=keyfunc), keyfunc))
+    grouped = defaultdict(list)
+    for plant in plants:
+        grouped[plant.scientific_name].append(plant)
+    return (_merge(g) for g in grouped.values())
 
 
 def _merge(plants: Iterator[DatabasePlant]) -> DatabasePlant:
