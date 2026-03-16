@@ -145,29 +145,27 @@ class NCConverter(Converter):
         else:
             return super().convert_string(key, value)
 
-    def convert_item(self, key, value):
-        dispatchers = {
-            "Bacteria-Fungal Ratio": self.convert_ignore,
-            "Bloom Time": self.convert_period,
-            "Common name": self.convert_list,
-            "Compatible": self.convert_bool,
-            "Fire Damage": self.convert_list,
-            "Flood": self.convert_list,
-            "Flower Color": self.convert_list,
-            "Fruit Time": self.convert_period,
-            "Growth Rate": self.convert_list,
-            "Height": self.convert_range,
-            "Minimum Root Depth": partial(self.convert_float, unit=inches),
-            "Notes": self.convert_ignore,
-            "Root Type": self.convert_list,
-            "Soil Moisture": self.convert_list,
-            "Soil Type": self.convert_list,
-            "Soil pH": self.convert_range,
-            "Spread": self.convert_range,
-            "Sun": self.convert_list,
-            "USDA Hardiness Zones": self.convert_range,
-        }
-        return dispatchers.get(key, self.convert_string)(key, value)
+    DISPATCH = {
+        "Bacteria-Fungal Ratio": Converter.convert_ignore,
+        "Bloom Time": convert_period,
+        "Common name": Converter.convert_list,
+        "Compatible": Converter.convert_bool,
+        "Fire Damage": Converter.convert_list,
+        "Flood": Converter.convert_list,
+        "Flower Color": Converter.convert_list,
+        "Fruit Time": convert_period,
+        "Growth Rate": Converter.convert_list,
+        "Height": convert_range,
+        "Minimum Root Depth": partial(Converter.convert_float, unit=inches),
+        "Notes": Converter.convert_ignore,
+        "Root Type": Converter.convert_list,
+        "Soil Moisture": Converter.convert_list,
+        "Soil Type": Converter.convert_list,
+        "Soil pH": convert_range,
+        "Spread": convert_range,
+        "Sun": Converter.convert_list,
+        "USDA Hardiness Zones": convert_range,
+    }
 
 
 @define(frozen=True)

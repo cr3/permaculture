@@ -34,32 +34,30 @@ class PFAFConverter(Converter):
         else:
             return super().convert_float(key, value)
 
-    def convert_item(self, key, value):
-        dispatchers = {
-            "Author": self.convert_ignore,
-            "Common name": self.convert_list,
-            "Cultivation details": self.convert_ignore,
-            "Deciduous/Evergreen": self.convert_letters,
-            "Drought": self.convert_ignore,
-            "Edible uses": self.convert_ignore,
-            "Growth rate": self.convert_list,
-            "Habitat": self.convert_ignore,
-            "Height": self.convert_float,
-            "Known hazards": self.convert_ignore,
-            "Latin name": self.convert_token,
-            "Medicinal": self.convert_ignore,
-            "Moisture": self.convert_letters,
-            "Pollinators": self.convert_list,
-            "Propagation": self.convert_ignore,
-            "Range": self.convert_ignore,
-            "Shade": self.convert_letters,
-            "Soil": self.convert_letters,
-            "Uses notes": self.convert_ignore,
-            "Width": self.convert_float,
-            "Wildlife": self.convert_ignore,
-            "pH": self.convert_letters,
-        }
-        return dispatchers.get(key, self.convert_string)(key, value)
+    DISPATCH = {
+        "Author": Converter.convert_ignore,
+        "Common name": Converter.convert_list,
+        "Cultivation details": Converter.convert_ignore,
+        "Deciduous/Evergreen": Converter.convert_letters,
+        "Drought": Converter.convert_ignore,
+        "Edible uses": Converter.convert_ignore,
+        "Growth rate": Converter.convert_list,
+        "Habitat": Converter.convert_ignore,
+        "Height": convert_float,
+        "Known hazards": Converter.convert_ignore,
+        "Latin name": Converter.convert_token,
+        "Medicinal": Converter.convert_ignore,
+        "Moisture": Converter.convert_letters,
+        "Pollinators": Converter.convert_list,
+        "Propagation": Converter.convert_ignore,
+        "Range": Converter.convert_ignore,
+        "Shade": Converter.convert_letters,
+        "Soil": Converter.convert_letters,
+        "Uses notes": Converter.convert_ignore,
+        "Width": convert_float,
+        "Wildlife": Converter.convert_ignore,
+        "pH": Converter.convert_letters,
+    }
 
 
 @define(frozen=True)
