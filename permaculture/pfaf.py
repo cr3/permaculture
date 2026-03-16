@@ -8,9 +8,11 @@ import xlrd
 from attrs import define, field
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
+
+PFAF_ORIGIN = "https://pfaf.org/"
 
 logger = logging.getLogger(__name__)
 
@@ -87,15 +89,16 @@ class PFAFModel:
 
 @define(frozen=True)
 class PFAFIngestor:
+    name: str
     model: PFAFModel
     priority: Priority = field(factory=Priority)
 
     @classmethod
-    def from_config(cls, config):
+    def from_config(cls, config, name):
         """Instantiate PFAFIngestor from config."""
         model = PFAFModel.from_path(config.pfaf_file)
         priority = LocationPriority("United Kingdom").with_cache(config.storage)
-        return cls(model, priority)
+        return cls(name, model, priority)
 
     def fetch_all(self):
         count = 0
@@ -103,5 +106,8 @@ class PFAFIngestor:
             count += 1
             if count % 100 == 0:
                 logger.info("PFAF: ingested %d plants", count)
-            yield DatabasePlant(p, self.priority.weight)
+            yield IngestorPlant(
+                p, self.priority.weight,
+                ingestor=self.name, source=PFAF_ORIGIN,
+            )
         logger.info("PFAF: ingested %d plants total", count)

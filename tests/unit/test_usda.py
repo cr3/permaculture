@@ -4,7 +4,7 @@ from unittest.mock import ANY, Mock
 
 import pytest
 
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.usda import (
     USDAConverter,
     USDAIngestor,
@@ -188,13 +188,15 @@ def test_plants_ingestor_fetch_all(unique):
         )
     )
 
-    ingestor = USDAIngestor(model)
+    ingestor = USDAIngestor("usda", model)
     elements = list(ingestor.fetch_all())
     assert elements == [
-        DatabasePlant(
+        IngestorPlant(
             {
                 "scientific name": scientific_name,
                 f"common name/{common_name}": True,
-            }
+            },
+            ingestor="usda",
+            source="https://plantsservices.sc.egov.usda.gov",
         ),
     ]

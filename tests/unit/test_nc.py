@@ -32,7 +32,7 @@ def test_nc_ingestor_from_config_password_file(tmpdir, unique):
     )
     with patch.object(NCModel, "with_authentication") as mock_auth:
         mock_auth.return_value = NCModel()
-        NCIngestor.from_config(config)
+        NCIngestor.from_config(config, "nc")
         mock_auth.assert_called_once_with(
             config.nc_username,
             password,
@@ -51,7 +51,7 @@ def test_nc_ingestor_from_config_password(unique):
     )
     with patch.object(NCModel, "with_authentication") as mock_auth:
         mock_auth.return_value = NCModel()
-        NCIngestor.from_config(config)
+        NCIngestor.from_config(config, "nc")
         mock_auth.assert_called_once_with(
             config.nc_username,
             password,

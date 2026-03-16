@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from defusedxml.ElementTree import fromstring
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.nlp import normalize
@@ -49,6 +49,10 @@ class SDPWeb:
         """Fetch an individual product page."""
         response = self.session.get(path)
         return response.text
+
+    def source_url(self, path):
+        """Return the full URL for a product page."""
+        return f"{self.session.origin}{path}"
 
 
 def parse_sitemap_urls(xml_text):
@@ -191,7 +195,7 @@ class SDPModel:
         return parse_product(html)
 
     def all_plants(self):
-        """Yield converted plant data for all products."""
+        """Yield (path, converted plant data) for all products."""
         for path in self.product_paths():
             raw = self.get_plant(path)
             if raw is None or raw["scientific name"] is None:
@@ -204,28 +208,34 @@ class SDPModel:
             if common_name:
                 converted[f"common name/{common_name}"] = True
 
-            yield converted
+            yield path, converted
 
 
 @define(frozen=True)
 class SDPIngestor:
     """Ingestor for La Société des Plantes."""
 
+    name: str
     model: SDPModel = field(factory=SDPModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
-    def from_config(cls, config):
+    def from_config(cls, config, name):
         """Instantiate SDPIngestor from config."""
         model = SDPModel().with_cache(config.storage)
         priority = LocationPriority("Quebec").with_cache(config.storage)
-        return cls(model, priority)
+        return cls(name, model, priority)
 
     def fetch_all(self):
         count = 0
-        for plant in self.model.all_plants():
+        for path, plant in self.model.all_plants():
             count += 1
             if count % 100 == 0:
                 logger.info("SDP: ingested %d plants", count)
-            yield DatabasePlant(plant, self.priority.weight)
+            yield IngestorPlant(
+                plant,
+                self.priority.weight,
+                ingestor=self.name,
+                source=self.model.web.source_url(path),
+            )
         logger.info("SDP: ingested %d plants total", count)

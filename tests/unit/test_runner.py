@@ -4,7 +4,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import Database
+from permaculture.plant import IngestorPlant
 from permaculture.runner import Runner
 
 
@@ -19,8 +20,8 @@ def database(tmp_path):
 def test_runner_ingest_single_source(database):
     """Running with a single source should write all records."""
     records = [
-        DatabasePlant({"scientific name": "symphytum officinale"}),
-        DatabasePlant({"scientific name": "achillea millefolium"}),
+        IngestorPlant({"scientific name": "symphytum officinale"}, ingestor="test"),
+        IngestorPlant({"scientific name": "achillea millefolium"}, ingestor="test"),
     ]
     source = Mock(fetch_all=Mock(return_value=iter(records)))
     runner = Runner(sources={"test": source}, database=database)
@@ -36,7 +37,7 @@ def test_runner_ingest_multiple_sources(database):
         fetch_all=Mock(
             return_value=iter(
                 [
-                    DatabasePlant({"scientific name": "a"}),
+                    IngestorPlant({"scientific name": "a"}, ingestor="a"),
                 ]
             )
         )
@@ -45,7 +46,7 @@ def test_runner_ingest_multiple_sources(database):
         fetch_all=Mock(
             return_value=iter(
                 [
-                    DatabasePlant({"scientific name": "b"}),
+                    IngestorPlant({"scientific name": "b"}, ingestor="b"),
                 ]
             )
         )
@@ -64,7 +65,7 @@ def test_runner_batching(tmp_path):
     """Records should be written in batches of the configured size."""
     mock_database = Mock()
     records = [
-        DatabasePlant({"scientific name": f"plant-{i}"}) for i in range(5)
+        IngestorPlant({"scientific name": f"plant-{i}"}, ingestor="test") for i in range(5)
     ]
     source = Mock(fetch_all=Mock(return_value=iter(records)))
     runner = Runner(
@@ -75,11 +76,11 @@ def test_runner_batching(tmp_path):
     runner.run()
 
     total_written = sum(
-        len(call.args[1]) for call in mock_database.write_batch.call_args_list
+        len(call.args[0]) for call in mock_database.write_batch.call_args_list
     )
     assert total_written == 5
     for call in mock_database.write_batch.call_args_list:
-        assert len(call.args[1]) <= 2
+        assert len(call.args[0]) <= 2
 
 
 def test_runner_retries_on_failure(tmp_path):
@@ -91,7 +92,7 @@ def test_runner_retries_on_failure(tmp_path):
                 RuntimeError("fail"),
                 iter(
                     [
-                        DatabasePlant({"scientific name": "a"}),
+                        IngestorPlant({"scientific name": "a"}, ingestor="test"),
                     ]
                 ),
             ]

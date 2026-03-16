@@ -11,7 +11,7 @@ from requests import Session
 from yarl import URL
 
 from permaculture.converter import FLOAT_RE, Converter
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
@@ -79,6 +79,13 @@ class NCAdapter(HTTPCacheAdapter):
 @define(frozen=True)
 class NCWeb:
     session: HTTPSession = field(factory=partial(HTTPSession, NC_ORIGIN))
+
+    def source_url(self, Id):
+        """Return the URL for a plant detail page."""
+        return (
+            f"{self.session.origin}/plant-database"
+            f"/new-the-plant-list?vw=detail&id={Id}"
+        )
 
     def view_detail(self, Id):
         """View plant detail."""
@@ -299,11 +306,12 @@ class NCLink:
 
 @define(frozen=True)
 class NCIngestor:
+    name: str
     model: NCModel = field(factory=NCModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
-    def from_config(cls, config):
+    def from_config(cls, config, name):
         """Instantiate NCIngestor from config."""
         password = config.nc_password
         if config.nc_password_file:
@@ -314,7 +322,7 @@ class NCIngestor:
             config.storage,
         )
         priority = LocationPriority("United States").with_cache(config.storage)
-        return cls(model, priority)
+        return cls(name, model, priority)
 
     def fetch_all(self):
         total = self.model.get_plant_total()
@@ -325,8 +333,11 @@ class NCIngestor:
                 count += 1
                 if count % 100 == 0:
                     logger.info("NC: ingested %d/%d plants", count, total)
-                yield DatabasePlant(
-                    self.model.get_plant(plant["plant name"].Id),
+                plant_id = plant["plant name"].Id
+                yield IngestorPlant(
+                    self.model.get_plant(plant_id),
                     self.priority.weight,
+                    ingestor=self.name,
+                    source=self.model.web.source_url(plant_id),
                 )
         logger.info("NC: ingested %d plants total", count)

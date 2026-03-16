@@ -2,7 +2,7 @@
 
 from http.cookiejar import Cookie, CookieJar
 
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.nlp import normalize
 
 
@@ -58,11 +58,14 @@ def unique_cookies(unique, count=1):
 
 def unique_plant(unique):
     """Generate a unique database plant."""
-    return DatabasePlant(
+    return IngestorPlant(
         {
             "scientific name": unique("token"),
             "common name": unique("text"),
-        }
+        },
+        1.0,
+        ingestor="test",
+        source="https://test.example.com",
     )
 
 

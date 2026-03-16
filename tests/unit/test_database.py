@@ -6,10 +6,10 @@ import pytest
 
 from permaculture.database import (
     Database,
-    DatabasePlant,
     _merge,
     _merge_all,
 )
+from permaculture.plant import DatabasePlant, IngestorPlant
 from permaculture.storage import FileStorage, MemoryStorage
 
 
@@ -36,38 +36,37 @@ def test_database_from_storage_memory():
     assert db.db_path == Path(":memory:")
 
 
-def test_database_plant_with_database(unique):
-    plant = unique("plant")
-    assert "database" not in plant
-    plant = plant.with_database("a")
-    assert plant["database/a"]
+def test_database_plant_ingestor():
+    """IngestorPlant should support the ingestor field."""
+    plant = IngestorPlant({"scientific name": "a"}, 1.0, ingestor="pfaf", source="x")
+    assert plant.ingestor == "pfaf"
 
 
-def test_database_sources(db_path):
-    """Sources should list distinct source names."""
+def test_database_ingestors(db_path):
+    """Ingestors should list distinct ingestor names."""
     database = Database(db_path)
-    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
-    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", source="s")])
 
-    assert sorted(database.sources()) == ["a", "b"]
+    assert sorted(database.ingestors()) == ["a", "b"]
 
 
-def test_database_sources_filtered(db_path):
-    """Sources should filter by regex when provided."""
+def test_database_ingestors_filtered(db_path):
+    """Ingestors should filter by regex when provided."""
     database = Database(db_path)
-    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
-    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", source="s")])
 
     import re
 
     include = re.compile("a", re.I)
-    assert database.sources(include) == ["a"]
+    assert database.ingestors(include) == ["a"]
 
 
 def test_database_iterate(db_path):
     """Iterating should return all plants from the local database."""
     database = Database(db_path)
-    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
 
     database = Database(db_path)
     result = list(database.iterate())
@@ -79,10 +78,13 @@ def test_database_lookup(db_path):
     """Lookup should return plants matching scientific names."""
     database = Database(db_path)
     database.write_batch(
-        "a",
         [
-            DatabasePlant({"scientific name": "symphytum officinale"}),
-            DatabasePlant({"scientific name": "achillea millefolium"}),
+            IngestorPlant(
+                {"scientific name": "symphytum officinale"}, 1.0, ingestor="a", source="s"
+            ),
+            IngestorPlant(
+                {"scientific name": "achillea millefolium"}, 1.0, ingestor="a", source="s"
+            ),
         ],
     )
 
@@ -96,13 +98,15 @@ def test_database_search(db_path):
     """Search should return plants matching common name."""
     database = Database(db_path)
     database.write_batch(
-        "a",
         [
-            DatabasePlant(
+            IngestorPlant(
                 {
                     "scientific name": "symphytum officinale",
                     "common name/comfrey": True,
-                }
+                },
+                1.0,
+                ingestor="a",
+                source="s",
             ),
         ],
     )
@@ -117,13 +121,14 @@ def test_database_search_by_scientific_name(db_path):
     """Search should also match on scientific name via FTS5."""
     database = Database(db_path)
     database.write_batch(
-        "a",
         [
-            DatabasePlant(
+            IngestorPlant(
                 {
                     "scientific name": "symphytum officinale",
                     "common name/comfrey": True,
-                }
+                },
+                ingestor="a",
+                source="s",
             ),
         ],
     )
@@ -134,10 +139,10 @@ def test_database_search_by_scientific_name(db_path):
 
 
 def test_database_iterate_merges_sources(db_path):
-    """Iterating should merge plants from multiple sources."""
+    """Iterating should merge plants from multiple ingestors."""
     database = Database(db_path)
-    database.write_batch("a", [DatabasePlant({"scientific name": "x"})])
-    database.write_batch("b", [DatabasePlant({"scientific name": "y"})])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", source="s")])
 
     result = list(database.iterate())
     assert len(result) == 2
@@ -145,13 +150,14 @@ def test_database_iterate_merges_sources(db_path):
     assert names == {"x", "y"}
 
 
-def test_database_iterate_tags_source(db_path):
-    """Iterating should tag each plant with its source."""
+def test_database_iterate_tracks_source(db_path):
+    """Iterating should track per-attribute ingestors and sources after merging."""
     database = Database(db_path)
-    database.write_batch("pfaf", [DatabasePlant({"scientific name": "x"})])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="pfaf", source="https://pfaf.org/")])
 
     result = list(database.iterate())
-    assert result[0]["database/pfaf"]
+    assert result[0].ingestors == {"scientific name": ["pfaf"]}
+    assert result[0].sources == {"pfaf": "https://pfaf.org/"}
 
 
 @pytest.mark.parametrize(
@@ -163,16 +169,30 @@ def test_database_iterate_tags_source(db_path):
             id="empty",
         ),
         pytest.param(
-            [DatabasePlant({"scientific name": "a"})],
-            [DatabasePlant({"scientific name": "a"})],
+            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1")],
+            [
+                DatabasePlant(
+                    {"scientific name": "a"},
+                    1.0,
+                    ingestors={"scientific name": ["s1"]},
+                    sources={"s1": "u1"},
+                ),
+            ],
             id="single",
         ),
         pytest.param(
             [
-                DatabasePlant({"scientific name": "a"}),
-                DatabasePlant({"scientific name": "a"}),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1"),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", source="u2"),
             ],
-            [DatabasePlant({"scientific name": "a"})],
+            [
+                DatabasePlant(
+                    {"scientific name": "a"},
+                    1.0,
+                    ingestors={"scientific name": ["s1", "s2"]},
+                    sources={"s1": "u1", "s2": "u2"},
+                ),
+            ],
             id="group by scientific name",
         ),
     ],
@@ -188,36 +208,56 @@ def test_database_merge_all(plants, expected):
     [
         pytest.param(
             [],
-            DatabasePlant(),
+            DatabasePlant({}, 1.0, ingestors={}, sources={}),
             id="empty",
         ),
         pytest.param(
-            [DatabasePlant({"scientific name": "a"})],
-            DatabasePlant({"scientific name": "a"}),
+            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1")],
+            DatabasePlant(
+                {"scientific name": "a"},
+                1.0,
+                ingestors={"scientific name": ["s1"]},
+                sources={"s1": "u1"},
+            ),
             id="single",
         ),
         pytest.param(
             [
-                DatabasePlant({"scientific name": "a"}),
-                DatabasePlant({"scientific name": "a"}),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1"),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", source="u2"),
             ],
-            DatabasePlant({"scientific name": "a"}),
+            DatabasePlant(
+                {"scientific name": "a"},
+                1.0,
+                ingestors={"scientific name": ["s1", "s2"]},
+                sources={"s1": "u1", "s2": "u2"},
+            ),
             id="group by scientific name",
         ),
         pytest.param(
             [
-                DatabasePlant({"scientific name": "a", "x": 1}, 2.0),
-                DatabasePlant({"scientific name": "a", "x": 4}, 1.0),
+                IngestorPlant({"scientific name": "a", "x": 1}, 2.0, ingestor="s1", source="u1"),
+                IngestorPlant({"scientific name": "a", "x": 4}, 1.0, ingestor="s2", source="u2"),
             ],
-            DatabasePlant({"scientific name": "a", "x": 2.0}, 1.5),
+            DatabasePlant(
+                {"scientific name": "a", "x": 2.0},
+                1.5,
+                ingestors={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
+                sources={"s1": "u1", "s2": "u2"},
+            ),
             id="merge numbers",
         ),
         pytest.param(
             [
-                DatabasePlant({"scientific name": "a", "x": "b"}, 2.0),
-                DatabasePlant({"scientific name": "a", "x": "c"}, 1.0),
+                IngestorPlant({"scientific name": "a", "x": "b"}, 2.0, ingestor="s1", source="u1"),
+                IngestorPlant({"scientific name": "a", "x": "c"}, 1.0, ingestor="s2", source="u2"),
             ],
-            DatabasePlant({"scientific name": "a", "x": "b"}, 1.5),
+            DatabasePlant(
+                {"scientific name": "a", "x": "b"},
+                1.5,
+                ingestors={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
+                sources={"s1": "u1", "s2": "u2"},
+            ),
             id="merge strings",
         ),
     ],
@@ -238,20 +278,24 @@ def test_database_write_batch_and_iterate(db_path):
     """Writing a batch should persist records retrievable via iterate."""
     database = Database(db_path)
     records = [
-        DatabasePlant(
+        IngestorPlant(
             {
                 "scientific name": "symphytum officinale",
                 "common name/comfrey": True,
-            }
+            },
+            ingestor="pfaf",
+            source="https://pfaf.org/",
         ),
-        DatabasePlant(
+        IngestorPlant(
             {
                 "scientific name": "achillea millefolium",
                 "common name/yarrow": True,
-            }
+            },
+            ingestor="pfaf",
+            source="https://pfaf.org/",
         ),
     ]
-    database.write_batch("pfaf", records)
+    database.write_batch(records)
     result = list(database.iterate())
     assert len(result) == 2
     names = {p["scientific name"] for p in result}
@@ -262,13 +306,14 @@ def test_database_search_no_match(db_path):
     """Searching for a non-existent name should return empty."""
     database = Database(db_path)
     database.write_batch(
-        "pfaf",
         [
-            DatabasePlant(
+            IngestorPlant(
                 {
                     "scientific name": "symphytum officinale",
                     "common name/comfrey": True,
-                }
+                },
+                ingestor="pfaf",
+                source="https://pfaf.org/",
             ),
         ],
     )
@@ -287,9 +332,8 @@ def test_database_weight_preserved(db_path):
     """Weight should be preserved through write and read."""
     database = Database(db_path)
     database.write_batch(
-        "pfaf",
         [
-            DatabasePlant({"scientific name": "test"}, weight=2.5),
+            IngestorPlant({"scientific name": "test"}, weight=2.5, ingestor="pfaf", source="https://pfaf.org/"),
         ],
     )
     result = list(database.iterate())
