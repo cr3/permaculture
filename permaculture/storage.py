@@ -197,7 +197,7 @@ class SqliteStorage(Storage):
 
     def __iter__(self):
         cursor = self.conn.execute("SELECT key FROM storage")
-        for row in cursor.fetchmany():
+        for row in cursor:
             yield row[0]
 
     def __len__(self):

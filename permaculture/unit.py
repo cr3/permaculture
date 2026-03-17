@@ -1,12 +1,12 @@
 """Unit functions."""
 
-from attrs import define, field
+from attrs import define
 
 
 @define(frozen=True)
 class Unit:
-    multiplier: float = field
-    offset: float = field(default=0.0)
+    multiplier: float
+    offset: float = 0.0
 
     def __rmul__(self, other):
         return (other + self.offset) * self.multiplier
