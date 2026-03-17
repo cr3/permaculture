@@ -2,6 +2,8 @@
 
 import re
 import string
+from collections.abc import Callable
+from typing import ClassVar
 
 from attrs import define, field
 
@@ -15,6 +17,8 @@ LETTERS_RE = re.compile(rf"[^\s{re.escape(string.punctuation)}][a-z]*")
 @define(frozen=True)
 class Converter:
     locales: Locales = field()
+
+    DISPATCH: ClassVar[dict[str, Callable]] = {}
 
     def translate(self, message, context=None):
         """Convenience function to translate from locales."""
@@ -86,7 +90,10 @@ class Converter:
         return [(self.translate(key), normalize(value))]
 
     def convert_item(self, key, value):
-        return self.convert_string(key, value)
+        method = self.DISPATCH.get(key)
+        if method is None:
+            return self.convert_string(key, value)
+        return method(self, key, value)
 
     def convert(self, data):
         return {

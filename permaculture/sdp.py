@@ -161,14 +161,12 @@ class SDPConverter(Converter):
 
     locales: Locales = field(factory=partial(Locales.from_domain, "sdp"))
 
-    def convert_item(self, key, value):
-        dispatchers = {
-            "common name": self.convert_ignore,
-            "description": self.convert_string,
-            "family": self.convert_string,
-            "scientific name": self.convert_ignore,
-        }
-        return dispatchers.get(key, self.convert_string)(key, value)
+    DISPATCH = {
+        "common name": Converter.convert_ignore,
+        "description": Converter.convert_string,
+        "family": Converter.convert_string,
+        "scientific name": Converter.convert_ignore,
+    }
 
 
 @define(frozen=True)
