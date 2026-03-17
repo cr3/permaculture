@@ -1,6 +1,8 @@
 """USDA Plants database."""
 
+from collections.abc import Callable
 from functools import partial
+from typing import ClassVar
 
 from attrs import define, field
 from requests.exceptions import HTTPError
@@ -123,7 +125,7 @@ class USDAConverter(Converter):
         factory=partial(Locales.from_domain, "usda")
     )
 
-    DISPATCH = {
+    DISPATCH: ClassVar[dict[str, Callable]] = {
         "AcceptedId": Converter.convert_ignore,
         "Adapted to Coarse Textured Soils": Converter.convert_bool,
         "Adapted to Fine Textured Soils": Converter.convert_bool,

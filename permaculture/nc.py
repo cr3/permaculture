@@ -2,8 +2,10 @@
 
 import logging
 import re
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
+from typing import ClassVar
 
 from attrs import define, field
 from bs4 import BeautifulSoup
@@ -153,7 +155,7 @@ class NCConverter(Converter):
         else:
             return super().convert_string(key, value)
 
-    DISPATCH = {
+    DISPATCH: ClassVar[dict[str, Callable]] = {
         "Bacteria-Fungal Ratio": Converter.convert_ignore,
         "Bloom Time": convert_period,
         "Common name": Converter.convert_list,

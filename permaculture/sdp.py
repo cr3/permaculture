@@ -1,7 +1,9 @@
 """La Société des Plantes database."""
 
 import re
+from collections.abc import Callable
 from functools import partial
+from typing import ClassVar
 
 from attrs import define, evolve, field
 from bs4 import BeautifulSoup
@@ -164,7 +166,7 @@ class SDPConverter(Converter):
 
     locales: Locales = field(factory=partial(Locales.from_domain, "sdp"))
 
-    DISPATCH = {
+    DISPATCH: ClassVar[dict[str, Callable]] = {
         "common name": Converter.convert_ignore,
         "description": Converter.convert_string,
         "family": Converter.convert_string,

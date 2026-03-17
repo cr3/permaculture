@@ -1,8 +1,10 @@
 """Plants For A Future database."""
 
 import logging
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
+from typing import ClassVar
 
 import xlrd
 from attrs import define, field
@@ -37,7 +39,7 @@ class PFAFConverter(Converter):
         else:
             return super().convert_float(key, value)
 
-    DISPATCH = {
+    DISPATCH: ClassVar[dict[str, Callable]] = {
         "Author": Converter.convert_ignore,
         "Common name": Converter.convert_list,
         "Cultivation details": Converter.convert_ignore,

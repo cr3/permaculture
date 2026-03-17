@@ -260,7 +260,7 @@ def test_sdp_model_all_plants():
     plants = list(model.all_plants())
 
     assert len(plants) == 2
-    path, data = plants[0]
+    _path, data = plants[0]
     assert data["scientific name"] == "borago officinalis alba"
     assert "common name/bourrache à fleurs blanches bio" in data
     assert "concombre" in data["description"]
