@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permaculture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 720px; margin: 2rem auto; padding: 0 1rem;
+    color: #1a1a1a; background: #fafaf8;
+  }
+  h1 { margin-bottom: 1.5rem; font-size: 1.6rem; }
+  h2 { margin: 1.5rem 0 .75rem; font-size: 1.2rem; }
+  .search-box {
+    position: relative; width: 100%;
+  }
+  input[type=search] {
+    width: 100%; padding: .6rem .8rem; font-size: 1rem;
+    border: 1px solid #ccc; border-radius: 6px;
+  }
+  .suggestions {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: #fff; border: 1px solid #ddd; border-top: none;
+    border-radius: 0 0 6px 6px; list-style: none;
+    max-height: 300px; overflow-y: auto; z-index: 10;
+    display: none;
+  }
+  .suggestions li {
+    padding: .5rem .8rem; cursor: pointer;
+  }
+  .suggestions li:hover, .suggestions li.active {
+    background: #e8f5e9;
+  }
+  .suggestions .sci { font-style: italic; }
+  .suggestions .common { color: #666; font-size: .9em; }
+  #detail { margin-top: 2rem; }
+  #detail h2 { font-style: italic; }
+  table {
+    width: 100%; border-collapse: collapse; margin-top: .5rem;
+  }
+  th, td {
+    text-align: left; padding: .4rem .6rem;
+    border-bottom: 1px solid #eee;
+  }
+  th { width: 40%; color: #555; font-weight: 500; }
+  .tag {
+    display: inline-block; background: #e8f5e9; color: #2e7d32;
+    padding: .15rem .5rem; border-radius: 12px; margin: .1rem;
+    font-size: .85em;
+  }
+</style>
+</head>
+<body>
+<h1>&#127793; Permaculture Plant Database</h1>
+
+<div class="search-box">
+  <input type="search" id="q" placeholder="Search plants&#8230;"
+         autocomplete="off">
+  <ul class="suggestions" id="suggestions"></ul>
+</div>
+<div id="detail"></div>
+
+<script>
+const q = document.getElementById('q');
+const sugBox = document.getElementById('suggestions');
+const detail = document.getElementById('detail');
+let debounce;
+
+q.addEventListener('input', () => {
+  clearTimeout(debounce);
+  debounce = setTimeout(search, 200);
+});
+
+q.addEventListener('keydown', e => {
+  const items = sugBox.querySelectorAll('li');
+  const cur = sugBox.querySelector('.active');
+  let idx = [...items].indexOf(cur);
+  if (e.key === 'ArrowDown') { e.preventDefault(); idx++; }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); idx--; }
+  else if (e.key === 'Enter' && cur) { e.preventDefault(); cur.click(); return; }
+  else if (e.key === 'Escape') { sugBox.style.display = 'none'; return; }
+  else return;
+  if (idx < 0) idx = items.length - 1;
+  if (idx >= items.length) idx = 0;
+  items.forEach(i => i.classList.remove('active'));
+  items[idx]?.classList.add('active');
+});
+
+async function search() {
+  const val = q.value.trim();
+  if (val.length < 1) { sugBox.style.display = 'none'; return; }
+  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val));
+  const plants = await r.json();
+  sugBox.innerHTML = '';
+  for (const p of plants) {
+    const li = document.createElement('li');
+    const common = p.common_names.length ? ' \u2014 ' + p.common_names.join(', ') : '';
+    li.innerHTML = '<span class="sci">' + esc(p.scientific_name) + '</span>'
+      + '<span class="common">' + esc(common) + '</span>';
+    li.addEventListener('click', () => lookup(p.scientific_name));
+    sugBox.appendChild(li);
+  }
+  sugBox.style.display = plants.length ? 'block' : 'none';
+}
+
+async function lookup(name) {
+  sugBox.style.display = 'none';
+  q.value = name;
+  const r = await fetch('/permaculture/plants/' + encodeURIComponent(name));
+  const data = await r.json();
+  if (!Object.keys(data).length) { detail.innerHTML = '<p>No data found.</p>'; return; }
+  let html = '<h2>' + esc(name) + '</h2><table>';
+  for (const [k, v] of Object.entries(data)) {
+    html += '<tr><th>' + esc(k) + '</th><td>' + renderVal(v) + '</td></tr>';
+  }
+  detail.innerHTML = html + '</table>';
+}
+
+function renderVal(v) {
+  if (Array.isArray(v)) return v.map(i => '<span class="tag">' + esc(String(i)) + '</span>').join(' ');
+  if (v && typeof v === 'object') {
+    let s = '<table>';
+    for (const [k2, v2] of Object.entries(v)) s += '<tr><th>' + esc(k2) + '</th><td>' + renderVal(v2) + '</td></tr>';
+    return s + '</table>';
+  }
+  return esc(String(v));
+}
+
+function esc(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box')) sugBox.style.display = 'none';
+});
+</script>
+</body>
+</html>

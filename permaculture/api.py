@@ -1,0 +1,129 @@
+"""FastAPI application for plant lookup."""
+
+import argparse
+from contextlib import suppress
+from importlib.resources import files
+from itertools import islice
+from typing import Annotated
+
+from appdirs import user_cache_dir
+from fastapi import Depends, FastAPI, Query
+from fastapi.responses import HTMLResponse
+
+from permaculture.data import unflatten
+from permaculture.database import Database
+from permaculture.locales import Locales
+from permaculture.storage import FileStorage
+
+
+def group_characteristics(data):
+    """Group flat characteristics into a presentation-friendly structure.
+
+    Sub-keys where all values are True are collected into a list:
+    ``{"sun/partial": True, "sun/full": True}`` becomes
+    ``{"sun": ["partial", "full"]}``.
+    """
+    nested = unflatten(data)
+    if not isinstance(nested, dict):
+        return nested
+
+    return {
+        key: (
+            sorted(value)
+            if isinstance(value, dict)
+            and all(v is True for v in value.values())
+            else value
+        )
+        for key, value in nested.items()
+    }
+
+
+def translate_keys(data, locales):
+    """Recursively translate dictionary keys using locales."""
+    if not isinstance(data, dict):
+        return data
+
+    return {
+        locales.translate(key): (
+            translate_keys(value, locales)
+            if isinstance(value, dict)
+            else value
+        )
+        for key, value in data.items()
+    }
+
+
+def get_database():
+    """Return the database backed by the default cache directory."""
+    storage = FileStorage(user_cache_dir("permaculture"))
+    return Database.from_storage(storage)
+
+
+DatabaseDep = Annotated[Database, Depends(get_database)]
+
+
+app = FastAPI(title="Permaculture", docs_url="/permaculture/docs")
+
+with suppress(ImportError):
+    from permaculture.mcp_server import mcp
+
+    app.mount("/permaculture/mcp", mcp.sse_app(mount_path="/permaculture/mcp"))
+
+
+@app.get("/permaculture/plants")
+def get_plants(
+    database: DatabaseDep,
+    q: str = Query(min_length=1, description="Search query"),
+    limit: int = Query(default=10, ge=1, le=100),
+):
+    """Return search results for the given query."""
+    return [
+        {
+            "scientific_name": plant.scientific_name,
+            "common_names": plant.common_names,
+        }
+        for plant in islice(database.search(q, score=0.6), limit)
+    ]
+
+
+@app.get("/permaculture/plants/{scientific_name}")
+def get_plant(
+    scientific_name: str,
+    database: DatabaseDep,
+):
+    """Return full characteristics for a scientific name."""
+    plants = list(database.lookup([scientific_name], score=1.0))
+    if not plants:
+        return {}
+
+    locales = Locales.from_domain("display")
+    data = group_characteristics(dict(plants[0].items()))
+    return translate_keys(data, locales)
+
+
+@app.get("/permaculture/", response_class=HTMLResponse)
+def index():
+    """Serve the minimal web interface."""
+    return files("permaculture.static").joinpath("index.html").read_text()
+
+
+def main():
+    """Entry point for the permaculture web server."""
+    import uvicorn
+
+    parser = argparse.ArgumentParser(
+        description="Permaculture web server",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="bind address (default: 127.0.0.1)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="port (default: 8000)",
+    )
+    args = parser.parse_args()
+    uvicorn.run(app, host=args.host, port=args.port)

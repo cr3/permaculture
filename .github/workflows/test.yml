@@ -35,7 +35,7 @@ jobs:
         uses: ./.github/actions/setup-uv-env
         with:
           python-version: ${{ matrix.python-version }}
-          extras: test
+          extras: test,mcp,web
 
       - name: Run test target
         run: make test

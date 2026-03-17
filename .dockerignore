@@ -1,0 +1,6 @@
+*
+!*.rst
+!log-config.*
+!pyproject.toml
+!uv.lock
+!permaculture

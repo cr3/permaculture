@@ -68,6 +68,37 @@ in your home directory. To configure logging:
     log-level = debug
     log-file = permaculture.log
 
+Web Interface
+-------------
+
+A minimal web interface with a REST API is also available. Install the
+API extra:
+
+.. code-block:: text
+
+    pip install permaculture[web]
+
+Start the server:
+
+.. code-block:: text
+
+    permaculture-web
+    permaculture-web --host 0.0.0.0 --port 9000
+
+Then open http://127.0.0.1:8000 in a browser to search and browse
+plants. The API is also available directly:
+
+.. code-block:: text
+
+    GET /api/plants?q=comfrey&limit=10
+    GET /api/plants/symphytum%20officinale
+
+Interactive API documentation is at ``/api/docs``.
+
+The web interface also includes an MCP server automatically
+mounted at ``/mcp`` (SSE transport), so a single ``permaculture-web``
+process serves the web UI, REST API, and MCP server.
+
 MCP Server
 ----------
 
@@ -114,8 +145,6 @@ Available tools:
 
 ``lookup_plants(names, score=1.0)``
     Look up plant characteristics by exact scientific name.
-
-
 
 Project Information
 -------------------
