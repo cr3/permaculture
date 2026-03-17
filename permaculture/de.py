@@ -1,6 +1,5 @@
 """Design Ecologique database."""
 
-import logging
 import re
 import string
 from csv import reader
@@ -14,14 +13,13 @@ from yarl import URL
 from permaculture.browser import BrowserClient
 from permaculture.converter import Converter
 from permaculture.google import GoogleSpreadsheet
+from permaculture.ingestor import logged_fetch
 from permaculture.locales import Locales
 from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import Storage, null_storage
 
 DE_ORIGIN = "https://designecologique.ca"
-
-logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -147,12 +145,9 @@ class DEIngestor:
         priority = LocationPriority("Quebec").with_cache(config.storage)
         return cls(name, model=model, priority=priority)
 
+    @logged_fetch
     def fetch_all(self):
-        count = 0
         for p in self.model.get_perenial_plants():
-            count += 1
-            if count % 100 == 0:
-                logger.info("DE: ingested %d plants", count)
             yield IngestorPlant(
                 {
                     "scientific name": f"{p.pop('genus')} {p.pop('species')}",
@@ -169,4 +164,3 @@ class DEIngestor:
                 title=self.title,
                 source=self.model.web.source_url(),
             )
-        logger.info("DE: ingested %d plants total", count)

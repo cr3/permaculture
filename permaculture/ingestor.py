@@ -1,11 +1,15 @@
 """Ingestor protocol for fetching plant data from remote sources."""
 
+import logging
 import re
 from collections.abc import Iterator
+from functools import wraps
 from typing import Protocol, runtime_checkable
 
 from permaculture.plant import IngestorPlant
 from permaculture.registry import registry_load
+
+logger = logging.getLogger(__name__)
 
 
 @runtime_checkable
@@ -20,6 +24,20 @@ class Ingestor(Protocol):
     def fetch_all(self) -> Iterator[IngestorPlant]:
         """Yield all plants from this source."""
         ...
+
+
+def logged_fetch(method):
+    """Decorator that wraps a fetch_all generator with progress logging."""
+    @wraps(method)
+    def wrapper(self):
+        count = 0
+        for plant in method(self):
+            count += 1
+            if count % 100 == 0:
+                logger.info("%s: ingested %d plants", self.id, count)
+            yield plant
+        logger.info("%s: ingested %d plants total", self.id, count)
+    return wrapper
 
 
 class Ingestors(dict):

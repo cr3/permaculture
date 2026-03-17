@@ -1,6 +1,5 @@
 """USDA Plants database."""
 
-import logging
 from functools import partial
 
 from attrs import define, field
@@ -8,6 +7,7 @@ from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
 from permaculture.http import HTTPSession
+from permaculture.ingestor import logged_fetch
 from permaculture.locales import Locales
 from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
@@ -15,7 +15,6 @@ from permaculture.unit import fahrenheit, feet, inches
 
 USDA_ORIGIN = "https://plantsservices.sc.egov.usda.gov"
 
-logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -257,14 +256,10 @@ class USDAIngestor:
         priority = LocationPriority("United States").with_cache(config.storage)
         return cls(name, model=model, priority=priority)
 
+    @logged_fetch
     def fetch_all(self):
-        count = 0
         for c in self.model.all_characteristics():
-            count += 1
-            if count % 100 == 0:
-                logger.info("USDA: ingested %d plants", count)
             yield IngestorPlant(
                 c, self.priority.weight,
                 ingestor=self.name, title=self.title, source=self.model.web.source_url(),
             )
-        logger.info("USDA: ingested %d plants total", count)
