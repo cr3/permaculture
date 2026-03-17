@@ -60,11 +60,12 @@ docs = [
 permaculture = "permaculture.testing.fixtures"
 
 [project.entry-points."permaculture.ingestors"]
-"usda" = "permaculture.usda:USDAIngestor"
 "de" = "permaculture.de:DEIngestor"
+"local" = "permaculture.local:LocalIngestor"
 "nc" = "permaculture.nc:NCIngestor"
 "pfaf" = "permaculture.pfaf:PFAFIngestor"
 "sdp" = "permaculture.sdp:SDPIngestor"
+"usda" = "permaculture.usda:USDAIngestor"
 
 [project.entry-points."permaculture.serializers"]
 "application/json" = "permaculture.serializer:json_serializer"

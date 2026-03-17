@@ -184,6 +184,14 @@ def make_config_parser(config_files):
     pfaf.add_argument(
         "--pfaf-file",
     )
+    local_group = config.add_argument_group(
+        "local",
+        "Local file ingestor",
+    )
+    local_group.add_argument(
+        "--local-path",
+        help="path to a local JSON file of plant records",
+    )
     return config
 
 
