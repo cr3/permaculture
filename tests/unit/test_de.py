@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.de import (
     DEConverter,
     DEIngestor,
@@ -353,14 +353,16 @@ def test_de_ingestor_fetch_all():
         )
     )
 
-    ingestor = DEIngestor(model)
+    ingestor = DEIngestor("de", model)
     elements = list(ingestor.fetch_all())
     assert elements == [
-        DatabasePlant(
+        IngestorPlant(
             {
                 "scientific name": "a b",
                 "common name/c": True,
                 "common name/d": True,
-            }
+            },
+            ingestor="de",
+            source="https://designecologique.ca",
         ),
     ]

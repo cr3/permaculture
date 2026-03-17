@@ -13,7 +13,7 @@ from yarl import URL
 
 from permaculture.browser import BrowserClient
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.google import GoogleSpreadsheet
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
@@ -34,6 +34,10 @@ class DEWeb:
     def with_cache(self, storage):
         client = self.client.with_cache(storage)
         return evolve(self, client=client, storage=storage)
+
+    def source_url(self):
+        """Return the origin URL for this data source."""
+        return self.client.origin
 
     def perenial_plants_list(self):
         """List of perenial plants useful for permaculture in Quebec.
@@ -131,15 +135,16 @@ class DEModel:
 
 @define(frozen=True)
 class DEIngestor:
+    name: str
     model: DEModel = field(factory=DEModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
-    def from_config(cls, config):
+    def from_config(cls, config, name):
         """Instantiate DEIngestor from config."""
         model = DEModel().with_cache(config.storage)
         priority = LocationPriority("Quebec").with_cache(config.storage)
-        return cls(model, priority)
+        return cls(name, model, priority)
 
     def fetch_all(self):
         count = 0
@@ -147,7 +152,7 @@ class DEIngestor:
             count += 1
             if count % 100 == 0:
                 logger.info("DE: ingested %d plants", count)
-            yield DatabasePlant(
+            yield IngestorPlant(
                 {
                     "scientific name": f"{p.pop('genus')} {p.pop('species')}",
                     **{
@@ -159,5 +164,7 @@ class DEIngestor:
                     **p,
                 },
                 self.priority.weight,
+                ingestor=self.name,
+                source=self.model.web.source_url(),
             )
         logger.info("DE: ingested %d plants total", count)

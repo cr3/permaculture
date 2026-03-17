@@ -7,7 +7,7 @@ from attrs import define, field
 from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.priority import LocationPriority, Priority
@@ -25,6 +25,10 @@ class USDAWeb:
     session: HTTPSession = field(
         factory=partial(HTTPSession, USDA_ORIGIN, headers={"Accept": "application/json"}),
     )
+
+    def source_url(self):
+        """Return the origin URL for this data source."""
+        return self.session.origin
 
     def characteristics_search(self, **kwargs):
         """Search characteristics."""
@@ -241,15 +245,16 @@ class USDAModel:
 
 @define(frozen=True)
 class USDAIngestor:
+    name: str
     model: USDAModel = field(factory=USDAModel)
     priority: Priority = field(factory=Priority)
 
     @classmethod
-    def from_config(cls, config):
+    def from_config(cls, config, name):
         """Instantiate USDAIngestor from config."""
         model = USDAModel().with_cache(config.storage)
         priority = LocationPriority("United States").with_cache(config.storage)
-        return cls(model, priority)
+        return cls(name, model, priority)
 
     def fetch_all(self):
         count = 0
@@ -257,5 +262,8 @@ class USDAIngestor:
             count += 1
             if count % 100 == 0:
                 logger.info("USDA: ingested %d plants", count)
-            yield DatabasePlant(c, self.priority.weight)
+            yield IngestorPlant(
+                c, self.priority.weight,
+                ingestor=self.name, source=self.model.web.source_url(),
+            )
         logger.info("USDA: ingested %d plants total", count)

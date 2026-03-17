@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.sdp import (
     SDPConverter,
     SDPIngestor,
@@ -260,9 +260,10 @@ def test_sdp_model_all_plants():
     plants = list(model.all_plants())
 
     assert len(plants) == 2
-    assert plants[0]["scientific name"] == "borago officinalis alba"
-    assert "common name/bourrache à fleurs blanches bio" in plants[0]
-    assert "concombre" in plants[0]["description"]
+    path, data = plants[0]
+    assert data["scientific name"] == "borago officinalis alba"
+    assert "common name/bourrache à fleurs blanches bio" in data
+    assert "concombre" in data["description"]
 
 
 def test_sdp_model_all_plants_skips_no_scientific_name():
@@ -289,29 +290,34 @@ def test_sdp_model_all_plants_skips_no_scientific_name():
 
 
 def test_sdp_ingestor_fetch_all():
-    """Fetching all should return DatabasePlant objects."""
+    """Fetching all should return IngestorPlant objects."""
     model = Mock(
         all_plants=Mock(
             return_value=[
-                {
-                    "scientific name": "borago officinalis alba",
-                    "common name/bourrache à fleurs blanches bio": True,
-                    "family": "boraginacées",
-                    "description": "Un excellent légume-feuille.",
-                },
+                (
+                    "/produits/bourrache/",
+                    {
+                        "scientific name": "borago officinalis alba",
+                        "common name/bourrache à fleurs blanches bio": True,
+                        "family": "boraginacées",
+                        "description": "Un excellent légume-feuille.",
+                    },
+                ),
             ]
         )
     )
 
-    ingestor = SDPIngestor(model)
+    ingestor = SDPIngestor("sdp", model)
     elements = list(ingestor.fetch_all())
     assert elements == [
-        DatabasePlant(
+        IngestorPlant(
             {
                 "scientific name": "borago officinalis alba",
                 "common name/bourrache à fleurs blanches bio": True,
                 "family": "boraginacées",
                 "description": "Un excellent légume-feuille.",
-            }
+            },
+            ingestor="sdp",
+            source="https://www.lasocietedesplantes.com/produits/bourrache/",
         ),
     ]

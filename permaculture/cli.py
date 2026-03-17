@@ -206,7 +206,7 @@ def command_iterate(database):
 
 def command_list(database):
     """List available ingestors."""
-    return database.sources()
+    return database.ingestors()
 
 
 def command_lookup(args, config, database):

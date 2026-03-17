@@ -6,7 +6,8 @@ import random
 
 from attrs import define, field
 
-from permaculture.database import Database, DatabasePlant
+from permaculture.database import Database
+from permaculture.plant import IngestorPlant
 from permaculture.ingestor import Ingestor
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class Runner:
         asyncio.run(self._run_async())
 
     async def _run_async(self):
-        queue: asyncio.Queue[tuple[str, DatabasePlant] | None] = asyncio.Queue(
+        queue: asyncio.Queue[IngestorPlant | None] = asyncio.Queue(
             maxsize=self.queue_size
         )
         loop = asyncio.get_running_loop()
@@ -78,7 +79,7 @@ class Runner:
 
     async def _writer(self, queue):
         """Drain the queue and write batches to the database."""
-        buffer: list[tuple[str, DatabasePlant]] = []
+        buffer: list[IngestorPlant] = []
         while True:
             item = await queue.get()
             if item is None:
@@ -86,20 +87,11 @@ class Runner:
 
             buffer.append(item)
             if len(buffer) >= self.batch_size:
-                self._flush(buffer)
+                self.database.write_batch(buffer)
                 buffer = []
 
         if buffer:
-            self._flush(buffer)
-
-    def _flush(self, buffer):
-        """Write buffered records grouped by source."""
-        by_source: dict[str, list[DatabasePlant]] = {}
-        for source, record in buffer:
-            by_source.setdefault(source, []).append(record)
-
-        for source, records in by_source.items():
-            self.database.write_batch(source, records)
+            self.database.write_batch(buffer)
 
     async def _ingest_source(self, name, source, sem, queue, loop):
         async with sem:
@@ -107,7 +99,7 @@ class Runner:
             for attempt in range(self.max_retries):
                 try:
                     await asyncio.to_thread(
-                        self._ingest_sync, name, source, queue, loop
+                        self._ingest_sync, source, queue, loop
                     )
                 except Exception as exc:
                     last_exc = exc
@@ -135,6 +127,6 @@ class Runner:
         exp = min(self.backoff_cap, self.backoff_base * (2 ** (attempt - 1)))
         return random.random() * exp  # noqa: S311
 
-    def _ingest_sync(self, name, source, queue, loop):
+    def _ingest_sync(self, source, queue, loop):
         for record in source.fetch_all():
-            asyncio.run_coroutine_threadsafe(queue.put((name, record)), loop).result()
+            asyncio.run_coroutine_threadsafe(queue.put(record), loop).result()

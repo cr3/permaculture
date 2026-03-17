@@ -4,7 +4,7 @@ import re
 from collections.abc import Iterator
 from typing import Protocol, runtime_checkable
 
-from permaculture.database import DatabasePlant
+from permaculture.plant import IngestorPlant
 from permaculture.registry import registry_load
 
 
@@ -12,10 +12,12 @@ from permaculture.registry import registry_load
 class Ingestor(Protocol):
     """Protocol for fetching plant data from a remote source."""
 
-    @classmethod
-    def from_config(cls, config): ...
+    name: str
 
-    def fetch_all(self) -> Iterator[DatabasePlant]:
+    @classmethod
+    def from_config(cls, config, name: str): ...
+
+    def fetch_all(self) -> Iterator[IngestorPlant]:
         """Yield all plants from this source."""
         ...
 
@@ -29,7 +31,7 @@ class Ingestors(dict):
 
         include = re.compile("|".join(config.ingestors), re.I)
         ingestors = {
-            k: v.from_config(config)
+            k: v.from_config(config, k)
             for k, v in registry.get("ingestors", {}).items()
             if include.match(k)
         }

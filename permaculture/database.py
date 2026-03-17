@@ -3,7 +3,7 @@
 import json
 import sqlite3
 from collections import defaultdict
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator
 from itertools import starmap
 from operator import mul
 from pathlib import Path
@@ -12,45 +12,8 @@ from attrs import define, field
 
 from permaculture.data import merge
 from permaculture.nlp import Extractor, normalize, score
+from permaculture.plant import DatabasePlant, IngestorPlant
 from permaculture.storage import FileStorage
-
-
-@define(frozen=True, hash=False)
-class DatabasePlant(Mapping):
-    """Plant record with structured data and weight."""
-
-    data: dict = field(factory=dict)
-    weight: float = 1.0
-
-    @property
-    def scientific_name(self):
-        return self.data.get("scientific name", "")
-
-    @property
-    def common_names(self):
-        return [
-            key.removeprefix("common name/")
-            for key in self.data
-            if key.startswith("common name/")
-        ]
-
-    @property
-    def names(self):
-        return [self.scientific_name, *self.common_names]
-
-    def with_database(self, name):
-        """Add the database name to this plant."""
-        self.data[f"database/{name}"] = True
-        return self
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __iter__(self):
-        return iter(self.data)
-
-    def __len__(self):
-        return len(self.data)
 
 
 @define(frozen=True)
@@ -80,6 +43,7 @@ class Database:
                 """
                 CREATE TABLE IF NOT EXISTS plants (
                     id INTEGER PRIMARY KEY,
+                    ingestor TEXT NOT NULL,
                     source TEXT NOT NULL,
                     scientific_name TEXT NOT NULL,
                     data TEXT NOT NULL,
@@ -105,16 +69,22 @@ class Database:
                 " USING fts5(name, plant_id UNINDEXED, tokenize='trigram')"
             )
 
-    def write_batch(self, source, records):
+    def write_batch(self, records):
         """Persist a batch of plant records."""
         with self._connect() as conn:
             for record in records:
                 data_json = json.dumps(record.data)
                 cur = conn.execute(
                     "INSERT INTO plants"
-                    " (source, scientific_name, data, weight)"
-                    " VALUES (?, ?, ?, ?)",
-                    (source, record.scientific_name, data_json, record.weight),
+                    " (ingestor, source, scientific_name, data, weight)"
+                    " VALUES (?, ?, ?, ?, ?)",
+                    (
+                        record.ingestor,
+                        record.source,
+                        record.scientific_name,
+                        data_json,
+                        record.weight,
+                    ),
                 )
                 pid = cur.lastrowid
                 common_names = record.common_names
@@ -131,75 +101,85 @@ class Database:
                     fts_rows,
                 )
 
-    def sources(self, include=None) -> list[str]:
-        """Return the distinct source names in the database.
+    def ingestors(self, include=None) -> list[str]:
+        """Return the distinct ingestor names in the database.
 
-        :param include: Optional regex to filter sources.
+        :param include: Optional regex to filter ingestors.
         """
         with self._connect() as conn:
-            all_sources = [
-                row[0] for row in conn.execute("SELECT DISTINCT source FROM plants")
+            all_ingestors = [
+                row[0]
+                for row in conn.execute("SELECT DISTINCT ingestor FROM plants")
             ]
 
         if include is None:
-            return all_sources
+            return all_ingestors
 
-        return [s for s in all_sources if include.match(s)]
+        return [s for s in all_ingestors if include.match(s)]
 
     def iterate(self) -> Iterator[DatabasePlant]:
         """Iterate over all plants, merging across sources."""
-        return _merge_all(
-            plant.with_database(source) for source, plant in self._iterate_raw()
-        )
+        return _merge_all(self._iterate_raw())
 
     def _iterate_raw(self):
-        """Yield (source, plant) pairs for all rows."""
+        """Yield plants for all rows."""
         with self._connect() as conn:
-            for source, data, weight in conn.execute(
-                "SELECT source, data, weight FROM plants"
+            for ingestor, source, data, weight in conn.execute(
+                "SELECT ingestor, source, data, weight FROM plants"
             ):
-                yield source, DatabasePlant(json.loads(data), weight)
+                yield IngestorPlant(
+                    json.loads(data), weight,
+                    ingestor=ingestor, source=source,
+                )
 
     def lookup(self, names: list[str], score: float) -> Iterator[DatabasePlant]:
-        """Lookup characteristics by scientific names, merging across sources."""
+        """Lookup characteristics by scientific names, merging across ingestors."""
         if not names:
             return
 
         with self._connect() as conn:
             placeholders = ",".join("?" * len(names))
             rows = conn.execute(
-                "SELECT source, data, weight FROM plants"  # noqa: S608
+                "SELECT ingestor, source, data, weight FROM plants"  # noqa: S608
                 f" WHERE scientific_name IN ({placeholders})",
                 names,
             )
             yield from _merge_all(
-                DatabasePlant(json.loads(data), weight).with_database(src)
-                for src, data, weight in rows
+                IngestorPlant(
+                    json.loads(data), weight,
+                    ingestor=ing, source=source,
+                )
+                for ing, source, data, weight in rows
             )
 
     def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
         """Search for plants by name using FTS5 trigram matching."""
         with self._connect() as conn:
             rows = conn.execute(
-                "SELECT DISTINCT p.source, p.data, p.weight"
+                "SELECT DISTINCT p.ingestor, p.source, p.data, p.weight"
                 " FROM names_fts fts"
                 " JOIN plants p ON fts.plant_id = p.id"
                 " WHERE fts.name MATCH ?",
                 (f'"{name}"',),
             )
             yield from _merge_all(
-                plant.with_database(src)
-                for src, data, weight in rows
+                plant
+                for ing, source, data, weight in rows
                 if self._extract(
                     name,
-                    (plant := DatabasePlant(json.loads(data), weight)).names,
+                    (
+                        plant := IngestorPlant(
+                            json.loads(data), weight,
+                            ingestor=ing, source=source,
+                        )
+                    ).names,
                 )
                 >= score
             )
 
 
 def _merge_all(
-    plants: Iterator[DatabasePlant],
+    plants: Iterator[IngestorPlant],
 ) -> Iterator[DatabasePlant]:
     """Group plants by scientific name, merging numbers and strings."""
     grouped = defaultdict(list)
@@ -208,9 +188,15 @@ def _merge_all(
     return (_merge(g) for g in grouped.values())
 
 
-def _merge(plants: Iterator[DatabasePlant]) -> DatabasePlant:
+def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
     """Merge plants with the same scientific name using weighted resolution."""
     plants = list(plants)
+
+    attr_ingestors = {}
+    for key in {k for p in plants for k in p}:
+        attr_ingestors[key] = [p.ingestor for p in plants if key in p]
+
+    plant_sources = {p.ingestor: p.source for p in plants if p.ingestor}
 
     def resolve(key, values):
         weights = [p.weight for p in plants if key in p]
@@ -223,4 +209,9 @@ def _merge(plants: Iterator[DatabasePlant]) -> DatabasePlant:
 
     weights = [p.weight for p in plants]
     avg_weight = sum(weights) / len(weights) if weights else 1.0
-    return DatabasePlant(merge(plants, resolve), avg_weight)
+    return DatabasePlant(
+        merge(plants, resolve),
+        avg_weight,
+        ingestors=attr_ingestors,
+        sources=plant_sources,
+    )
