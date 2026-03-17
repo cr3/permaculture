@@ -2,9 +2,11 @@
 
 import re
 import string
+from collections.abc import Callable
 from csv import reader
 from functools import partial
 from io import StringIO
+from typing import ClassVar
 
 from attrs import define, evolve, field
 from bs4 import BeautifulSoup
@@ -79,7 +81,7 @@ class DEConverter(Converter):
     def convert_range(self, key, value, unit=1.0):
         return super().convert_range(key, value.replace(",", "."))
 
-    DISPATCH = {
+    DISPATCH: ClassVar[dict[str, Callable]] = {
         "Accumulateur de Nutriments": Converter.convert_ignore,
         "Comestible": Converter.convert_list,
         "Couleur de feuillage": Converter.convert_letters,
