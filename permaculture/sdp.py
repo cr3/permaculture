@@ -1,6 +1,5 @@
 """La Société des Plantes database."""
 
-import logging
 import re
 from functools import partial
 
@@ -10,6 +9,7 @@ from defusedxml.ElementTree import fromstring
 
 from permaculture.converter import Converter
 from permaculture.http import HTTPSession
+from permaculture.ingestor import logged_fetch
 from permaculture.locales import Locales
 from permaculture.nlp import normalize
 from permaculture.plant import IngestorPlant
@@ -27,7 +27,6 @@ NON_PLANT_SLUGS = re.compile(
     r"|sweatshirt-"
 )
 
-logger = logging.getLogger(__name__)
 
 
 @define(frozen=True)
@@ -227,12 +226,9 @@ class SDPIngestor:
         priority = LocationPriority("Quebec").with_cache(config.storage)
         return cls(name, model=model, priority=priority)
 
+    @logged_fetch
     def fetch_all(self):
-        count = 0
         for path, plant in self.model.all_plants():
-            count += 1
-            if count % 100 == 0:
-                logger.info("SDP: ingested %d plants", count)
             yield IngestorPlant(
                 plant,
                 self.priority.weight,
@@ -240,4 +236,3 @@ class SDPIngestor:
                 title=self.title,
                 source=self.model.web.source_url(path),
             )
-        logger.info("SDP: ingested %d plants total", count)

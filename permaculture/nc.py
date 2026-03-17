@@ -12,6 +12,7 @@ from yarl import URL
 
 from permaculture.converter import FLOAT_RE, Converter
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
+from permaculture.ingestor import logged_fetch
 from permaculture.locales import Locales
 from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
@@ -325,15 +326,12 @@ class NCIngestor:
         priority = LocationPriority("United States").with_cache(config.storage)
         return cls(name, model=model, priority=priority)
 
+    @logged_fetch
     def fetch_all(self):
         total = self.model.get_plant_total()
         logger.info("NC: found %d plants total", total)
-        count = 0
         for limit_start in range(0, total, 50):
             for plant in self.model.get_plants(limit_start=limit_start):
-                count += 1
-                if count % 100 == 0:
-                    logger.info("NC: ingested %d/%d plants", count, total)
                 plant_id = plant["plant name"].Id
                 yield IngestorPlant(
                     self.model.get_plant(plant_id),
@@ -342,4 +340,3 @@ class NCIngestor:
                     title=self.title,
                     source=self.model.web.source_url(plant_id),
                 )
-        logger.info("NC: ingested %d plants total", count)
