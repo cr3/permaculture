@@ -68,6 +68,55 @@ in your home directory. To configure logging:
     log-level = debug
     log-file = permaculture.log
 
+MCP Server
+----------
+
+The plant database can be exposed as an
+`MCP <https://modelcontextprotocol.io/>`__ server, allowing LLM clients
+to search and look up plants.
+
+Install the MCP extra:
+
+.. code-block:: text
+
+    pip install permaculture[mcp]
+
+**Stdio transport** (default) — for use with Claude Desktop or other
+MCP clients that launch the server as a subprocess:
+
+.. code-block:: text
+
+    permaculture-mcp
+
+Add this to your Claude Desktop configuration:
+
+.. code-block:: json
+
+    {
+      "mcpServers": {
+        "permaculture": {
+          "command": "permaculture-mcp"
+        }
+      }
+    }
+
+**SSE transport** — runs an HTTP server for remote or browser-based
+clients:
+
+.. code-block:: text
+
+    permaculture-mcp --transport sse --host 127.0.0.1 --port 8000
+
+Available tools:
+
+``search_plants(name, score=0.7)``
+    Search for plants by common or scientific name.
+
+``lookup_plants(names, score=1.0)``
+    Look up plant characteristics by exact scientific name.
+
+
+
 Project Information
 -------------------
 
