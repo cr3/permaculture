@@ -7,9 +7,9 @@ from attrs import define, field
 from requests.exceptions import HTTPError
 
 from permaculture.converter import Converter
-from permaculture.plant import IngestorPlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
+from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
 from permaculture.unit import fahrenheit, feet, inches
 
@@ -246,6 +246,7 @@ class USDAModel:
 @define(frozen=True)
 class USDAIngestor:
     name: str
+    title: str = "USDA Plants"
     model: USDAModel = field(factory=USDAModel)
     priority: Priority = field(factory=Priority)
 
@@ -254,7 +255,7 @@ class USDAIngestor:
         """Instantiate USDAIngestor from config."""
         model = USDAModel().with_cache(config.storage)
         priority = LocationPriority("United States").with_cache(config.storage)
-        return cls(name, model, priority)
+        return cls(name, model=model, priority=priority)
 
     def fetch_all(self):
         count = 0
@@ -264,6 +265,6 @@ class USDAIngestor:
                 logger.info("USDA: ingested %d plants", count)
             yield IngestorPlant(
                 c, self.priority.weight,
-                ingestor=self.name, source=self.model.web.source_url(),
+                ingestor=self.name, title=self.title, source=self.model.web.source_url(),
             )
         logger.info("USDA: ingested %d plants total", count)

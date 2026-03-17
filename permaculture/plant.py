@@ -43,6 +43,7 @@ class IngestorPlant(Plant):
     """Plant record from a single ingestor."""
 
     ingestor: str = field(kw_only=True)
+    title: str = field(kw_only=True)
     source: str = field(kw_only=True)
 
 

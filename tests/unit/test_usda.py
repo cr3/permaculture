@@ -188,7 +188,7 @@ def test_plants_ingestor_fetch_all(unique):
         )
     )
 
-    ingestor = USDAIngestor("usda", model)
+    ingestor = USDAIngestor("usda", model=model)
     elements = list(ingestor.fetch_all())
     assert elements == [
         IngestorPlant(
@@ -197,6 +197,7 @@ def test_plants_ingestor_fetch_all(unique):
                 f"common name/{common_name}": True,
             },
             ingestor="usda",
+            name="USDA Plants",
             source="https://plantsservices.sc.egov.usda.gov",
         ),
     ]

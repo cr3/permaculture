@@ -13,9 +13,9 @@ from yarl import URL
 
 from permaculture.browser import BrowserClient
 from permaculture.converter import Converter
-from permaculture.plant import IngestorPlant
 from permaculture.google import GoogleSpreadsheet
 from permaculture.locales import Locales
+from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import Storage, null_storage
 
@@ -136,6 +136,7 @@ class DEModel:
 @define(frozen=True)
 class DEIngestor:
     name: str
+    title: str = "Design Écologique"
     model: DEModel = field(factory=DEModel)
     priority: Priority = field(factory=Priority)
 
@@ -144,7 +145,7 @@ class DEIngestor:
         """Instantiate DEIngestor from config."""
         model = DEModel().with_cache(config.storage)
         priority = LocationPriority("Quebec").with_cache(config.storage)
-        return cls(name, model, priority)
+        return cls(name, model=model, priority=priority)
 
     def fetch_all(self):
         count = 0
@@ -165,6 +166,7 @@ class DEIngestor:
                 },
                 self.priority.weight,
                 ingestor=self.name,
+                title=self.title,
                 source=self.model.web.source_url(),
             )
         logger.info("DE: ingested %d plants total", count)

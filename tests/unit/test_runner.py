@@ -20,8 +20,8 @@ def database(tmp_path):
 def test_runner_ingest_single_source(database):
     """Running with a single source should write all records."""
     records = [
-        IngestorPlant({"scientific name": "symphytum officinale"}, ingestor="test"),
-        IngestorPlant({"scientific name": "achillea millefolium"}, ingestor="test"),
+        IngestorPlant({"scientific name": "symphytum officinale"}, ingestor="test", title="Test", source="s"),
+        IngestorPlant({"scientific name": "achillea millefolium"}, ingestor="test", title="Test", source="s"),
     ]
     source = Mock(fetch_all=Mock(return_value=iter(records)))
     runner = Runner(sources={"test": source}, database=database)
@@ -37,7 +37,7 @@ def test_runner_ingest_multiple_sources(database):
         fetch_all=Mock(
             return_value=iter(
                 [
-                    IngestorPlant({"scientific name": "a"}, ingestor="a"),
+                    IngestorPlant({"scientific name": "a"}, ingestor="a", title="A", source="s"),
                 ]
             )
         )
@@ -46,7 +46,7 @@ def test_runner_ingest_multiple_sources(database):
         fetch_all=Mock(
             return_value=iter(
                 [
-                    IngestorPlant({"scientific name": "b"}, ingestor="b"),
+                    IngestorPlant({"scientific name": "b"}, ingestor="b", title="B", source="s"),
                 ]
             )
         )
@@ -65,7 +65,7 @@ def test_runner_batching(tmp_path):
     """Records should be written in batches of the configured size."""
     mock_database = Mock()
     records = [
-        IngestorPlant({"scientific name": f"plant-{i}"}, ingestor="test") for i in range(5)
+        IngestorPlant({"scientific name": f"plant-{i}"}, ingestor="test", title="Test", source="s") for i in range(5)
     ]
     source = Mock(fetch_all=Mock(return_value=iter(records)))
     runner = Runner(
@@ -92,7 +92,7 @@ def test_runner_retries_on_failure(tmp_path):
                 RuntimeError("fail"),
                 iter(
                     [
-                        IngestorPlant({"scientific name": "a"}, ingestor="test"),
+                        IngestorPlant({"scientific name": "a"}, ingestor="test", title="Test", source="s"),
                     ]
                 ),
             ]

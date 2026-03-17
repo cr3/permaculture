@@ -11,9 +11,9 @@ from requests import Session
 from yarl import URL
 
 from permaculture.converter import FLOAT_RE, Converter
-from permaculture.plant import IngestorPlant
 from permaculture.http import HTTPCacheAdapter, HTTPCacheAll, HTTPSession
 from permaculture.locales import Locales
+from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
 from permaculture.storage import null_storage
 from permaculture.unit import feet, inches
@@ -307,6 +307,7 @@ class NCLink:
 @define(frozen=True)
 class NCIngestor:
     name: str
+    title: str = "Natural Capital"
     model: NCModel = field(factory=NCModel)
     priority: Priority = field(factory=Priority)
 
@@ -322,7 +323,7 @@ class NCIngestor:
             config.storage,
         )
         priority = LocationPriority("United States").with_cache(config.storage)
-        return cls(name, model, priority)
+        return cls(name, model=model, priority=priority)
 
     def fetch_all(self):
         total = self.model.get_plant_total()
@@ -338,6 +339,7 @@ class NCIngestor:
                     self.model.get_plant(plant_id),
                     self.priority.weight,
                     ingestor=self.name,
+                    title=self.title,
                     source=self.model.web.source_url(plant_id),
                 )
         logger.info("NC: ingested %d plants total", count)

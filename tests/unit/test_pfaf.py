@@ -5,13 +5,13 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.plant import IngestorPlant
 from permaculture.pfaf import (
     PFAFConverter,
     PFAFFile,
     PFAFIngestor,
     PFAFModel,
 )
+from permaculture.plant import IngestorPlant
 
 
 def test_pfaf_file_main_database():
@@ -134,7 +134,7 @@ def test_pfaf_ingestor_fetch_all():
         )
     )
 
-    ingestor = PFAFIngestor("pfaf", model)
+    ingestor = PFAFIngestor("pfaf", model=model)
     elements = list(ingestor.fetch_all())
     assert elements == [
         IngestorPlant(
@@ -143,5 +143,7 @@ def test_pfaf_ingestor_fetch_all():
                 "common name": "b",
             },
             ingestor="pfaf",
+            name="Plants For A Future",
+            source="https://pfaf.org/",
         ),
     ]
