@@ -38,15 +38,15 @@ def test_database_from_storage_memory():
 
 def test_database_plant_ingestor():
     """IngestorPlant should support the ingestor field."""
-    plant = IngestorPlant({"scientific name": "a"}, 1.0, ingestor="pfaf", source="x")
+    plant = IngestorPlant({"scientific name": "a"}, 1.0, ingestor="pfaf", title="Plants For A Future", source="x")
     assert plant.ingestor == "pfaf"
 
 
 def test_database_ingestors(db_path):
     """Ingestors should list distinct ingestor names."""
     database = Database(db_path)
-    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
-    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")])
 
     assert sorted(database.ingestors()) == ["a", "b"]
 
@@ -54,8 +54,8 @@ def test_database_ingestors(db_path):
 def test_database_ingestors_filtered(db_path):
     """Ingestors should filter by regex when provided."""
     database = Database(db_path)
-    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
-    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")])
 
     import re
 
@@ -66,7 +66,7 @@ def test_database_ingestors_filtered(db_path):
 def test_database_iterate(db_path):
     """Iterating should return all plants from the local database."""
     database = Database(db_path)
-    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
 
     database = Database(db_path)
     result = list(database.iterate())
@@ -80,10 +80,10 @@ def test_database_lookup(db_path):
     database.write_batch(
         [
             IngestorPlant(
-                {"scientific name": "symphytum officinale"}, 1.0, ingestor="a", source="s"
+                {"scientific name": "symphytum officinale"}, 1.0, ingestor="a", title="A", source="s"
             ),
             IngestorPlant(
-                {"scientific name": "achillea millefolium"}, 1.0, ingestor="a", source="s"
+                {"scientific name": "achillea millefolium"}, 1.0, ingestor="a", title="A", source="s"
             ),
         ],
     )
@@ -105,7 +105,7 @@ def test_database_search(db_path):
                     "common name/comfrey": True,
                 },
                 1.0,
-                ingestor="a",
+                ingestor="a", title="A",
                 source="s",
             ),
         ],
@@ -127,7 +127,7 @@ def test_database_search_by_scientific_name(db_path):
                     "scientific name": "symphytum officinale",
                     "common name/comfrey": True,
                 },
-                ingestor="a",
+                ingestor="a", title="A",
                 source="s",
             ),
         ],
@@ -141,8 +141,8 @@ def test_database_search_by_scientific_name(db_path):
 def test_database_iterate_merges_sources(db_path):
     """Iterating should merge plants from multiple ingestors."""
     database = Database(db_path)
-    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", source="s")])
-    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
+    database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")])
 
     result = list(database.iterate())
     assert len(result) == 2
@@ -153,11 +153,11 @@ def test_database_iterate_merges_sources(db_path):
 def test_database_iterate_tracks_source(db_path):
     """Iterating should track per-attribute ingestors and sources after merging."""
     database = Database(db_path)
-    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="pfaf", source="https://pfaf.org/")])
+    database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="pfaf", title="Plants For A Future", source="https://pfaf.org/")])
 
     result = list(database.iterate())
-    assert result[0].ingestors == {"scientific name": ["pfaf"]}
-    assert result[0].sources == {"pfaf": "https://pfaf.org/"}
+    assert result[0].ingestors == {"pfaf": {"title": "Plants For A Future", "source": "https://pfaf.org/"}}
+    assert result[0].sources == {"scientific name": ["pfaf"]}
 
 
 @pytest.mark.parametrize(
@@ -169,28 +169,28 @@ def test_database_iterate_tracks_source(db_path):
             id="empty",
         ),
         pytest.param(
-            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1")],
+            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1")],
             [
                 DatabasePlant(
                     {"scientific name": "a"},
                     1.0,
-                    ingestors={"scientific name": ["s1"]},
-                    sources={"s1": "u1"},
+                    ingestors={"s1": {"title": "S1", "source": "u1"}},
+                    sources={"scientific name": ["s1"]},
                 ),
             ],
             id="single",
         ),
         pytest.param(
             [
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1"),
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", source="u2"),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1"),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", title="S2", source="u2"),
             ],
             [
                 DatabasePlant(
                     {"scientific name": "a"},
                     1.0,
-                    ingestors={"scientific name": ["s1", "s2"]},
-                    sources={"s1": "u1", "s2": "u2"},
+                    ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
+                    sources={"scientific name": ["s1", "s2"]},
                 ),
             ],
             id="group by scientific name",
@@ -212,51 +212,51 @@ def test_database_merge_all(plants, expected):
             id="empty",
         ),
         pytest.param(
-            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1")],
+            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1")],
             DatabasePlant(
                 {"scientific name": "a"},
                 1.0,
-                ingestors={"scientific name": ["s1"]},
-                sources={"s1": "u1"},
+                ingestors={"s1": {"title": "S1", "source": "u1"}},
+                sources={"scientific name": ["s1"]},
             ),
             id="single",
         ),
         pytest.param(
             [
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", source="u1"),
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", source="u2"),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1"),
+                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", title="S2", source="u2"),
             ],
             DatabasePlant(
                 {"scientific name": "a"},
                 1.0,
-                ingestors={"scientific name": ["s1", "s2"]},
-                sources={"s1": "u1", "s2": "u2"},
+                ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
+                sources={"scientific name": ["s1", "s2"]},
             ),
             id="group by scientific name",
         ),
         pytest.param(
             [
-                IngestorPlant({"scientific name": "a", "x": 1}, 2.0, ingestor="s1", source="u1"),
-                IngestorPlant({"scientific name": "a", "x": 4}, 1.0, ingestor="s2", source="u2"),
+                IngestorPlant({"scientific name": "a", "x": 1}, 2.0, ingestor="s1", title="S1", source="u1"),
+                IngestorPlant({"scientific name": "a", "x": 4}, 1.0, ingestor="s2", title="S2", source="u2"),
             ],
             DatabasePlant(
                 {"scientific name": "a", "x": 2.0},
                 1.5,
-                ingestors={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
-                sources={"s1": "u1", "s2": "u2"},
+                ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
+                sources={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
             ),
             id="merge numbers",
         ),
         pytest.param(
             [
-                IngestorPlant({"scientific name": "a", "x": "b"}, 2.0, ingestor="s1", source="u1"),
-                IngestorPlant({"scientific name": "a", "x": "c"}, 1.0, ingestor="s2", source="u2"),
+                IngestorPlant({"scientific name": "a", "x": "b"}, 2.0, ingestor="s1", title="S1", source="u1"),
+                IngestorPlant({"scientific name": "a", "x": "c"}, 1.0, ingestor="s2", title="S2", source="u2"),
             ],
             DatabasePlant(
                 {"scientific name": "a", "x": "b"},
                 1.5,
-                ingestors={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
-                sources={"s1": "u1", "s2": "u2"},
+                ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
+                sources={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
             ),
             id="merge strings",
         ),
@@ -283,7 +283,7 @@ def test_database_write_batch_and_iterate(db_path):
                 "scientific name": "symphytum officinale",
                 "common name/comfrey": True,
             },
-            ingestor="pfaf",
+            ingestor="pfaf", title="Plants For A Future",
             source="https://pfaf.org/",
         ),
         IngestorPlant(
@@ -291,7 +291,7 @@ def test_database_write_batch_and_iterate(db_path):
                 "scientific name": "achillea millefolium",
                 "common name/yarrow": True,
             },
-            ingestor="pfaf",
+            ingestor="pfaf", title="Plants For A Future",
             source="https://pfaf.org/",
         ),
     ]
@@ -312,7 +312,7 @@ def test_database_search_no_match(db_path):
                     "scientific name": "symphytum officinale",
                     "common name/comfrey": True,
                 },
-                ingestor="pfaf",
+                ingestor="pfaf", title="Plants For A Future",
                 source="https://pfaf.org/",
             ),
         ],
@@ -333,7 +333,7 @@ def test_database_weight_preserved(db_path):
     database = Database(db_path)
     database.write_batch(
         [
-            IngestorPlant({"scientific name": "test"}, weight=2.5, ingestor="pfaf", source="https://pfaf.org/"),
+            IngestorPlant({"scientific name": "test"}, weight=2.5, ingestor="pfaf", title="Plants For A Future", source="https://pfaf.org/"),
         ],
     )
     result = list(database.iterate())

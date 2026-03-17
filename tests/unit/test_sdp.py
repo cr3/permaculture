@@ -307,7 +307,7 @@ def test_sdp_ingestor_fetch_all():
         )
     )
 
-    ingestor = SDPIngestor("sdp", model)
+    ingestor = SDPIngestor("sdp", model=model)
     elements = list(ingestor.fetch_all())
     assert elements == [
         IngestorPlant(
@@ -318,6 +318,7 @@ def test_sdp_ingestor_fetch_all():
                 "description": "Un excellent légume-feuille.",
             },
             ingestor="sdp",
+            name="La Société des Plantes",
             source="https://www.lasocietedesplantes.com/produits/bourrache/",
         ),
     ]

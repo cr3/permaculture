@@ -7,8 +7,8 @@ import random
 from attrs import define, field
 
 from permaculture.database import Database
-from permaculture.plant import IngestorPlant
 from permaculture.ingestor import Ingestor
+from permaculture.plant import IngestorPlant
 
 logger = logging.getLogger(__name__)
 

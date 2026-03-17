@@ -4,13 +4,13 @@ from unittest.mock import Mock
 
 import pytest
 
-from permaculture.plant import IngestorPlant
 from permaculture.de import (
     DEConverter,
     DEIngestor,
     DEModel,
     DEWeb,
 )
+from permaculture.plant import IngestorPlant
 
 from .stubs import StubRequestsResponse
 
@@ -353,7 +353,7 @@ def test_de_ingestor_fetch_all():
         )
     )
 
-    ingestor = DEIngestor("de", model)
+    ingestor = DEIngestor("de", model=model)
     elements = list(ingestor.fetch_all())
     assert elements == [
         IngestorPlant(
@@ -363,6 +363,7 @@ def test_de_ingestor_fetch_all():
                 "common name/d": True,
             },
             ingestor="de",
+            name="Design Écologique",
             source="https://designecologique.ca",
         ),
     ]

@@ -9,10 +9,10 @@ from bs4 import BeautifulSoup
 from defusedxml.ElementTree import fromstring
 
 from permaculture.converter import Converter
-from permaculture.plant import IngestorPlant
 from permaculture.http import HTTPSession
 from permaculture.locales import Locales
 from permaculture.nlp import normalize
+from permaculture.plant import IngestorPlant
 from permaculture.priority import LocationPriority, Priority
 
 SDP_ORIGIN = "https://www.lasocietedesplantes.com"
@@ -216,6 +216,7 @@ class SDPIngestor:
     """Ingestor for La Société des Plantes."""
 
     name: str
+    title: str = "La Société des Plantes"
     model: SDPModel = field(factory=SDPModel)
     priority: Priority = field(factory=Priority)
 
@@ -224,7 +225,7 @@ class SDPIngestor:
         """Instantiate SDPIngestor from config."""
         model = SDPModel().with_cache(config.storage)
         priority = LocationPriority("Quebec").with_cache(config.storage)
-        return cls(name, model, priority)
+        return cls(name, model=model, priority=priority)
 
     def fetch_all(self):
         count = 0
@@ -236,6 +237,7 @@ class SDPIngestor:
                 plant,
                 self.priority.weight,
                 ingestor=self.name,
+                title=self.title,
                 source=self.model.web.source_url(path),
             )
         logger.info("SDP: ingested %d plants total", count)

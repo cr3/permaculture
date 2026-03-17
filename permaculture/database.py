@@ -44,6 +44,7 @@ class Database:
                 CREATE TABLE IF NOT EXISTS plants (
                     id INTEGER PRIMARY KEY,
                     ingestor TEXT NOT NULL,
+                    title TEXT NOT NULL,
                     source TEXT NOT NULL,
                     scientific_name TEXT NOT NULL,
                     data TEXT NOT NULL,
@@ -76,10 +77,11 @@ class Database:
                 data_json = json.dumps(record.data)
                 cur = conn.execute(
                     "INSERT INTO plants"
-                    " (ingestor, source, scientific_name, data, weight)"
-                    " VALUES (?, ?, ?, ?, ?)",
+                    " (ingestor, title, source, scientific_name, data, weight)"
+                    " VALUES (?, ?, ?, ?, ?, ?)",
                     (
                         record.ingestor,
+                        record.title,
                         record.source,
                         record.scientific_name,
                         data_json,
@@ -124,12 +126,12 @@ class Database:
     def _iterate_raw(self):
         """Yield plants for all rows."""
         with self._connect() as conn:
-            for ingestor, source, data, weight in conn.execute(
-                "SELECT ingestor, source, data, weight FROM plants"
+            for ingestor, title, source, data, weight in conn.execute(
+                "SELECT ingestor, title, source, data, weight FROM plants"
             ):
                 yield IngestorPlant(
                     json.loads(data), weight,
-                    ingestor=ingestor, source=source,
+                    ingestor=ingestor, title=title, source=source,
                 )
 
     def lookup(self, names: list[str], score: float) -> Iterator[DatabasePlant]:
@@ -140,23 +142,23 @@ class Database:
         with self._connect() as conn:
             placeholders = ",".join("?" * len(names))
             rows = conn.execute(
-                "SELECT ingestor, source, data, weight FROM plants"  # noqa: S608
+                "SELECT ingestor, title, source, data, weight FROM plants"  # noqa: S608
                 f" WHERE scientific_name IN ({placeholders})",
                 names,
             )
             yield from _merge_all(
                 IngestorPlant(
                     json.loads(data), weight,
-                    ingestor=ing, source=source,
+                    ingestor=ing, title=title, source=source,
                 )
-                for ing, source, data, weight in rows
+                for ing, title, source, data, weight in rows
             )
 
     def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
         """Search for plants by name using FTS5 trigram matching."""
         with self._connect() as conn:
             rows = conn.execute(
-                "SELECT DISTINCT p.ingestor, p.source, p.data, p.weight"
+                "SELECT DISTINCT p.ingestor, p.title, p.source, p.data, p.weight"
                 " FROM names_fts fts"
                 " JOIN plants p ON fts.plant_id = p.id"
                 " WHERE fts.name MATCH ?",
@@ -164,13 +166,13 @@ class Database:
             )
             yield from _merge_all(
                 plant
-                for ing, source, data, weight in rows
+                for ing, ing_title, source, data, weight in rows
                 if self._extract(
                     name,
                     (
                         plant := IngestorPlant(
                             json.loads(data), weight,
-                            ingestor=ing, source=source,
+                            ingestor=ing, title=ing_title, source=source,
                         )
                     ).names,
                 )
@@ -192,11 +194,15 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
     """Merge plants with the same scientific name using weighted resolution."""
     plants = list(plants)
 
-    attr_ingestors = {}
+    sources = {}
     for key in {k for p in plants for k in p}:
-        attr_ingestors[key] = [p.ingestor for p in plants if key in p]
+        sources[key] = [p.ingestor for p in plants if key in p]
 
-    plant_sources = {p.ingestor: p.source for p in plants if p.ingestor}
+    ingestors = {
+        p.ingestor: {"title": p.title, "source": p.source}
+        for p in plants
+        if p.ingestor
+    }
 
     def resolve(key, values):
         weights = [p.weight for p in plants if key in p]
@@ -212,6 +218,6 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
     return DatabasePlant(
         merge(plants, resolve),
         avg_weight,
-        ingestors=attr_ingestors,
-        sources=plant_sources,
+        ingestors=ingestors,
+        sources=sources,
     )

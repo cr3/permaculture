@@ -2,8 +2,8 @@
 
 from http.cookiejar import Cookie, CookieJar
 
-from permaculture.plant import IngestorPlant
 from permaculture.nlp import normalize
+from permaculture.plant import IngestorPlant
 
 
 def unique_cookie(unique):
