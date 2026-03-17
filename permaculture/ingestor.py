@@ -34,9 +34,9 @@ def logged_fetch(method):
         for plant in method(self):
             count += 1
             if count % 100 == 0:
-                logger.info("%s: ingested %d plants", self.id, count)
+                logger.info("%s: ingested %d plants", self.name, count)
             yield plant
-        logger.info("%s: ingested %d plants total", self.id, count)
+        logger.info("%s: ingested %d plants total", self.name, count)
     return wrapper
 
 

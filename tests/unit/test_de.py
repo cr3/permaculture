@@ -341,6 +341,7 @@ def test_de_model_get_perenial_plants():
 def test_de_ingestor_fetch_all():
     """Fetching all should return a list of elements."""
     model = Mock(
+        web=Mock(source_url=Mock(return_value="https://designecologique.ca")),
         get_perenial_plants=Mock(
             return_value=[
                 {
@@ -362,8 +363,9 @@ def test_de_ingestor_fetch_all():
                 "common name/c": True,
                 "common name/d": True,
             },
+            1.0,
             ingestor="de",
-            name="Design Écologique",
+            title="Design Écologique",
             source="https://designecologique.ca",
         ),
     ]

@@ -292,6 +292,7 @@ def test_sdp_model_all_plants_skips_no_scientific_name():
 def test_sdp_ingestor_fetch_all():
     """Fetching all should return IngestorPlant objects."""
     model = Mock(
+        web=Mock(source_url=Mock(return_value="https://www.lasocietedesplantes.com/produits/bourrache/")),
         all_plants=Mock(
             return_value=[
                 (
@@ -317,8 +318,9 @@ def test_sdp_ingestor_fetch_all():
                 "family": "boraginacées",
                 "description": "Un excellent légume-feuille.",
             },
+            1.0,
             ingestor="sdp",
-            name="La Société des Plantes",
+            title="La Société des Plantes",
             source="https://www.lasocietedesplantes.com/produits/bourrache/",
         ),
     ]

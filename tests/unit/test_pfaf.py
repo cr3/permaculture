@@ -142,8 +142,9 @@ def test_pfaf_ingestor_fetch_all():
                 "scientific name": "a",
                 "common name": "b",
             },
+            1.0,
             ingestor="pfaf",
-            name="Plants For A Future",
+            title="Plants For A Future",
             source="https://pfaf.org/",
         ),
     ]

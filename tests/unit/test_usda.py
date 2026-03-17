@@ -178,6 +178,7 @@ def test_plants_ingestor_fetch_all(unique):
     """Fetching all should return a list of elements."""
     scientific_name, common_name = unique("token"), unique("text")
     model = Mock(
+        web=Mock(source_url=Mock(return_value="https://plantsservices.sc.egov.usda.gov")),
         all_characteristics=Mock(
             return_value=[
                 {
@@ -196,8 +197,9 @@ def test_plants_ingestor_fetch_all(unique):
                 "scientific name": scientific_name,
                 f"common name/{common_name}": True,
             },
+            1.0,
             ingestor="usda",
-            name="USDA Plants",
+            title="USDA Plants",
             source="https://plantsservices.sc.egov.usda.gov",
         ),
     ]
