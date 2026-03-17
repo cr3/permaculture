@@ -9,6 +9,7 @@ from permaculture.locales import Locales
 from permaculture.nlp import normalize
 
 FLOAT_RE = r"([+-]?\d+(?:\.\d*)?)"
+LETTERS_RE = re.compile(rf"[^\s{re.escape(string.punctuation)}][a-z]*")
 
 
 @define(frozen=True)
@@ -50,10 +51,9 @@ class Converter:
         by punctuation or whitespace.
         """
         k = self.translate(key)
-        punctuation = re.escape(string.punctuation)
         values = [
             self.translate(v, key)
-            for v in re.findall(rf"[^\s{punctuation}][a-z]*", value)
+            for v in LETTERS_RE.findall(value)
         ]
         return [(f"{k}/{v}", True) for v in values]
 

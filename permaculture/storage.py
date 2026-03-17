@@ -52,7 +52,8 @@ class Storage(MutableMapping):
         return FileStorage(path) if path else MemoryStorage()
 
 
-MemoryStorage: Storage = dict
+class MemoryStorage(dict, Storage):
+    """In-memory storage backed by a plain dict."""
 
 
 @define(frozen=True)
