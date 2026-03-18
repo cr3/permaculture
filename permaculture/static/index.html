@@ -50,10 +50,26 @@
     padding: .15rem .5rem; border-radius: 12px; margin: .1rem;
     font-size: .85em;
   }
+  .lang-toggle {
+    display: inline-flex; border: 1px solid #ccc; border-radius: 6px;
+    overflow: hidden; float: right; margin-top: .2rem;
+  }
+  .lang-toggle button {
+    padding: .3rem .7rem; border: none; background: #fff;
+    cursor: pointer; font-size: .85rem; color: #555;
+  }
+  .lang-toggle button.active {
+    background: #2e7d32; color: #fff;
+  }
 </style>
 </head>
 <body>
-<h1>&#127793; Permaculture Plant Database</h1>
+<h1>&#127793; Permaculture Plant Database
+  <span class="lang-toggle">
+    <button data-lang="en">EN</button>
+    <button data-lang="fr">FR</button>
+  </span>
+</h1>
 
 <div class="search-box">
   <input type="search" id="q" placeholder="Search plants&#8230;"
@@ -66,7 +82,20 @@
 const q = document.getElementById('q');
 const sugBox = document.getElementById('suggestions');
 const detail = document.getElementById('detail');
+const langButtons = document.querySelectorAll('.lang-toggle button');
 let debounce;
+let lang = navigator.language.startsWith('fr') ? 'fr' : 'en';
+
+function setLang(l) {
+  lang = l;
+  langButtons.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  if (q.value.trim()) search();
+  const name = detail.querySelector('h2');
+  if (name) lookup(name.textContent);
+}
+
+langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+setLang(lang);
 
 q.addEventListener('input', () => {
   clearTimeout(debounce);
@@ -91,15 +120,18 @@ q.addEventListener('keydown', e => {
 async function search() {
   const val = q.value.trim();
   if (val.length < 1) { sugBox.style.display = 'none'; return; }
-  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val));
+  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val) + '&lang=' + lang);
   const plants = await r.json();
   sugBox.innerHTML = '';
   for (const p of plants) {
     const li = document.createElement('li');
-    const common = p.common_names.length ? ' \u2014 ' + p.common_names.join(', ') : '';
-    li.innerHTML = '<span class="sci">' + esc(p.scientific_name) + '</span>'
+    const keys = Object.keys(p);
+    const sciName = p[keys[0]];
+    const commonNames = p[keys[1]];
+    const common = commonNames.length ? ' \u2014 ' + commonNames.join(', ') : '';
+    li.innerHTML = '<span class="sci">' + esc(sciName) + '</span>'
       + '<span class="common">' + esc(common) + '</span>';
-    li.addEventListener('click', () => lookup(p.scientific_name));
+    li.addEventListener('click', () => lookup(sciName));
     sugBox.appendChild(li);
   }
   sugBox.style.display = plants.length ? 'block' : 'none';
@@ -108,7 +140,7 @@ async function search() {
 async function lookup(name) {
   sugBox.style.display = 'none';
   q.value = name;
-  const r = await fetch('/permaculture/plants/' + encodeURIComponent(name));
+  const r = await fetch('/permaculture/plants/' + encodeURIComponent(name) + '?lang=' + lang);
   const data = await r.json();
   if (!Object.keys(data).length) { detail.innerHTML = '<p>No data found.</p>'; return; }
   let html = '<h2>' + esc(name) + '</h2><table>';

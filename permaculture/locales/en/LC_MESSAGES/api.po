@@ -1,4 +1,4 @@
-# Permaculture display translations (English).
+# Permaculture API translations (English).
 # Copyright (C) 2023 Marc Tardif
 # Marc Tardif <marc@interunion.ca>, 2023.
 #

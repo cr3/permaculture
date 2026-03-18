@@ -62,8 +62,8 @@ def test_get_plants_search(client):
     assert r.status_code == 200
     data = r.json()
     assert len(data) == 1
-    assert data[0]["scientific_name"] == "symphytum officinale"
-    assert "comfrey" in data[0]["common_names"]
+    assert data[0]["scientific name"] == "symphytum officinale"
+    assert "comfrey" in data[0]["common names"]
 
 
 def test_get_plants_no_match(client):
@@ -131,7 +131,7 @@ def test_translate_keys_non_dict():
 
 def test_translate_keys_flat():
     """Translate keys should translate top-level keys."""
-    locales = Locales.from_domain("display", language="fr")
+    locales = Locales.from_domain("api", language="fr")
     data = {"scientific name": "test", "height": 1.2}
     result = translate_keys(data, locales)
     assert result == {"nom scientifique": "test", "hauteur": 1.2}
@@ -139,7 +139,7 @@ def test_translate_keys_flat():
 
 def test_translate_keys_nested():
     """Translate keys should recurse into nested dicts."""
-    locales = Locales.from_domain("display", language="fr")
+    locales = Locales.from_domain("api", language="fr")
     data = {"height": {"max": 1.2}}
     result = translate_keys(data, locales)
     assert result == {"hauteur": {"max": 1.2}}
@@ -147,7 +147,7 @@ def test_translate_keys_nested():
 
 def test_translate_keys_passthrough():
     """Untranslated keys should pass through unchanged."""
-    locales = Locales.from_domain("display", language="fr")
+    locales = Locales.from_domain("api", language="fr")
     data = {"unknown key": 42}
     result = translate_keys(data, locales)
     assert result == {"unknown key": 42}

@@ -72,13 +72,17 @@ def get_plants(
     database: DatabaseDep,
     q: str = Query(min_length=1, description="Search query"),
     limit: int = Query(default=10, ge=1, le=100),
+    lang: str = Query(default="en", description="Language for translated names"),
 ):
     """Return search results for the given query."""
-    return [
-        {
-            "scientific_name": plant.scientific_name,
-            "common_names": plant.common_names,
-        }
+    locales = Locales.from_domain("api", language=lang)
+    return [translate_keys(
+            {
+                "scientific name": plant.scientific_name,
+                "common names": plant.common_names,
+            },
+            locales,
+        )
         for plant in islice(database.search(q, score=0.6), limit)
     ]
 
@@ -87,13 +91,14 @@ def get_plants(
 def get_plant(
     scientific_name: str,
     database: DatabaseDep,
+    lang: str = Query(default="en", description="Language for translated keys"),
 ):
     """Return full characteristics for a scientific name."""
     plants = list(database.lookup([scientific_name], score=1.0))
     if not plants:
         return {}
 
-    locales = Locales.from_domain("display")
+    locales = Locales.from_domain("api", language=lang)
     data = group_characteristics(dict(plants[0].items()))
     return translate_keys(data, locales)
 

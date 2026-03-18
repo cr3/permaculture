@@ -1,4 +1,4 @@
-# Permaculture display translations (French).
+# Permaculture API translations (French).
 # Copyright (C) 2023 Marc Tardif
 # Marc Tardif <marc@interunion.ca>, 2023.
 #
@@ -16,8 +16,8 @@ msgstr ""
 msgid "bloom period"
 msgstr "période de floraison"
 
-msgid "common name"
-msgstr "nom commun"
+msgid "common names"
+msgstr "noms communs"
 
 msgid "edibility rating"
 msgstr "comestibilité"
