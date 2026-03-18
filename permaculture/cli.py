@@ -6,7 +6,6 @@ import sys
 from argparse import ArgumentParser, FileType
 from pathlib import Path
 
-from appdirs import user_cache_dir
 from configargparse import ArgParser
 
 from permaculture.data import (
@@ -23,19 +22,19 @@ from permaculture.logger import (
 from permaculture.nlp import score_type
 from permaculture.runner import Runner
 from permaculture.serializer import SerializerAction
-from permaculture.storage import StorageAction
 
 logger = logging.getLogger(__name__)
 
 
-def load_database(config):
+def load_database():
     """Load the database from the configured storage."""
-    db = Database.from_storage(config.storage)
-    if not Path(db.db_path).exists():
+    database = Database.from_env()
+    if not Path(database.db_path).exists():
         raise SystemExit(
-            f"Database not found: {db.db_path}\n" "Run 'permaculture ingest' first."
+            f"Database not found: {database.db_path}\n"
+            "Run 'permaculture ingest' first."
         )
-    return db
+    return database
 
 
 def make_args_parser():
@@ -159,11 +158,6 @@ def make_config_parser(config_files):
         action=LoggerLevelAction,
         default=logging.WARNING,
     )
-    config.add_argument(
-        "--storage",
-        action=StorageAction,
-        default=user_cache_dir("permaculture"),
-    )
     nc = config.add_argument_group(
         "nc",
         "Natural Capital",
@@ -198,10 +192,10 @@ def make_config_parser(config_files):
 def command_ingest(args, config):
     """Ingest plant data into local database."""
     ingestors = Ingestors.load(config)
-    db = Database.from_storage(config.storage)
+    database = Database.from_env()
     Runner(
         sources=dict(ingestors),
-        database=db,
+        database=database,
         max_concurrency=args.concurrency,
         max_retries=args.retries,
     ).run()
@@ -264,16 +258,16 @@ def main(argv=None):
                 args_parser.error(str(e))
             return
         case "iterate":
-            database = load_database(config)
+            database = load_database()
             data = command_iterate(database)
         case "list":
-            database = load_database(config)
+            database = load_database()
             data = command_list(database)
         case "lookup":
-            database = load_database(config)
+            database = load_database()
             data = command_lookup(args, config, database)
         case "search":
-            database = load_database(config)
+            database = load_database()
             data = command_search(args, database)
         case command:
             args_parser.error(f"Programming error for command: {command}")

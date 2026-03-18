@@ -1,6 +1,7 @@
 """Database utilities."""
 
 import json
+import os
 import sqlite3
 from collections import defaultdict
 from collections.abc import Iterator
@@ -13,7 +14,7 @@ from attrs import define, field
 from permaculture.data import merge
 from permaculture.nlp import Extractor, normalize, score
 from permaculture.plant import DatabasePlant, IngestorPlant
-from permaculture.storage import FileStorage
+from permaculture.storage import Storage
 
 
 @define(frozen=True)
@@ -23,11 +24,18 @@ class Database:
     db_path: Path = field(converter=Path)
 
     @classmethod
+    def from_env(cls, env=os.environ):
+        """Get a Database from the environment."""
+        storage = Storage.from_env(env)
+        return cls.from_storage(storage)
+
+    @classmethod
     def from_storage(cls, storage):
         """Create a Database from a storage provider."""
-        if isinstance(storage, FileStorage):
+        try:
             return cls(storage.base_dir / "permaculture.db")
-        return cls(":memory:")
+        except AttributeError:
+            return cls(":memory:")
 
     def _connect(self):
         self.db_path.parent.mkdir(parents=True, exist_ok=True)

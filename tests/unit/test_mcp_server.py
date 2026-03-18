@@ -1,11 +1,9 @@
 """Unit tests for the MCP server module."""
 
-from unittest.mock import patch
-
 import pytest
 
 from permaculture.database import Database
-from permaculture.mcp_server import lookup_plants, search_plants
+from permaculture.mcp_server import lookup_plants_in, search_plants_in
 from permaculture.plant import IngestorPlant
 
 
@@ -43,8 +41,7 @@ def database(tmp_path):
 
 def test_search_plants(database):
     """Searching by common name should return matching plants."""
-    with patch("permaculture.mcp_server._load_database", return_value=database):
-        result = search_plants("comfrey")
+    result = search_plants_in(database, "comfrey")
 
     assert len(result) == 1
     assert result[0]["scientific_name"] == "symphytum officinale"
@@ -53,16 +50,14 @@ def test_search_plants(database):
 
 def test_search_plants_no_match(database):
     """Searching for a non-existent name should return empty."""
-    with patch("permaculture.mcp_server._load_database", return_value=database):
-        result = search_plants("nonexistent")
+    result = search_plants_in(database, "nonexistent")
 
     assert result == []
 
 
 def test_lookup_plants(database):
     """Looking up by scientific name should return matching plants."""
-    with patch("permaculture.mcp_server._load_database", return_value=database):
-        result = lookup_plants(["symphytum officinale"])
+    result = lookup_plants_in(database, ["symphytum officinale"])
 
     assert len(result) == 1
     assert result[0]["scientific_name"] == "symphytum officinale"
@@ -73,10 +68,6 @@ def test_lookup_plants(database):
 
 def test_lookup_plants_empty(database):
     """Looking up with empty names should return empty."""
-    with patch("permaculture.mcp_server._load_database", return_value=database):
-        result = lookup_plants([])
+    result = lookup_plants_in(database, [])
 
     assert result == []
-
-
-

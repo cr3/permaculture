@@ -6,14 +6,12 @@ from importlib.resources import files
 from itertools import islice
 from typing import Annotated
 
-from appdirs import user_cache_dir
 from fastapi import Depends, FastAPI, Query
 from fastapi.responses import HTMLResponse
 
 from permaculture.data import unflatten
 from permaculture.database import Database
 from permaculture.locales import Locales
-from permaculture.storage import FileStorage
 
 
 def group_characteristics(data):
@@ -54,9 +52,8 @@ def translate_keys(data, locales):
 
 
 def get_database():
-    """Return the database backed by the default cache directory."""
-    storage = FileStorage(user_cache_dir("permaculture"))
-    return Database.from_storage(storage)
+    # Used by test client dependency overrides.
+    return Database.from_env()
 
 
 DatabaseDep = Annotated[Database, Depends(get_database)]
@@ -125,5 +122,10 @@ def main():
         default=8000,
         help="port (default: 8000)",
     )
+    parser.add_argument(
+        "--reload",
+        action="store_true",
+        help="auto-reload",
+    )
     args = parser.parse_args()
-    uvicorn.run(app, host=args.host, port=args.port)
+    uvicorn.run("permaculture.api:app", host=args.host, port=args.port, reload=args.reload)

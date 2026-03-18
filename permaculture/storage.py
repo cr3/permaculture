@@ -1,15 +1,16 @@
 """Storage providers."""
 
 import logging
+import os
 import sqlite3
 from collections.abc import MutableMapping
 from hashlib import md5
 from pathlib import Path
 from urllib.parse import quote, unquote
 
+from appdirs import user_cache_dir
 from attrs import define, field
 
-from permaculture.action import SingleAction
 from permaculture.serializer import Serializer, json_serializer
 
 logger = logging.getLogger(__name__)
@@ -21,35 +22,13 @@ def hash_request(method, url, body=None):
     return md5(data).hexdigest()  # noqa: S324
 
 
-class StorageAction(SingleAction):
-    """Argument action for storage."""
-
-    metavar = "PATH"
-
-    def __init__(self, option_strings, registry=None, **kwargs):
-        """Initializer storage defaults."""
-        default = kwargs.pop("default", None)
-        kwargs.setdefault("default", self.get_storage(default))
-        kwargs.setdefault("metavar", self.metavar)
-        kwargs.setdefault("help", f"storage path (default {default})")
-        super().__init__(option_strings, **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        """Set the values to a storage."""
-        storage = self.get_storage(values)
-
-        super().__call__(parser, namespace, storage, option_string)
-
-    @classmethod
-    def get_storage(cls, path):
-        """Get storage with a default path."""
-        return Storage.load(path)
-
-
 class Storage(MutableMapping):
+
     @classmethod
-    def load(cls, path=None):
-        return FileStorage(path) if path else MemoryStorage()
+    def from_env(cls, env=os.environ):
+        """Get Storage from the environment."""
+        path = env.get("PERMACULTURE_STORAGE", user_cache_dir("permaculture"))
+        return FileStorage(path)
 
 
 class MemoryStorage(dict, Storage):
