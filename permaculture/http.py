@@ -66,7 +66,7 @@ class HTTPEntry:
 class HTTPCache:
     """Manages caching of responses according to RFC 2616."""
 
-    storage: Storage = field(factory=MemoryStorage)
+    storage: Storage = field(factory=lambda: MemoryStorage.from_url("memory://"))
 
     def store(self, response):
         """Store an HTTP response object in the cache."""
@@ -145,7 +145,7 @@ class HTTPCache:
 class HTTPCacheAll:
     """Manages caching of all responses."""
 
-    storage: Storage = field(factory=MemoryStorage)
+    storage: Storage = field(factory=lambda: MemoryStorage.from_url("memory://"))
 
     @staticmethod
     def _hash_request(request):

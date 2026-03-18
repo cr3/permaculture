@@ -2,19 +2,8 @@
 
 from unittest.mock import Mock
 
-import pytest
-
-from permaculture.database import Database
 from permaculture.plant import IngestorPlant
 from permaculture.runner import Runner
-
-
-@pytest.fixture
-def database(tmp_path):
-    """Create a Database backed by a temporary file."""
-    db = Database(tmp_path / "test.db")
-    db.initialize()
-    return db
 
 
 def test_runner_ingest_single_source(database):

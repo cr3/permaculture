@@ -1,7 +1,5 @@
 """Unit tests for the database module."""
 
-from pathlib import Path
-
 import pytest
 
 from permaculture.database import (
@@ -10,30 +8,22 @@ from permaculture.database import (
     _merge_all,
 )
 from permaculture.plant import DatabasePlant, IngestorPlant
-from permaculture.storage import FileStorage, MemoryStorage
 
 
-@pytest.fixture
-def db_path(tmp_path):
-    """Create a temporary SQLite database with test data."""
-    path = tmp_path / "permaculture.db"
-    database = Database(path)
-    database.initialize()
-    return path
+def test_database_from_url_file(tmp_path):
+    """Creating from a file path should use that path."""
+    db_path = tmp_path / "test.db"
+    db = Database.from_url(str(db_path))
+    db.initialize()
+    assert db_path.exists()
 
 
-def test_database_from_storage_file(tmp_path):
-    """Creating from FileStorage should use base_dir."""
-    storage = FileStorage(tmp_path)
-    db = Database.from_storage(storage)
-    assert db.db_path == tmp_path / "permaculture.db"
-
-
-def test_database_from_storage_memory():
-    """Creating from non-FileStorage should use in-memory database."""
-    storage = MemoryStorage()
-    db = Database.from_storage(storage)
-    assert db.db_path == Path(":memory:")
+def test_database_from_url_memory():
+    """Creating from :memory: should produce a working database."""
+    db = Database.from_url(":memory:")
+    db.initialize()
+    result = list(db.iterate())
+    assert result == []
 
 
 def test_database_plant_ingestor():
@@ -42,18 +32,16 @@ def test_database_plant_ingestor():
     assert plant.ingestor == "pfaf"
 
 
-def test_database_ingestors(db_path):
+def test_database_ingestors(database):
     """Ingestors should list distinct ingestor names."""
-    database = Database(db_path)
     database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
     database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")])
 
     assert sorted(database.ingestors()) == ["a", "b"]
 
 
-def test_database_ingestors_filtered(db_path):
+def test_database_ingestors_filtered(database):
     """Ingestors should filter by regex when provided."""
-    database = Database(db_path)
     database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
     database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")])
 
@@ -63,20 +51,17 @@ def test_database_ingestors_filtered(db_path):
     assert database.ingestors(include) == ["a"]
 
 
-def test_database_iterate(db_path):
+def test_database_iterate(database):
     """Iterating should return all plants from the local database."""
-    database = Database(db_path)
     database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
 
-    database = Database(db_path)
     result = list(database.iterate())
     assert len(result) == 1
     assert result[0]["scientific name"] == "x"
 
 
-def test_database_lookup(db_path):
+def test_database_lookup(database):
     """Lookup should return plants matching scientific names."""
-    database = Database(db_path)
     database.write_batch(
         [
             IngestorPlant(
@@ -88,15 +73,13 @@ def test_database_lookup(db_path):
         ],
     )
 
-    database = Database(db_path)
     result = list(database.lookup(["symphytum officinale"], 1.0))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
 
-def test_database_search(db_path):
+def test_database_search(database):
     """Search should return plants matching common name."""
-    database = Database(db_path)
     database.write_batch(
         [
             IngestorPlant(
@@ -111,15 +94,13 @@ def test_database_search(db_path):
         ],
     )
 
-    database = Database(db_path)
     result = list(database.search("comfrey", 0.5))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
 
-def test_database_search_by_scientific_name(db_path):
+def test_database_search_by_scientific_name(database):
     """Search should also match on scientific name via FTS5."""
-    database = Database(db_path)
     database.write_batch(
         [
             IngestorPlant(
@@ -139,9 +120,8 @@ def test_database_search_by_scientific_name(db_path):
     assert result[0]["scientific name"] == "symphytum officinale"
 
 
-def test_database_iterate_merges_sources(db_path):
+def test_database_iterate_merges_sources(database):
     """Iterating should merge plants from multiple ingestors."""
-    database = Database(db_path)
     database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")])
     database.write_batch([IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")])
 
@@ -151,9 +131,8 @@ def test_database_iterate_merges_sources(db_path):
     assert names == {"x", "y"}
 
 
-def test_database_iterate_tracks_source(db_path):
+def test_database_iterate_tracks_source(database):
     """Iterating should track per-attribute ingestors and sources after merging."""
-    database = Database(db_path)
     database.write_batch([IngestorPlant({"scientific name": "x"}, 1.0, ingestor="pfaf", title="Plants For A Future", source="https://pfaf.org/")])
 
     result = list(database.iterate())
@@ -269,15 +248,13 @@ def test_database_merge(plants, expected):
     assert result == expected
 
 
-def test_database_initialize_idempotent(db_path):
+def test_database_initialize_idempotent(database):
     """Initializing twice should be idempotent."""
-    database = Database(db_path)
     database.initialize()
 
 
-def test_database_write_batch_and_iterate(db_path):
+def test_database_write_batch_and_iterate(database):
     """Writing a batch should persist records retrievable via iterate."""
-    database = Database(db_path)
     records = [
         IngestorPlant(
             {
@@ -305,9 +282,8 @@ def test_database_write_batch_and_iterate(db_path):
     assert names == {"symphytum officinale", "achillea millefolium"}
 
 
-def test_database_search_no_match(db_path):
+def test_database_search_no_match(database):
     """Searching for a non-existent name should return empty."""
-    database = Database(db_path)
     database.write_batch(
         [
             IngestorPlant(
@@ -325,16 +301,14 @@ def test_database_search_no_match(db_path):
     assert result == []
 
 
-def test_database_lookup_empty(db_path):
+def test_database_lookup_empty(database):
     """Lookup with empty names should return empty."""
-    database = Database(db_path)
     result = list(database.lookup([], 1.0))
     assert result == []
 
 
-def test_database_weight_preserved(db_path):
+def test_database_weight_preserved(database):
     """Weight should be preserved through write and read."""
-    database = Database(db_path)
     database.write_batch(
         [
             IngestorPlant({"scientific name": "test"}, weight=2.5, ingestor="pfaf", title="Plants For A Future", source="https://pfaf.org/"),
@@ -344,9 +318,8 @@ def test_database_weight_preserved(db_path):
     assert result[0].weight == 2.5
 
 
-def test_database_delete_ingestor(db_path):
+def test_database_delete_ingestor(database):
     """Deleting an ingestor should remove its plants, common names, and FTS entries."""
-    database = Database(db_path)
     database.write_batch(
         [
             IngestorPlant(
@@ -369,9 +342,8 @@ def test_database_delete_ingestor(db_path):
     assert list(database.search("comfrey", 0.5)) == []
 
 
-def test_database_write_batch_idempotent(db_path):
+def test_database_write_batch_idempotent(database):
     """Writing the same batch twice should not create duplicates."""
-    database = Database(db_path)
     records = [
         IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s"),
     ]
@@ -382,9 +354,8 @@ def test_database_write_batch_idempotent(db_path):
     assert len(result) == 1
 
 
-def test_database_write_batch_replaces_data(db_path):
+def test_database_write_batch_replaces_data(database):
     """Writing a record with the same key should update data."""
-    database = Database(db_path)
     database.write_batch(
         [IngestorPlant({"scientific name": "x", "height": 1.0}, 1.0, ingestor="a", title="A", source="s")],
     )

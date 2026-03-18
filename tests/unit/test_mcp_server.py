@@ -8,9 +8,9 @@ from permaculture.plant import IngestorPlant
 
 
 @pytest.fixture
-def database(tmp_path):
-    """Create a populated database backed by a temporary file."""
-    db = Database(tmp_path / "permaculture.db")
+def database():
+    """Create a populated in-memory database for MCP server testing."""
+    db = Database.from_url(":memory:")
     db.initialize()
     db.write_batch(
         [

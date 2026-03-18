@@ -8,7 +8,7 @@ from permaculture.storage import MemoryStorage
 
 @pytest.fixture
 def session():
-    storage = MemoryStorage()
+    storage = MemoryStorage.from_url("memory://")
     return HTTPSession("http://httpbin.org").with_cache(storage, HTTPCache)
 
 

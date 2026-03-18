@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
 
 
 def load_database():
-    """Load the database from the configured storage."""
+    """Load the database from the environment."""
     database = Database.from_env()
-    if not Path(database.db_path).exists():
+    if not database.is_initialized():
         raise SystemExit(
-            f"Database not found: {database.db_path}\n"
+            "Database not found.\n"
             "Run 'permaculture ingest' first."
         )
     return database

@@ -2,51 +2,55 @@
 
 import json
 import os
-import sqlite3
 from collections import defaultdict
 from collections.abc import Iterator
 from itertools import starmap
 from operator import mul
 from pathlib import Path
 
+from appdirs import user_cache_dir
 from attrs import define, field
+from yarl import URL
 
 from permaculture.data import merge
 from permaculture.nlp import Extractor, normalize, score
 from permaculture.plant import DatabasePlant, IngestorPlant
-from permaculture.storage import Storage
+from permaculture.sqlite import connect as sqliteconnect
+
+DEFAULT_DATABASE = str(Path(user_cache_dir("permaculture")) / "permaculture.db")
 
 
-@define(frozen=True)
+@define(frozen=True, slots=False)
 class Database:
     """Local SQLite database for plant records."""
 
-    db_path: Path = field(converter=Path)
+    conn = field()
 
     @classmethod
-    def from_env(cls, env=os.environ):
-        """Get a Database from the environment."""
-        storage = Storage.from_env(env)
-        return cls.from_storage(storage)
+    def from_env(cls, env=os.environ) -> "Database":
+        """Create a Database from the environment."""
+        url = env.get("PERMACULTURE_DATABASE", DEFAULT_DATABASE)
+        return cls.from_url(url)
 
     @classmethod
-    def from_storage(cls, storage):
-        """Create a Database from a storage provider."""
-        try:
-            return cls(storage.base_dir / "permaculture.db")
-        except AttributeError:
-            return cls(":memory:")
+    def from_url(cls, url: str | URL) -> "Database":
+        """Create a Database from a URL or file path."""
+        return cls(sqliteconnect(url))
 
-    def _connect(self):
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        return sqlite3.connect(self.db_path)
+    def is_initialized(self) -> bool:
+        """Return whether the database schema has been created."""
+        row = self.conn.execute(
+            "SELECT count(*) FROM sqlite_master"
+            " WHERE type = 'table' AND name = 'plants'"
+        ).fetchone()
+        return row[0] > 0
 
     def _extract(self, query, choices):
         return Extractor(query, normalize, score).extract_one(choices)[0]
 
-    def initialize(self):
+    def initialize(self) -> None:
         """Create tables and indexes."""
-        with self._connect() as conn:
+        with self.conn as conn:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS plants (
@@ -74,17 +78,17 @@ class Database:
                 " ON plants(ingestor, scientific_name)"
             )
             conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_sci" " ON plants(scientific_name)"
+                "CREATE INDEX IF NOT EXISTS idx_sci ON plants(scientific_name)"
             )
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_cn" " ON common_names(name)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_cn ON common_names(name)")
             conn.execute(
                 "CREATE VIRTUAL TABLE IF NOT EXISTS names_fts"
                 " USING fts5(name, plant_id UNINDEXED, tokenize='trigram')"
             )
 
-    def delete_ingestor(self, name):
+    def delete_ingestor(self, name) -> None:
         """Remove all data for an ingestor."""
-        with self._connect() as conn:
+        with self.conn as conn:
             conn.execute(
                 "DELETE FROM names_fts WHERE plant_id IN"
                 " (SELECT id FROM plants WHERE ingestor = ?)",
@@ -97,14 +101,14 @@ class Database:
             )
             conn.execute("DELETE FROM plants WHERE ingestor = ?", (name,))
 
-    def write_batch(self, records):
+    def write_batch(self, records) -> None:
         """Persist a batch of plant records.
 
         Each record replaces any existing entry for the same
         (ingestor, scientific_name) pair, keeping the database
         free of duplicates even across retries.
         """
-        with self._connect() as conn:
+        with self.conn as conn:
             for record in records:
                 # Remove stale row (if any) before inserting.
                 conn.execute(
@@ -120,8 +124,7 @@ class Database:
                     (record.ingestor, record.scientific_name),
                 )
                 conn.execute(
-                    "DELETE FROM plants"
-                    " WHERE ingestor = ? AND scientific_name = ?",
+                    "DELETE FROM plants WHERE ingestor = ? AND scientific_name = ?",
                     (record.ingestor, record.scientific_name),
                 )
 
@@ -142,7 +145,7 @@ class Database:
                 pid = cur.lastrowid
                 common_names = record.common_names
                 conn.executemany(
-                    "INSERT INTO common_names (plant_id, name)" " VALUES (?, ?)",
+                    "INSERT INTO common_names (plant_id, name) VALUES (?, ?)",
                     [(pid, n) for n in common_names],
                 )
                 fts_rows = [
@@ -150,7 +153,7 @@ class Database:
                     *((n, pid) for n in common_names),
                 ]
                 conn.executemany(
-                    "INSERT INTO names_fts (name, plant_id)" " VALUES (?, ?)",
+                    "INSERT INTO names_fts (name, plant_id) VALUES (?, ?)",
                     fts_rows,
                 )
 
@@ -159,10 +162,9 @@ class Database:
 
         :param include: Optional regex to filter ingestors.
         """
-        with self._connect() as conn:
+        with self.conn as conn:
             all_ingestors = [
-                row[0]
-                for row in conn.execute("SELECT DISTINCT ingestor FROM plants")
+                row[0] for row in conn.execute("SELECT DISTINCT ingestor FROM plants")
             ]
 
         if include is None:
@@ -176,13 +178,16 @@ class Database:
 
     def _iterate_raw(self):
         """Yield plants for all rows."""
-        with self._connect() as conn:
+        with self.conn as conn:
             for ingestor, title, source, data, weight in conn.execute(
                 "SELECT ingestor, title, source, data, weight FROM plants"
             ):
                 yield IngestorPlant(
-                    json.loads(data), weight,
-                    ingestor=ingestor, title=title, source=source,
+                    json.loads(data),
+                    weight,
+                    ingestor=ingestor,
+                    title=title,
+                    source=source,
                 )
 
     def lookup(self, names: list[str], score: float) -> Iterator[DatabasePlant]:
@@ -190,7 +195,7 @@ class Database:
         if not names:
             return
 
-        with self._connect() as conn:
+        with self.conn as conn:
             placeholders = ",".join("?" * len(names))
             rows = conn.execute(
                 "SELECT ingestor, title, source, data, weight FROM plants"  # noqa: S608
@@ -199,15 +204,18 @@ class Database:
             )
             yield from _merge_all(
                 IngestorPlant(
-                    json.loads(data), weight,
-                    ingestor=ing, title=title, source=source,
+                    json.loads(data),
+                    weight,
+                    ingestor=ing,
+                    title=title,
+                    source=source,
                 )
                 for ing, title, source, data, weight in rows
             )
 
     def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
         """Search for plants by name using FTS5 trigram matching."""
-        with self._connect() as conn:
+        with self.conn as conn:
             rows = conn.execute(
                 "SELECT DISTINCT p.ingestor, p.title, p.source, p.data, p.weight"
                 " FROM names_fts fts"
@@ -222,8 +230,11 @@ class Database:
                     name,
                     (
                         plant := IngestorPlant(
-                            json.loads(data), weight,
-                            ingestor=ing, title=ing_title, source=source,
+                            json.loads(data),
+                            weight,
+                            ingestor=ing,
+                            title=ing_title,
+                            source=source,
                         )
                     ).names,
                 )
@@ -250,9 +261,7 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
         sources[key] = [p.ingestor for p in plants if key in p]
 
     ingestors = {
-        p.ingestor: {"title": p.title, "source": p.source}
-        for p in plants
-        if p.ingestor
+        p.ingestor: {"title": p.title, "source": p.source} for p in plants if p.ingestor
     }
 
     def resolve(key, values):

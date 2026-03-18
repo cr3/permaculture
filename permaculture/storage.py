@@ -2,7 +2,6 @@
 
 import logging
 import os
-import sqlite3
 from collections.abc import MutableMapping
 from hashlib import md5
 from pathlib import Path
@@ -10,10 +9,15 @@ from urllib.parse import quote, unquote
 
 from appdirs import user_cache_dir
 from attrs import define, field
+from yarl import URL
 
+from permaculture.registry import registry_load
 from permaculture.serializer import Serializer, json_serializer
+from permaculture.sqlite import connect as sqlite_connect
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_STORAGE = user_cache_dir("permaculture")
 
 
 def hash_request(method, url, body=None):
@@ -22,25 +26,47 @@ def hash_request(method, url, body=None):
     return md5(data).hexdigest()  # noqa: S324
 
 
+@define(frozen=True, slots=False)
 class Storage(MutableMapping):
+
+    url: URL = field(converter=URL)
 
     @classmethod
     def from_env(cls, env=os.environ):
         """Get Storage from the environment."""
-        path = env.get("PERMACULTURE_STORAGE", user_cache_dir("permaculture"))
-        return FileStorage(path)
+        path = env.get("PERMACULTURE_STORAGE", DEFAULT_STORAGE)
+        return cls.from_url(path)
+
+    @classmethod
+    def from_url(cls, url: URL | str, registry=None) -> "Storage":
+        """Find plugin in the registry."""
+        if registry is None or "storage" not in registry:
+            registry = registry_load("storage")
+        scheme = URL(url).scheme
+        if not scheme or len(scheme) == 1:
+            scheme = "file"
+        storage_cls = registry["storage"][scheme]
+        return storage_cls.from_url(url)
 
 
+@define(frozen=True, slots=False)
 class MemoryStorage(dict, Storage):
     """In-memory storage backed by a plain dict."""
 
+    @classmethod
+    def from_url(cls, url: URL | str) -> "MemoryStorage":
+        """Create a MemoryStorage from a URL."""
+        return cls(url)
+
 
 @define(frozen=True)
-class _NullStorage(Storage):
-    """Null storage.
+class NullStorage(Storage):
+    """Null storage."""
 
-    This storage stores a value and always retrieves the default value.
-    """
+    @classmethod
+    def from_url(cls, url: URL | str) -> "NullStorage":
+        """Create a NullStorage from a URL."""
+        return cls(url)
 
     def __getitem__(self, key):
         """Raise KeyError."""
@@ -61,28 +87,48 @@ class _NullStorage(Storage):
         return 0
 
 
-null_storage = _NullStorage()
+null_storage = NullStorage("null")
 
 
 @define(frozen=True)
 class FileStorage(Storage):
     """File storage.
 
-    :param base_dir: Base directory for storing files.
+    :param base_path: Base path for storing files.
     :param serializer: Serializer, defaults to `application/x-pickle`.
     """
 
-    base_dir: Path = field(converter=Path)
+    base_path: Path = field(converter=Path, kw_only=True)
     serializer: Serializer = field(
         default="application/x-pickle",
-        converter=lambda x: (
-            x if isinstance(x, Serializer) else Serializer.load(x)
-        ),
+        converter=lambda x: (x if isinstance(x, Serializer) else Serializer.load(x)),
+        kw_only=True,
     )
 
+    @classmethod
+    def from_url(cls, url: URL | str) -> "FileStorage":
+        """Create a FileStorage from a URL."""
+        if not isinstance(url, URL):
+            # Hack to prevent Windows separators from being encoded.
+            base_path = str(url).replace("\\", "/")
+            url = URL(base_path)
+        else:
+            base_path = url.path
+
+        return cls(url, base_path=base_path)
+
+    @property
+    def path(self):
+        path = self.url.path
+        if self.url.host:  # Relative path.
+            path = f"{self.url.host}{path}"
+        if len(self.url.scheme) == 1:  # Windows drive letter.
+            path = f"{self.url.scheme}:{path}"
+
+        return Path(path)
+
     def key_to_path(self, key):
-        path = self.base_dir / quote(key, "")
-        return path
+        return self.path / quote(key, "")
 
     def path_to_key(self, path):
         return unquote(path.name)
@@ -113,7 +159,7 @@ class FileStorage(Storage):
             raise KeyError(key) from error
 
     def __iter__(self):
-        return map(self.path_to_key, self.base_dir.iterdir())
+        return map(self.path_to_key, self.path.iterdir())
 
     def __len__(self):
         return sum(1 for _ in self)
@@ -121,39 +167,28 @@ class FileStorage(Storage):
 
 @define(frozen=True)
 class SqliteStorage(Storage):
-    """Sqlite storage.
+    """Sqlite storage."""
 
-    :param path: Path to SQLite database.
-    :param serializer: Serializer, defaults to `application/x-pickle`.
-    """
-
-    conn = field()
+    conn = field(kw_only=True)
     serializer: Serializer = field(
         default="application/x-pickle",
-        converter=lambda x: (
-            x if isinstance(x, Serializer) else Serializer.load(x)
-        ),
+        converter=lambda x: (x if isinstance(x, Serializer) else Serializer.load(x)),
+        kw_only=True,
     )
 
     @classmethod
-    def from_path(cls, path):
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-
-        conn = sqlite3.connect(path)
+    def from_url(cls, url: URL | str) -> "SqliteStorage":
+        conn = sqlite_connect(url)
         conn.execute("CREATE TABLE IF NOT EXISTS storage (key, data)")
         conn.execute(
-            "CREATE UNIQUE INDEX IF NOT EXISTS idx_storage_key "
-            "ON storage (key)"
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_storage_key ON storage (key)"
         )
         conn.commit()
 
-        return cls(conn)
+        return cls(url, conn=conn)
 
     def __getitem__(self, key):
-        cursor = self.conn.execute(
-            "SELECT data FROM storage WHERE key = ?", (key,)
-        )
+        cursor = self.conn.execute("SELECT data FROM storage WHERE key = ?", (key,))
         row = cursor.fetchone()
         if row is None:
             raise KeyError(key)

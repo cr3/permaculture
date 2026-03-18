@@ -2,32 +2,13 @@
 
 
 import pytest
+from yarl import URL
 
 from permaculture.storage import (
     FileStorage,
-    MemoryStorage,
     SqliteStorage,
     null_storage,
 )
-
-
-@pytest.fixture(
-    params=[
-        "file",
-        "memory",
-        "sqlite",
-    ]
-)
-def real_storage(request, tmpdir):
-    """Produce pytest parameters for all storages."""
-    if request.param == "file":
-        yield FileStorage(tmpdir)
-    elif request.param == "memory":
-        yield MemoryStorage()
-    elif request.param == "sqlite":
-        yield SqliteStorage.from_path(tmpdir / "storage.sqlite")
-    else:
-        raise KeyError(f"Unsupported storage type: {request.param}")
 
 
 @pytest.fixture(
@@ -42,41 +23,41 @@ def key(request):
     return request.param
 
 
-def test_real_storage_getitem_non_existing(key, real_storage):
+def test_storage_getitem_non_existing(key, storage):
     """Getting a non-existing key should return the default value."""
-    assert real_storage.get(key, True)
+    assert storage.get(key, True)
 
 
-def test_real_storage_getitem_existing(key, real_storage):
+def test_storage_getitem_existing(key, storage):
     """Getting a stored key should only return its value."""
-    real_storage[key] = True
-    assert real_storage.get(key, False)
+    storage[key] = True
+    assert storage.get(key, False)
 
 
-def test_real_storage_delitem_non_existing(key, real_storage):
+def test_storage_delitem_non_existing(key, storage):
     """Deleting a non-existing key should raise a KeyError."""
     with pytest.raises(KeyError):
-        del real_storage[key]
+        del storage[key]
 
 
-def test_real_storage_delitem_existing(key, real_storage):
+def test_storage_delitem_existing(key, storage):
     """Deleting a stored key should then return the default value."""
-    real_storage[key] = True
-    del real_storage[key]
-    assert real_storage.get(key, True)
+    storage[key] = True
+    del storage[key]
+    assert storage.get(key, True)
 
 
-def test_real_storage_iter(key, real_storage):
+def test_storage_iter(key, storage):
     """Iterating over a storage should return the keys."""
-    real_storage[key] = True
-    assert list(real_storage) == [key]
+    storage[key] = True
+    assert list(storage) == [key]
 
 
-def test_real_storage_length(key, real_storage):
+def test_storage_length(key, storage):
     """The length should return the number of stored keys."""
-    assert len(real_storage) == 0
-    real_storage[key] = True
-    assert len(real_storage) == 1
+    assert len(storage) == 0
+    storage[key] = True
+    assert len(storage) == 1
 
 
 def test_null_storage_getitem(key):
@@ -110,18 +91,39 @@ def test_null_storage_length(key):
     assert len(null_storage) == 0
 
 
+@pytest.mark.parametrize(
+    "url, path",
+    [
+        ("file://aaa", "aaa"),
+        ("file:///aaa", "/aaa"),
+        ("c:a", "c:a"),
+        ("c:/a", "c:/a"),
+        ("c:\\a", "c:/a"),
+        ("a", "a"),
+        ("/a", "/a"),
+        ("a/b", "a/b"),
+        ("/a/b", "/a/b"),
+    ],
+)
+def test_file_storage_from_url(url, path):
+    """Test file storage from URL matches the expected key."""
+    storage = FileStorage.from_url(url)
+    assert storage.path.as_posix() == path
+
+
 def test_file_storage_setitem(key, tmpdir):
     """Setting a key should create the parent directory."""
     parent = tmpdir / "parent"
     assert not parent.exists()
 
-    storage = FileStorage(parent)
+    storage = FileStorage.from_url(parent)
     storage[key] = True
     assert parent.exists()
 
 
-def test_sqlite_storage_from_path_twice(key, tmpdir):
-    """Instantiating an SQLite storage from path twice should not fail."""
-    path = tmpdir / "storage.sqlite"
-    SqliteStorage.from_path(path)
-    SqliteStorage.from_path(path)
+def test_sqlite_storage_from_url_twice(key, tmpdir):
+    """Instantiating an SQLite storage from file twice should not fail."""
+    path = tmpdir / "test.db"
+    url = URL.build(scheme="sqlite", path=str(path))
+    SqliteStorage.from_url(url)
+    SqliteStorage.from_url(url)

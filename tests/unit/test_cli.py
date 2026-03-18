@@ -1,7 +1,6 @@
 """Unit tests for the cli module."""
 
 import logging
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -109,9 +108,9 @@ def test_main_error(stderr, unique):
 
 
 @pytest.fixture
-def database(tmp_path):
-    """Create a populated database backed by a temporary file."""
-    db = Database(tmp_path / "permaculture.db")
+def database():
+    """Create a populated in-memory database for CLI testing."""
+    db = Database.from_url(":memory:")
     db.initialize()
     db.write_batch(
         [
@@ -316,13 +315,15 @@ def test_command_lookup_no_match(database):
 
 def test_load_database_not_found(monkeypatch, tmp_path):
     """Loading a database that doesn't exist should raise SystemExit."""
-    monkeypatch.setenv("PERMACULTURE_STORAGE", str(tmp_path))
+    monkeypatch.setenv("PERMACULTURE_DATABASE", str(tmp_path / "missing.db"))
     with pytest.raises(SystemExit, match="Database not found"):
         load_database()
 
 
-def test_load_database_exists(monkeypatch, database):
+def test_load_database_exists(monkeypatch, tmp_path):
     """Loading a database that exists should succeed."""
-    monkeypatch.setenv("PERMACULTURE_STORAGE", str(database.db_path.parent))
-    db = load_database()
-    assert Path(db.db_path).exists()
+    db_path = tmp_path / "permaculture.db"
+    db = Database.from_url(str(db_path))
+    db.initialize()
+    monkeypatch.setenv("PERMACULTURE_DATABASE", str(db_path))
+    load_database()
