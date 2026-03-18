@@ -80,7 +80,7 @@ def get_plants(
     return [translate_keys(
             {
                 "scientific name": plant.scientific_name,
-                "common names": plant.common_names,
+                "common name": plant.common_names,
             },
             locales,
         )

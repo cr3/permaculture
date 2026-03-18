@@ -16,7 +16,7 @@ msgstr ""
 msgid "bloom period"
 msgstr "période de floraison"
 
-msgid "common names"
+msgid "common name"
 msgstr "noms communs"
 
 msgid "edibility rating"
