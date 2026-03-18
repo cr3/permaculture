@@ -70,6 +70,10 @@ class Database:
             """
             )
             conn.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_ingestor_sci"
+                " ON plants(ingestor, scientific_name)"
+            )
+            conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_sci" " ON plants(scientific_name)"
             )
             conn.execute("CREATE INDEX IF NOT EXISTS idx_cn" " ON common_names(name)")
@@ -78,10 +82,49 @@ class Database:
                 " USING fts5(name, plant_id UNINDEXED, tokenize='trigram')"
             )
 
+    def delete_ingestor(self, name):
+        """Remove all data for an ingestor."""
+        with self._connect() as conn:
+            conn.execute(
+                "DELETE FROM names_fts WHERE plant_id IN"
+                " (SELECT id FROM plants WHERE ingestor = ?)",
+                (name,),
+            )
+            conn.execute(
+                "DELETE FROM common_names WHERE plant_id IN"
+                " (SELECT id FROM plants WHERE ingestor = ?)",
+                (name,),
+            )
+            conn.execute("DELETE FROM plants WHERE ingestor = ?", (name,))
+
     def write_batch(self, records):
-        """Persist a batch of plant records."""
+        """Persist a batch of plant records.
+
+        Each record replaces any existing entry for the same
+        (ingestor, scientific_name) pair, keeping the database
+        free of duplicates even across retries.
+        """
         with self._connect() as conn:
             for record in records:
+                # Remove stale row (if any) before inserting.
+                conn.execute(
+                    "DELETE FROM names_fts WHERE plant_id IN"
+                    " (SELECT id FROM plants"
+                    "  WHERE ingestor = ? AND scientific_name = ?)",
+                    (record.ingestor, record.scientific_name),
+                )
+                conn.execute(
+                    "DELETE FROM common_names WHERE plant_id IN"
+                    " (SELECT id FROM plants"
+                    "  WHERE ingestor = ? AND scientific_name = ?)",
+                    (record.ingestor, record.scientific_name),
+                )
+                conn.execute(
+                    "DELETE FROM plants"
+                    " WHERE ingestor = ? AND scientific_name = ?",
+                    (record.ingestor, record.scientific_name),
+                )
+
                 data_json = json.dumps(record.data)
                 cur = conn.execute(
                     "INSERT INTO plants"

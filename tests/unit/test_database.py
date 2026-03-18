@@ -342,3 +342,56 @@ def test_database_weight_preserved(db_path):
     )
     result = list(database.iterate())
     assert result[0].weight == 2.5
+
+
+def test_database_delete_ingestor(db_path):
+    """Deleting an ingestor should remove its plants, common names, and FTS entries."""
+    database = Database(db_path)
+    database.write_batch(
+        [
+            IngestorPlant(
+                {"scientific name": "x", "common name/comfrey": True},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+            IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s"),
+        ],
+    )
+    database.delete_ingestor("a")
+
+    result = list(database.iterate())
+    assert len(result) == 1
+    assert result[0]["scientific name"] == "y"
+
+    assert database.search("comfrey", 0.5) is not None
+    assert list(database.search("comfrey", 0.5)) == []
+
+
+def test_database_write_batch_idempotent(db_path):
+    """Writing the same batch twice should not create duplicates."""
+    database = Database(db_path)
+    records = [
+        IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s"),
+    ]
+    database.write_batch(records)
+    database.write_batch(records)
+
+    result = list(database.iterate())
+    assert len(result) == 1
+
+
+def test_database_write_batch_replaces_data(db_path):
+    """Writing a record with the same key should update data."""
+    database = Database(db_path)
+    database.write_batch(
+        [IngestorPlant({"scientific name": "x", "height": 1.0}, 1.0, ingestor="a", title="A", source="s")],
+    )
+    database.write_batch(
+        [IngestorPlant({"scientific name": "x", "height": 2.0}, 1.0, ingestor="a", title="A", source="s")],
+    )
+
+    result = list(database.iterate())
+    assert len(result) == 1
+    assert result[0]["height"] == 2.0

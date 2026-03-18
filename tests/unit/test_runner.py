@@ -116,3 +116,50 @@ def test_runner_empty_source(database):
 
     result = list(database.iterate())
     assert result == []
+
+
+def test_runner_idempotent(database):
+    """Running the same ingestor twice should not create duplicates."""
+    def make_source():
+        return Mock(
+            fetch_all=Mock(
+                return_value=iter(
+                    [
+                        IngestorPlant({"scientific name": "a"}, 1.0, ingestor="test", title="Test", source="s"),
+                        IngestorPlant({"scientific name": "b"}, 1.0, ingestor="test", title="Test", source="s"),
+                    ]
+                )
+            )
+        )
+
+    Runner(sources={"test": make_source()}, database=database).run()
+    Runner(sources={"test": make_source()}, database=database).run()
+
+    result = list(database.iterate())
+    assert len(result) == 2
+
+
+def test_runner_preserves_other_ingestors(database):
+    """Running one ingestor should not affect data from another."""
+    source_a = Mock(
+        fetch_all=Mock(
+            return_value=iter(
+                [IngestorPlant({"scientific name": "x"}, 1.0, ingestor="a", title="A", source="s")]
+            )
+        )
+    )
+    Runner(sources={"a": source_a}, database=database).run()
+
+    source_b = Mock(
+        fetch_all=Mock(
+            return_value=iter(
+                [IngestorPlant({"scientific name": "y"}, 1.0, ingestor="b", title="B", source="s")]
+            )
+        )
+    )
+    Runner(sources={"b": source_b}, database=database).run()
+
+    result = list(database.iterate())
+    assert len(result) == 2
+    names = {p.scientific_name for p in result}
+    assert names == {"x", "y"}

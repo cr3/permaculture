@@ -45,6 +45,8 @@ class Runner:
     def run(self):
         """Run ingestion synchronously."""
         self.database.initialize()
+        for name in self.sources:
+            self.database.delete_ingestor(name)
         asyncio.run(self._run_async())
 
     async def _run_async(self):
