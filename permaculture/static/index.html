@@ -20,6 +20,12 @@
     width: 100%; padding: .6rem .8rem; font-size: 1rem;
     border: 1px solid #ccc; border-radius: 6px;
   }
+  .controls {
+    display: flex; align-items: center; gap: .6rem; margin-top: .5rem;
+  }
+  .controls label { font-size: .85rem; color: #555; }
+  .controls input[type=range] { width: 100px; }
+  .controls .score-val { font-size: .85rem; min-width: 2.2em; }
   .suggestions {
     position: absolute; top: 100%; left: 0; right: 0;
     background: #fff; border: 1px solid #ddd; border-top: none;
@@ -76,12 +82,19 @@
          autocomplete="off">
   <ul class="suggestions" id="suggestions"></ul>
 </div>
+<div class="controls">
+  <label for="score">Score</label>
+  <input type="range" id="score" min="0" max="1" step="0.1" value="0.6">
+  <span class="score-val" id="score-val">0.6</span>
+</div>
 <div id="detail"></div>
 
 <script>
 const q = document.getElementById('q');
 const sugBox = document.getElementById('suggestions');
 const detail = document.getElementById('detail');
+const scoreInput = document.getElementById('score');
+const scoreVal = document.getElementById('score-val');
 const langButtons = document.querySelectorAll('.lang-toggle button');
 let debounce;
 let lang = navigator.language.startsWith('fr') ? 'fr' : 'en';
@@ -96,6 +109,11 @@ function setLang(l) {
 
 langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 setLang(lang);
+
+scoreInput.addEventListener('input', () => {
+  scoreVal.textContent = scoreInput.value;
+  if (q.value.trim()) { clearTimeout(debounce); debounce = setTimeout(search, 200); }
+});
 
 q.addEventListener('input', () => {
   clearTimeout(debounce);
@@ -120,7 +138,7 @@ q.addEventListener('keydown', e => {
 async function search() {
   const val = q.value.trim();
   if (val.length < 1) { sugBox.style.display = 'none'; return; }
-  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val) + '&lang=' + lang);
+  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val) + '&lang=' + lang + '&score=' + scoreInput.value);
   const plants = await r.json();
   sugBox.innerHTML = '';
   for (const p of plants) {
