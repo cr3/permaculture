@@ -1,15 +1,23 @@
 """Unit tests for the cli module."""
 
 import logging
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from permaculture.cli import (
+    command_iterate,
+    command_list,
+    command_lookup,
+    command_search,
+    load_database,
     main,
     make_args_parser,
     make_config_parser,
 )
+from permaculture.database import Database
+from permaculture.plant import IngestorPlant
 
 
 def test_make_args_parser_command(unique):
@@ -98,3 +106,223 @@ def test_main_error(stderr, unique):
         main([unique("text")])
 
     assert "invalid choice" in stderr.write.call_args[0][0]
+
+
+@pytest.fixture
+def database(tmp_path):
+    """Create a populated database backed by a temporary file."""
+    db = Database(tmp_path / "permaculture.db")
+    db.initialize()
+    db.write_batch(
+        [
+            IngestorPlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                    "edibility": 3,
+                },
+                1.0,
+                ingestor="pfaf",
+                title="Plants For A Future",
+                source="https://pfaf.org/",
+            ),
+            IngestorPlant(
+                {
+                    "scientific name": "achillea millefolium",
+                    "common name/yarrow": True,
+                },
+                1.0,
+                ingestor="pfaf",
+                title="Plants For A Future",
+                source="https://pfaf.org/",
+            ),
+        ]
+    )
+    return db
+
+
+def test_make_args_parser_iterate():
+    """Making an args parser should parse the iterate command."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["iterate"])
+    assert args.command == "iterate"
+
+
+def test_make_args_parser_list():
+    """Making an args parser should parse the list command."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["list"])
+    assert args.command == "list"
+
+
+def test_make_args_parser_search(unique):
+    """Making an args parser should parse the search command."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["search", unique("text")])
+    assert args.command == "search"
+
+
+def test_make_args_parser_ingest_defaults():
+    """Making an args parser should have sensible ingest defaults."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["ingest"])
+    assert args.concurrency == 4
+    assert args.retries == 3
+
+
+def test_make_args_parser_ingest_custom():
+    """Making an args parser should accept custom ingest options."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(
+        ["ingest", "--concurrency=8", "--retries=5"]
+    )
+    assert args.concurrency == 8
+    assert args.retries == 5
+
+
+def test_make_args_parser_lookup_defaults(unique):
+    """Making an args parser should have sensible lookup defaults."""
+    args_parser = make_args_parser()
+    name = unique("text")
+    args, _ = args_parser.parse_known_args(["lookup", name])
+    assert args.names == [name]
+    assert args.file is False
+    assert args.score == 1.0
+
+
+def test_make_args_parser_lookup_multiple_names(unique):
+    """Making an args parser should accept multiple lookup names."""
+    args_parser = make_args_parser()
+    n1, n2 = unique("text"), unique("text")
+    args, _ = args_parser.parse_known_args(["lookup", n1, n2])
+    assert args.names == [n1, n2]
+
+
+def test_make_args_parser_search_defaults(unique):
+    """Making an args parser should have sensible search defaults."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["search", unique("text")])
+    assert args.score == 0.7
+
+
+def test_make_config_parser_serializer():
+    """Making a config parser should parse the serializer option."""
+    config_parser = make_config_parser([])
+    config = config_parser.parse_args(["--serializer=application/json"])
+    assert config.serializer.default_content_type == "application/json"
+
+
+def test_make_config_parser_ingestor():
+    """Making a config parser should parse the ingestor option."""
+    config_parser = make_config_parser([])
+    config = config_parser.parse_args(["--ingestor=pfaf"])
+    assert "pfaf" in config.ingestors
+
+
+def test_command_iterate(database):
+    """Iterating should return all scientific names."""
+    result = command_iterate(database)
+    assert sorted(result) == ["achillea millefolium", "symphytum officinale"]
+
+
+def test_command_list(database):
+    """Listing should return available ingestors."""
+    result = command_list(database)
+    assert result == ["pfaf"]
+
+
+def test_command_search(database):
+    """Searching should return matching plants."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["search", "comfrey"])
+    result = command_search(args, database)
+    assert len(result) == 1
+    assert "symphytum officinale" in result[0]
+
+
+def test_command_search_no_match(database):
+    """Searching for a non-existent name should return empty."""
+    args_parser = make_args_parser()
+    args, _ = args_parser.parse_known_args(["search", "nonexistent"])
+    result = command_search(args, database)
+    assert result == []
+
+
+def test_command_lookup(database):
+    """Looking up should return plant characteristics."""
+    args_parser = make_args_parser()
+    config_parser = make_config_parser([])
+    args, remaining = args_parser.parse_known_args(
+        ["lookup", "symphytum officinale"]
+    )
+    config = config_parser.parse_args(remaining)
+    result = command_lookup(args, config, database)
+    assert len(result) == 1
+    assert "scientific name" in result[0]
+
+
+def test_command_lookup_exclude(database):
+    """Looking up with exclude should filter characteristics."""
+    args_parser = make_args_parser()
+    config_parser = make_config_parser([])
+    args, remaining = args_parser.parse_known_args(
+        ["lookup", "symphytum officinale", "--exclude=edib"]
+    )
+    config = config_parser.parse_args(remaining)
+    result = command_lookup(args, config, database)
+    assert len(result) == 1
+    assert "edibility" not in result[0]
+
+
+def test_command_lookup_include(database):
+    """Looking up with include should only return matching characteristics."""
+    args_parser = make_args_parser()
+    config_parser = make_config_parser([])
+    args, remaining = args_parser.parse_known_args(
+        ["lookup", "symphytum officinale", "--include=scientific"]
+    )
+    config = config_parser.parse_args(remaining)
+    result = command_lookup(args, config, database)
+    assert len(result) == 1
+    assert list(result[0].keys()) == ["scientific name"]
+
+
+def test_command_lookup_file(database, tmp_path):
+    """Looking up with --file should read names from the given file."""
+    names_file = tmp_path / "names.txt"
+    names_file.write_text("symphytum officinale\n")
+    args_parser = make_args_parser()
+    config_parser = make_config_parser([])
+    args, remaining = args_parser.parse_known_args(
+        ["lookup", "--file", str(names_file)]
+    )
+    config = config_parser.parse_args(remaining)
+    result = command_lookup(args, config, database)
+    assert len(result) == 1
+    assert result[0]["scientific name"] == "symphytum officinale"
+
+
+def test_command_lookup_no_match(database):
+    """Looking up a non-existent name should return empty."""
+    args_parser = make_args_parser()
+    config_parser = make_config_parser([])
+    args, remaining = args_parser.parse_known_args(
+        ["lookup", "nonexistent species"]
+    )
+    config = config_parser.parse_args(remaining)
+    result = command_lookup(args, config, database)
+    assert result == []
+
+
+def test_load_database_not_found(monkeypatch, tmp_path):
+    """Loading a database that doesn't exist should raise SystemExit."""
+    monkeypatch.setenv("PERMACULTURE_STORAGE", str(tmp_path))
+    with pytest.raises(SystemExit, match="Database not found"):
+        load_database()
+
+
+def test_load_database_exists(monkeypatch, database):
+    """Loading a database that exists should succeed."""
+    monkeypatch.setenv("PERMACULTURE_STORAGE", str(database.db_path.parent))
+    db = load_database()
+    assert Path(db.db_path).exists()

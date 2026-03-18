@@ -3,7 +3,12 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from permaculture.api import app, get_database, group_characteristics
+from permaculture.api import (
+    app,
+    get_database,
+    group_characteristics,
+    translate_keys,
+)
 from permaculture.database import Database
 from permaculture.plant import IngestorPlant
 
@@ -109,3 +114,15 @@ def test_group_characteristics_mixed():
     data = {"bloom/min": "spring", "bloom/max": "summer"}
     result = group_characteristics(data)
     assert result == {"bloom": {"min": "spring", "max": "summer"}}
+
+
+def test_group_characteristics_non_dict():
+    """Numeric-keyed input should be returned as a list."""
+    data = {"0": "first", "1": "second"}
+    result = group_characteristics(data)
+    assert result == ["first", "second"]
+
+
+def test_translate_keys_non_dict():
+    """Non-dict input should be returned as-is."""
+    assert translate_keys([1, 2, 3], None) == [1, 2, 3]
