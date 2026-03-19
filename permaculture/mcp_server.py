@@ -1,10 +1,53 @@
 """MCP server exposing the permaculture plant database."""
 
+import os
+
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 from permaculture.database import Database
 
-mcp = FastMCP("permaculture", json_response=True)
+
+def get_allowed_hosts(env=os.environ):
+    allowed_hosts=[
+        "localhost:*",
+        "127.0.0.1:*",
+    ]
+    if "SERVER_IP" in env:
+        server_ip = env["SERVER_IP"]
+        allowed_hosts.append(
+            f"{server_ip}:*",
+        )
+    if "SERVER_HOSTNAME" in env:
+        server_hostname = env["SERVER_HOSTNAME"]
+        allowed_hosts.extend([
+            server_hostname,
+            f"{server_hostname}:*",
+        ])
+    return allowed_hosts
+
+
+def get_allowed_origins(env=os.environ):
+    allowed_origins=[
+        "http://localhost:*",
+    ]
+    if "SERVER_HOSTNAME" in env:
+        server_hostname = env["SERVER_HOSTNAME"]
+        allowed_origins.extend([
+            f"http://{server_hostname}",
+            f"http://{server_hostname}:*",
+        ])
+    return allowed_origins
+
+
+mcp = FastMCP(
+    "Permaculture",
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=get_allowed_hosts(),
+        allowed_origins=get_allowed_origins(),
+    ),
+)
 
 
 def _plant_dict(plant):

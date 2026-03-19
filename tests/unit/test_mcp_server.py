@@ -3,8 +3,45 @@
 import pytest
 
 from permaculture.database import Database
-from permaculture.mcp_server import lookup_plants_in, search_plants_in
+from permaculture.mcp_server import (
+    get_allowed_hosts,
+    get_allowed_origins,
+    lookup_plants_in,
+    search_plants_in,
+)
 from permaculture.plant import IngestorPlant
+
+
+def test_get_allowed_hosts_defaults():
+    """Allowed hosts should include localhost and 127.0.0.1 by default."""
+    result = get_allowed_hosts({})
+    assert result == ["localhost:*", "127.0.0.1:*"]
+
+
+def test_get_allowed_hosts_server_ip():
+    """Setting SERVER_IP in the env should allow that host."""
+    result = get_allowed_hosts({"SERVER_IP": "1.2.3.4"})
+    assert "1.2.3.4:*" in result
+
+
+def test_get_allowed_hosts_server_hostname():
+    """Setting SERVER_HOSTNAME in the env should allow that host."""
+    result = get_allowed_hosts({"SERVER_HOSTNAME": "example.com"})
+    assert "example.com" in result
+    assert "example.com:*" in result
+
+
+def test_get_allowed_origins_defaults():
+    """Allowed origins should include localhost by default."""
+    result = get_allowed_origins({})
+    assert result == ["http://localhost:*"]
+
+
+def test_get_allowed_origins_server_hostname():
+    """Setting SERVER_HOSTNAME in the env should allow that origin."""
+    result = get_allowed_origins({"SERVER_HOSTNAME": "example.com"})
+    assert "http://example.com" in result
+    assert "http://example.com:*" in result
 
 
 @pytest.fixture
