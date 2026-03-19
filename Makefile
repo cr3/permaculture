@@ -1,7 +1,7 @@
 VENV := .venv
 
 RUN := uv run
-PYTHON := $(RUN) python
+PYTHON := $(RUN) python3
 TOUCH := $(PYTHON) -c 'import sys; from pathlib import Path; Path(sys.argv[1]).touch()'
 
 # Find all the .po we want to format into .mo files.
@@ -31,7 +31,7 @@ check: $(VENV)
 %.po: $(VENV)
 
 %.mo: %.po
-	@python scripts/msgfmt.py --output-file $@ $^
+	@python3 scripts/msgfmt.py --output-file $@ $^
 
 # Convenience target to build locales.
 .PHONY: locales
@@ -57,7 +57,7 @@ docs: $(VENV)
 .PHONY: build
 build: locales
 	@echo "==> Creating wheel..."
-	@python -m build
+	@python3 -m build
 
 .PHONY: clean
 clean:
