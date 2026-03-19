@@ -3,15 +3,15 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from permaculture.api import (
+from permaculture.database import Database
+from permaculture.locales import Locales
+from permaculture.plant import IngestorPlant
+from permaculture.web import (
     app,
     get_database,
     group_characteristics,
     translate_data,
 )
-from permaculture.database import Database
-from permaculture.locales import Locales
-from permaculture.plant import IngestorPlant
 
 
 @pytest.fixture

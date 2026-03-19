@@ -29,12 +29,9 @@ de = [
   "playwright>=1.40.0,<2.0.0",
 ]
 
-mcp = [
-  "mcp>=1.0.0,<2.0.0",
-]
-
 web = [
   "fastapi>=0.115.0",
+  "mcp>=1.0.0,<2.0.0",
   "uvicorn>=0.30.0",
 ]
 
@@ -90,8 +87,7 @@ token = "permaculture.testing.unique:unique_token"
 
 [project.scripts]
 permaculture = "permaculture.cli:main"
-permaculture-mcp = "permaculture.mcp_server:main"
-permaculture-web = "permaculture.api:main"
+permaculture-web = "permaculture.web:main"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]

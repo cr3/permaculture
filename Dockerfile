@@ -9,7 +9,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 
 COPY uv.lock pyproject.toml ./
-RUN uv sync --frozen --no-install-project --extra de --extra mcp --extra web
+RUN uv sync --frozen --no-install-project --extra de --extra web
 
 COPY . ./
 RUN for f in permaculture/locales/*/LC_MESSAGES/*.po; do \
@@ -17,6 +17,6 @@ RUN for f in permaculture/locales/*/LC_MESSAGES/*.po; do \
     done
 
 ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.1.0
-RUN uv sync --frozen --no-editable --extra de --extra mcp --extra web
+RUN uv sync --frozen --no-editable --extra de --extra web
 
 ENTRYPOINT ["uv", "run", "--no-sync"]

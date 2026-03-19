@@ -1,7 +1,7 @@
 """FastAPI application for plant lookup."""
 
 import argparse
-from contextlib import suppress
+from contextlib import asynccontextmanager
 from importlib.resources import files
 from itertools import islice
 from typing import Annotated
@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse
 from permaculture.data import unflatten
 from permaculture.database import Database
 from permaculture.locales import Locales
+from permaculture.mcp_server import mcp
 
 
 def group_characteristics(data):
@@ -55,20 +56,22 @@ def translate_data(data, locales, context=""):
     }
 
 
+# Used by test client dependency overrides.
 def get_database():
-    # Used by test client dependency overrides.
     return Database.from_env()
 
 
 DatabaseDep = Annotated[Database, Depends(get_database)]
 
+@asynccontextmanager
+async def lifespan(app):
+    async with mcp.session_manager.run():
+        yield
 
-app = FastAPI(title="Permaculture", docs_url="/permaculture/docs")
+app = FastAPI(title="Permaculture", docs_url="/permaculture/docs", lifespan=lifespan)
 
-with suppress(ImportError):
-    from permaculture.mcp_server import mcp
-
-    app.mount("/permaculture/mcp", mcp.sse_app(mount_path="/permaculture/mcp"))
+mcp.settings.streamable_http_path = "/"
+app.mount("/permaculture/mcp", mcp.streamable_http_app())
 
 
 @app.get("/permaculture/plants")
@@ -143,4 +146,4 @@ def main():
         help="auto-reload",
     )
     args = parser.parse_args()
-    uvicorn.run("permaculture.api:app", host=args.host, port=args.port, reload=args.reload)
+    uvicorn.run("permaculture.web:app", host=args.host, port=args.port, reload=args.reload)

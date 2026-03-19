@@ -1,15 +1,10 @@
 """MCP server exposing the permaculture plant database."""
 
-import argparse
-import logging
-
 from mcp.server.fastmcp import FastMCP
 
 from permaculture.database import Database
 
-logger = logging.getLogger(__name__)
-
-mcp = FastMCP("permaculture")
+mcp = FastMCP("permaculture", json_response=True)
 
 
 def _plant_dict(plant):
@@ -56,30 +51,3 @@ def lookup_plants(
     """
     database = Database.from_env()
     return lookup_plants_in(database, names, score)
-
-
-
-def main():
-    """Entry point for the permaculture MCP server."""
-    parser = argparse.ArgumentParser(
-        description="Permaculture MCP server",
-    )
-    parser.add_argument(
-        "--transport",
-        choices=["stdio", "sse"],
-        default="stdio",
-        help="transport protocol (default: stdio)",
-    )
-    parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="host for SSE transport (default: 127.0.0.1)",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="port for SSE transport (default: 8000)",
-    )
-    args = parser.parse_args()
-    mcp.run(transport=args.transport, host=args.host, port=args.port)
