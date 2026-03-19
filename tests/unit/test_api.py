@@ -7,7 +7,7 @@ from permaculture.api import (
     app,
     get_database,
     group_characteristics,
-    translate_keys,
+    translate_data,
 )
 from permaculture.database import Database
 from permaculture.locales import Locales
@@ -128,31 +128,47 @@ def test_group_characteristics_non_dict():
     assert result == ["first", "second"]
 
 
-def test_translate_keys_non_dict():
+def test_translate_data_non_dict():
     """Non-dict input should be returned as-is."""
-    assert translate_keys([1, 2, 3], None) == [1, 2, 3]
+    assert translate_data([1, 2, 3], None) == [1, 2, 3]
 
 
-def test_translate_keys_flat():
-    """Translate keys should translate top-level keys."""
+def test_translate_data_flat():
+    """Translate data should translate top-level keys."""
     locales = Locales.from_domain("api", language="fr")
     data = {"scientific name": "test", "height": 1.2}
-    result = translate_keys(data, locales)
+    result = translate_data(data, locales)
     assert result == {"nom scientifique": "test", "hauteur": 1.2}
 
 
-def test_translate_keys_nested():
-    """Translate keys should recurse into nested dicts."""
+def test_translate_data_nested():
+    """Translate data should recurse into nested dicts."""
     locales = Locales.from_domain("api", language="fr")
     data = {"height": {"max": 1.2}}
-    result = translate_keys(data, locales)
+    result = translate_data(data, locales)
     assert result == {"hauteur": {"max": 1.2}}
 
 
-def test_translate_keys_passthrough():
+def test_translate_data_passthrough():
     """Untranslated keys should pass through unchanged."""
     locales = Locales.from_domain("api", language="fr")
     data = {"unknown key": 42}
-    result = translate_keys(data, locales)
+    result = translate_data(data, locales)
     assert result == {"unknown key": 42}
+
+
+def test_translate_data_string_values():
+    """Translate data should translate string values using context."""
+    locales = Locales.from_domain("api", language="fr")
+    data = {"growth rate": "fast"}
+    result = translate_data(data, locales)
+    assert result == {"taux de croissance": "rapide"}
+
+
+def test_translate_data_list_values():
+    """Translate data should translate list items using context."""
+    locales = Locales.from_domain("api", language="fr")
+    data = {"sun": ["full", "partial"]}
+    result = translate_data(data, locales)
+    assert result == {"soleil": ["plein soleil", "mi-ombre"]}
 
