@@ -36,3 +36,21 @@ class Locales:
                 return new_message
 
         return self.translations.gettext(message)
+
+    def translate_data(self, data, context=""):
+        """Recursively translate dictionary keys and string values."""
+        if not isinstance(data, dict):
+            return data
+
+        return {
+            self.translate(key): (
+                self.translate_data(value, context=key)
+                if isinstance(value, dict)
+                else [self.translate(item, context=key) for item in value]
+                if isinstance(value, list)
+                else self.translate(value, context=key)
+                if isinstance(value, str)
+                else value
+            )
+            for key, value in data.items()
+        }

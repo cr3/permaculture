@@ -9,7 +9,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, Query
 from fastapi.responses import HTMLResponse
 
-from permaculture.data import unflatten
+from permaculture.data import sort_data, unflatten
 from permaculture.database import Database
 from permaculture.locales import Locales
 from permaculture.mcp_server import mcp
@@ -34,25 +34,6 @@ def group_characteristics(data):
             else value
         )
         for key, value in nested.items()
-    }
-
-
-def translate_data(data, locales, context=""):
-    """Recursively translate dictionary keys and string values."""
-    if not isinstance(data, dict):
-        return data
-
-    return {
-        locales.translate(key): (
-            translate_data(value, locales, context=key)
-            if isinstance(value, dict)
-            else [locales.translate(item, context=key) for item in value]
-            if isinstance(value, list)
-            else locales.translate(value, context=key)
-            if isinstance(value, str)
-            else value
-        )
-        for key, value in data.items()
     }
 
 
@@ -84,12 +65,11 @@ def get_plants(
 ):
     """Return search results for the given query."""
     locales = Locales.from_domain("api", language=lang)
-    return [translate_data(
+    return [locales.translate_data(
             {
                 "scientific name": plant.scientific_name,
                 "common name": plant.common_names,
             },
-            locales,
         )
         for plant in islice(database.search(q, score=score), limit)
     ]
@@ -109,9 +89,10 @@ def get_plant(
     locales = Locales.from_domain("api", language=lang)
     plant = plants[0]
     data = group_characteristics(dict(plant.items()))
+    translated = sort_data(locales.translate_data(data))
     return {
-        **translate_data(data, locales),
-        "sources": translate_data(unflatten(plant.sources), locales),
+        **translated,
+        "sources": locales.translate_data(unflatten(plant.sources)),
         "ingestors": plant.ingestors,
     }
 
