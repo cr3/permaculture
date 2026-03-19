@@ -22,6 +22,7 @@ from permaculture.logger import (
 from permaculture.nlp import score_type
 from permaculture.runner import Runner
 from permaculture.serializer import SerializerAction
+from permaculture.storage import DEFAULT_STORAGE, StorageAction
 
 logger = logging.getLogger(__name__)
 
@@ -141,6 +142,11 @@ def make_config_parser(config_files):
     config.add_argument(
         "--serializer",
         action=SerializerAction,
+    )
+    config.add_argument(
+        "--storage",
+        action=StorageAction,
+        default=DEFAULT_STORAGE,
     )
     config.add_argument(
         "--ingestor",

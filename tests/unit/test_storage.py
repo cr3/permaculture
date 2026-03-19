@@ -1,12 +1,16 @@
 """Unit tests for the storage module."""
 
 
+from argparse import ArgumentParser
+
 import pytest
 from yarl import URL
 
 from permaculture.storage import (
     FileStorage,
+    MemoryStorage,
     SqliteStorage,
+    StorageAction,
     null_storage,
 )
 
@@ -21,6 +25,42 @@ from permaculture.storage import (
 def key(request):
     """Produce a key to test the storage."""
     return request.param
+
+
+def test_storage_action_default():
+    """A StorageAction with no args should use the default."""
+    parser = ArgumentParser()
+    parser.add_argument("--storage", action=StorageAction)
+    result = parser.parse_args([])
+
+    assert result.storage is None
+
+
+def test_storage_action_default_path(tmp_path):
+    """A StorageAction with a default path should produce a FileStorage."""
+    parser = ArgumentParser()
+    parser.add_argument("--storage", action=StorageAction, default=str(tmp_path))
+    result = parser.parse_args([])
+
+    assert isinstance(result.storage, FileStorage)
+
+
+def test_storage_action_custom(tmp_path):
+    """A StorageAction should use the URL given as argument."""
+    parser = ArgumentParser()
+    parser.add_argument("--storage", action=StorageAction)
+    result = parser.parse_args(["--storage", str(tmp_path)])
+
+    assert isinstance(result.storage, FileStorage)
+
+
+def test_storage_action_memory():
+    """A StorageAction with memory:// should produce a MemoryStorage."""
+    parser = ArgumentParser()
+    parser.add_argument("--storage", action=StorageAction)
+    result = parser.parse_args(["--storage", "memory://"])
+
+    assert isinstance(result.storage, MemoryStorage)
 
 
 def test_storage_getitem_non_existing(key, storage):

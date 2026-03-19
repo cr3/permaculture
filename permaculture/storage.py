@@ -11,6 +11,7 @@ from appdirs import user_cache_dir
 from attrs import define, field
 from yarl import URL
 
+from permaculture.action import SingleAction
 from permaculture.registry import registry_load
 from permaculture.serializer import Serializer, json_serializer
 from permaculture.sqlite import connect as sqlite_connect
@@ -18,6 +19,30 @@ from permaculture.sqlite import connect as sqlite_connect
 logger = logging.getLogger(__name__)
 
 DEFAULT_STORAGE = user_cache_dir("permaculture")
+
+
+class StorageAction(SingleAction):
+    """Argument action for storage."""
+
+    metavar = "URL"
+
+    def __init__(self, option_strings, **kwargs):
+        """Initialize storage defaults."""
+        default = kwargs.pop("default", None)
+        kwargs.setdefault("default", self.get_storage(default) if default else None)
+        kwargs.setdefault("metavar", self.metavar)
+        kwargs.setdefault("help", f"storage URL (default {default})")
+        super().__init__(option_strings, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        """Set the values to a storage."""
+        storage = self.get_storage(values)
+        super().__call__(parser, namespace, storage, option_string)
+
+    @classmethod
+    def get_storage(cls, url):
+        """Get storage from a URL."""
+        return Storage.from_url(url)
 
 
 def hash_request(method, url, body=None):
@@ -32,7 +57,7 @@ class Storage(MutableMapping):
     url: URL = field(converter=URL)
 
     @classmethod
-    def from_env(cls, env=os.environ):
+    def from_env(cls, env=os.environ) -> "Storage":
         """Get Storage from the environment."""
         path = env.get("PERMACULTURE_STORAGE", DEFAULT_STORAGE)
         return cls.from_url(path)
@@ -118,7 +143,7 @@ class FileStorage(Storage):
         return cls(url, base_path=base_path)
 
     @property
-    def path(self):
+    def path(self) -> Path:
         path = self.url.path
         if self.url.host:  # Relative path.
             path = f"{self.url.host}{path}"
@@ -127,10 +152,10 @@ class FileStorage(Storage):
 
         return Path(path)
 
-    def key_to_path(self, key):
+    def key_to_path(self, key) -> Path:
         return self.path / quote(key, "")
 
-    def path_to_key(self, path):
+    def path_to_key(self, path) -> str:
         return unquote(path.name)
 
     def __getitem__(self, key):
