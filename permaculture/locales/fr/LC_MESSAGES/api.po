@@ -19,6 +19,12 @@ msgstr "période de floraison"
 msgid "common name"
 msgstr "noms communs"
 
+msgid "ingestors"
+msgstr "sources de données"
+
+msgid "sources"
+msgstr "sources"
+
 msgid "edibility rating"
 msgstr "comestibilité"
 

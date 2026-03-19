@@ -100,8 +100,13 @@ def get_plant(
         return {}
 
     locales = Locales.from_domain("api", language=lang)
-    data = group_characteristics(dict(plants[0].items()))
-    return translate_keys(data, locales)
+    plant = plants[0]
+    data = group_characteristics(dict(plant.items()))
+    return {
+        **translate_keys(data, locales),
+        "sources": plant.sources,
+        "ingestors": plant.ingestors,
+    }
 
 
 @app.get("/permaculture/", response_class=HTMLResponse)

@@ -70,6 +70,19 @@
   .help-text {
     font-size: .8rem; color: #888; margin-top: .25rem;
   }
+  .source-ref {
+    font-size: .7em; vertical-align: super; color: #2e7d32;
+    margin-left: .15em; text-decoration: none;
+  }
+  .source-ref:hover { text-decoration: underline; }
+  .sources-footer {
+    margin-top: 1.5rem; padding-top: .75rem;
+    border-top: 1px solid #eee; font-size: .85rem; color: #555;
+  }
+  .sources-footer h3 { font-size: .95rem; margin-bottom: .4rem; }
+  .sources-footer ol { padding-left: 1.2rem; }
+  .sources-footer li { margin-bottom: .2rem; }
+  .sources-footer a { color: #2e7d32; }
 </style>
 </head>
 <body>
@@ -111,6 +124,7 @@ const i18n = {
     score: 'Score',
     scoreHelp: 'Minimum fuzzy\u2011match score: 0\u00A0=\u00A0all results, 1\u00A0=\u00A0exact matches only.',
     noData: 'No data found.',
+    sources: 'Sources',
   },
   fr: {
     title: '\u{1F331} Base de donn\u00E9es de plantes',
@@ -118,6 +132,7 @@ const i18n = {
     score: 'Score',
     scoreHelp: 'Score minimal de correspondance\u00A0: 0\u00A0=\u00A0tous les r\u00E9sultats, 1\u00A0=\u00A0correspondances exactes.',
     noData: 'Aucune donn\u00E9e trouv\u00E9e.',
+    sources: 'Sources',
   },
 };
 
@@ -190,11 +205,49 @@ async function lookup(name) {
   const data = await r.json();
   const t = i18n[lang] || i18n.en;
   if (!Object.keys(data).length) { detail.innerHTML = '<p>' + esc(t.noData) + '</p>'; return; }
+
+  const sources = data.sources || {};
+  const ingestors = data.ingestors || {};
+  delete data.sources;
+  delete data.ingestors;
+
+  // Assign each ingestor a stable index (1-based).
+  const ingNames = Object.keys(ingestors);
+  const ingIndex = {};
+  ingNames.forEach((name, i) => ingIndex[name] = i + 1);
+
   let html = '<h2>' + esc(name) + '</h2><table>';
   for (const [k, v] of Object.entries(data)) {
-    html += '<tr><th>' + esc(k) + '</th><td>' + renderVal(v) + '</td></tr>';
+    const refs = sourceRefs(k, sources, ingIndex);
+    html += '<tr><th>' + esc(k) + refs + '</th><td>' + renderVal(v) + '</td></tr>';
   }
-  detail.innerHTML = html + '</table>';
+  html += '</table>';
+
+  if (ingNames.length) {
+    html += '<div class="sources-footer"><h3>' + esc(t.sources) + '</h3><ol>';
+    for (const ing of ingNames) {
+      const info = ingestors[ing];
+      html += '<li><a href="' + esc(info.source) + '" target="_blank" rel="noopener">'
+        + esc(info.title) + '</a></li>';
+    }
+    html += '</ol></div>';
+  }
+
+  detail.innerHTML = html;
+}
+
+function sourceRefs(key, sources, ingIndex) {
+  // Collect ingestors for this key by matching flat source keys.
+  const matched = new Set();
+  for (const [sk, ings] of Object.entries(sources)) {
+    if (sk === key || sk.startsWith(key + '/')) {
+      ings.forEach(n => matched.add(n));
+    }
+  }
+  if (!matched.size) return '';
+  return [...matched]
+    .map(n => '<a class="source-ref" href="#source-' + ingIndex[n] + '">' + ingIndex[n] + '</a>')
+    .join('');
 }
 
 function renderVal(v) {

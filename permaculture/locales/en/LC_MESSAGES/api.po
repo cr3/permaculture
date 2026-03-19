@@ -15,3 +15,9 @@ msgstr ""
 
 msgid "common name"
 msgstr "common names"
+
+msgid "sources"
+msgstr "sources"
+
+msgid "ingestors"
+msgstr "ingestors"
