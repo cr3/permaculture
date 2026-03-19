@@ -36,15 +36,19 @@ def group_characteristics(data):
     }
 
 
-def translate_keys(data, locales):
-    """Recursively translate dictionary keys using locales."""
+def translate_data(data, locales, context=""):
+    """Recursively translate dictionary keys and string values."""
     if not isinstance(data, dict):
         return data
 
     return {
         locales.translate(key): (
-            translate_keys(value, locales)
+            translate_data(value, locales, context=key)
             if isinstance(value, dict)
+            else [locales.translate(item, context=key) for item in value]
+            if isinstance(value, list)
+            else locales.translate(value, context=key)
+            if isinstance(value, str)
             else value
         )
         for key, value in data.items()
@@ -77,7 +81,7 @@ def get_plants(
 ):
     """Return search results for the given query."""
     locales = Locales.from_domain("api", language=lang)
-    return [translate_keys(
+    return [translate_data(
             {
                 "scientific name": plant.scientific_name,
                 "common name": plant.common_names,
@@ -103,7 +107,7 @@ def get_plant(
     plant = plants[0]
     data = group_characteristics(dict(plant.items()))
     return {
-        **translate_keys(data, locales),
+        **translate_data(data, locales),
         "sources": plant.sources,
         "ingestors": plant.ingestors,
     }

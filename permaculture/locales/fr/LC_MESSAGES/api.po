@@ -13,17 +13,29 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "acid"
+msgstr "acide"
+
+msgid "alkaline"
+msgstr "alcalin"
+
+msgid "avg"
+msgstr "moy."
+
 msgid "bloom period"
 msgstr "période de floraison"
+
+msgid "cold injury"
+msgstr "blessure par le froid"
 
 msgid "common name"
 msgstr "noms communs"
 
-msgid "ingestors"
-msgstr "sources de données"
+msgid "disease issues"
+msgstr "problèmes de maladies"
 
-msgid "sources"
-msgstr "sources"
+msgid "drought"
+msgstr "sécheresse"
 
 msgid "edibility rating"
 msgstr "comestibilité"
@@ -31,23 +43,65 @@ msgstr "comestibilité"
 msgid "edible uses"
 msgstr "utilisations comestibles"
 
+msgid "family"
+msgstr "famille"
+
+msgid "fire damage"
+msgstr "dommages par le feu"
+
+msgid "flood"
+msgstr "inondation"
+
 msgid "flower color"
 msgstr "couleur de floraison"
 
 msgid "foliage color"
 msgstr "couleur de feuillage"
 
+msgid "form"
+msgstr "port"
+
 msgid "frost tender"
 msgstr "gélif"
+
+msgid "fruit period"
+msgstr "période de fructification"
+
+msgid "fruit type"
+msgstr "type de fruit"
+
+msgid "fungal types"
+msgstr "types de champignons"
+
+msgid "growing season"
+msgstr "saison de croissance"
 
 msgid "growth habits"
 msgstr "habitudes de croissance"
 
+msgid "growth rate"
+msgstr "taux de croissance"
+
+msgid "habit"
+msgstr "habitude"
+
 msgid "hardiness"
 msgstr "rusticité"
 
+msgid "heavy clay"
+msgstr "argile lourde"
+
 msgid "height"
 msgstr "hauteur"
+
+msgid "ingestors"
+msgstr "sources de données"
+
+msgid "insect"
+msgstr "insecte"
+
+msgid "life span"
+msgstr "durée de vie"
 
 msgid "medicinal rating"
 msgstr "usage médicinal"
@@ -55,11 +109,38 @@ msgstr "usage médicinal"
 msgid "moisture"
 msgstr "humidité"
 
+msgid "mowing"
+msgstr "tonte"
+
+msgid "native to north america?"
+msgstr "originaire d'Amérique du Nord?"
+
+msgid "neutral"
+msgstr "neutre"
+
 msgid "nitrogen fixer"
 msgstr "fixateur d'azote"
 
+msgid "pest damage"
+msgstr "dommages par les ravageurs"
+
 msgid "ph"
 msgstr "pH"
+
+msgid "plant binomial"
+msgstr "binôme"
+
+msgid "plant category"
+msgstr "catégorie de plante"
+
+msgid "plant type"
+msgstr "type de plante"
+
+msgid "pollinators"
+msgstr "pollinisateurs"
+
+msgid "poor soil"
+msgstr "sol pauvre"
 
 msgid "related"
 msgstr "apparenté"
@@ -67,8 +148,26 @@ msgstr "apparenté"
 msgid "root depth"
 msgstr "profondeur racinaire"
 
+msgid "root type"
+msgstr "type de racine"
+
+msgid "saline"
+msgstr "salin"
+
+msgid "salt"
+msgstr "sel"
+
+msgid "scented"
+msgstr "parfumé"
+
 msgid "scientific name"
 msgstr "nom scientifique"
+
+msgid "seasonal interest"
+msgstr "intérêt saisonnier"
+
+msgid "self-fertile"
+msgstr "autofertile"
 
 msgid "shape"
 msgstr "forme"
@@ -76,11 +175,149 @@ msgstr "forme"
 msgid "soil"
 msgstr "sol"
 
+msgid "soil compaction"
+msgstr "compaction du sol"
+
+msgid "soil type"
+msgstr "type de sol"
+
+msgid "sources"
+msgstr "sources"
+
 msgid "species"
 msgstr "espèce"
+
+msgid "spread"
+msgstr "étalement"
+
+msgid "stand persistence"
+msgstr "persistance"
 
 msgid "sun"
 msgstr "soleil"
 
+msgid "uk"
+msgstr "R.-U."
+
+msgid "well-drained"
+msgstr "bien drainé"
+
 msgid "width"
 msgstr "largeur"
+
+msgid "wind"
+msgstr "vent"
+
+msgid "wind storm damage"
+msgstr "dommages par le vent"
+
+msgid "achene"
+msgstr "akène"
+
+msgid "apomictic"
+msgstr "apomictique"
+
+msgid "cool-warm"
+msgstr "frais-chaud"
+
+msgid "endomycorrhizal"
+msgstr "endomycorhizien"
+
+msgid "fast"
+msgstr "rapide"
+
+msgid "fall"
+msgstr "automne"
+
+msgid "herbaceous"
+msgstr "herbacé"
+
+msgid "infrequent"
+msgstr "rare"
+
+msgid "minor"
+msgstr "mineur"
+
+msgid "moderate"
+msgstr "modéré"
+
+msgid "perennial"
+msgstr "vivace"
+
+msgid "spring"
+msgstr "printemps"
+
+msgid "summer"
+msgstr "été"
+
+msgid "tolerant"
+msgstr "tolérant"
+
+msgid "upright"
+msgstr "érigé"
+
+msgid "winter"
+msgstr "hiver"
+
+msgid "yellow"
+msgstr "jaune"
+
+msgctxt "life span"
+msgid "long"
+msgstr "longue"
+
+msgctxt "moisture"
+msgid "dry"
+msgstr "sec"
+
+msgctxt "moisture"
+msgid "moist"
+msgstr "humide"
+
+msgctxt "native to north america?"
+msgid "no"
+msgstr "non"
+
+msgctxt "pollinators"
+msgid "insects"
+msgstr "insectes"
+
+msgctxt "pollinators"
+msgid "self"
+msgstr "auto"
+
+msgctxt "root type"
+msgid "tap"
+msgstr "pivotante"
+
+msgctxt "soil type"
+msgid "clay"
+msgstr "argile"
+
+msgctxt "soil type"
+msgid "loamy"
+msgstr "limoneux"
+
+msgctxt "soil type"
+msgid "sandy"
+msgstr "sableux"
+
+msgctxt "soil type"
+msgid "silty"
+msgstr "silteux"
+
+msgctxt "stand persistence"
+msgid "long"
+msgstr "longue"
+
+msgctxt "sun"
+msgid "full"
+msgstr "plein soleil"
+
+msgctxt "sun"
+msgid "partial"
+msgstr "mi-ombre"
+
+msgctxt "texture"
+msgid "medium"
+msgstr "moyen"
