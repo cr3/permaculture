@@ -2,7 +2,7 @@
 
 import pytest
 
-from permaculture.sqlite import url_to_uri
+from permaculture.sqlite import connect, url_to_uri
 
 
 @pytest.mark.parametrize(
@@ -69,3 +69,11 @@ def test_url_to_uri_unsupported_scheme():
     """url_to_uri should reject unsupported schemes."""
     with pytest.raises(ValueError, match="Unsupported scheme"):
         url_to_uri("postgres://localhost/db")
+
+
+def test_connect_creates_parent_directories(tmp_path):
+    """connect should create parent directories for file URLs."""
+    db_path = tmp_path / "a" / "b" / "test.db"
+    conn = connect(str(db_path))
+    conn.close()
+    assert db_path.exists()

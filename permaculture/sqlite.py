@@ -1,6 +1,7 @@
 """SQLite URL-to-URI conversion utilities."""
 
 import sqlite3
+from pathlib import Path
 
 from yarl import URL
 
@@ -57,4 +58,11 @@ def url_to_uri(url: URL | str) -> tuple[str, dict]:
 def connect(url: URL | str) -> sqlite3.Connection:
     """Open a SQLite connection from a URL."""
     uri, kwargs = url_to_uri(url)
+
+    if uri != ":memory:" and not uri.startswith("file::memory:") and "mode=memory" not in uri:
+        path = uri.split("?")[0]
+        if kwargs.get("uri"):
+            path = path.removeprefix("file:")
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+
     return sqlite3.connect(uri, check_same_thread=False, **kwargs)
