@@ -153,6 +153,15 @@ function setLang(l) {
 langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 setLang(lang);
 
+// Load plant from URL on initial page load and back/forward navigation.
+const initPlant = new URL(window.location).searchParams.get('plant');
+if (initPlant) lookup(initPlant);
+window.addEventListener('popstate', () => {
+  const name = new URL(window.location).searchParams.get('plant');
+  if (name) lookup(name);
+  else { q.value = ''; detail.innerHTML = ''; }
+});
+
 scoreInput.addEventListener('input', () => {
   scoreVal.textContent = scoreInput.value;
   if (q.value.trim()) { clearTimeout(debounce); debounce = setTimeout(search, 200); }
@@ -201,6 +210,9 @@ async function search() {
 async function lookup(name) {
   sugBox.style.display = 'none';
   q.value = name;
+  const url = new URL(window.location);
+  url.searchParams.set('plant', name);
+  history.pushState(null, '', url);
   const r = await fetch('/permaculture/plants/' + encodeURIComponent(name) + '?lang=' + lang);
   const data = await r.json();
   const t = i18n[lang] || i18n.en;
@@ -228,7 +240,7 @@ async function lookup(name) {
     html += '<div class="sources-footer"><h3>' + esc(t.sources) + '</h3><ol>';
     for (const ing of ingNames) {
       const info = ingestors[ing];
-      html += '<li><a href="' + esc(info.source) + '" target="_blank" rel="noopener">'
+      html += '<li id="source-' + ingIndex[ing] + '"><a href="' + esc(info.source) + '" target="_blank" rel="noopener">'
         + esc(info.title) + '</a></li>';
     }
     html += '</ol></div>';
