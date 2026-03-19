@@ -92,6 +92,17 @@ def test_get_plant_detail(client):
     assert "scientific name" in data["sources"]
 
 
+def test_get_plant_detail_translated_sources(client):
+    """Source keys should be translated to match characteristic keys."""
+    r = client.get(
+        "/permaculture/plants/symphytum officinale",
+        params={"lang": "fr"},
+    )
+    data = r.json()
+    assert "nom scientifique" in data["sources"]
+    assert isinstance(data["sources"]["soleil"], dict)
+
+
 def test_get_plant_not_found(client):
     """Looking up a missing plant should return empty object."""
     r = client.get("/permaculture/plants/nonexistent species")

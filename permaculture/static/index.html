@@ -218,8 +218,9 @@ async function lookup(name) {
 
   let html = '<h2>' + esc(name) + '</h2><table>';
   for (const [k, v] of Object.entries(data)) {
-    const refs = sourceRefs(k, sources, ingIndex);
-    html += '<tr><th>' + esc(k) + refs + '</th><td>' + renderVal(v) + '</td></tr>';
+    const src = sources[k];
+    const refs = Array.isArray(src) ? ingRefs(src, ingIndex) : '';
+    html += '<tr><th>' + esc(k) + refs + '</th><td>' + renderVal(v, src, ingIndex) + '</td></tr>';
   }
   html += '</table>';
 
@@ -236,25 +237,26 @@ async function lookup(name) {
   detail.innerHTML = html;
 }
 
-function sourceRefs(key, sources, ingIndex) {
-  // Collect ingestors for this key by matching flat source keys.
-  const matched = new Set();
-  for (const [sk, ings] of Object.entries(sources)) {
-    if (sk === key || sk.startsWith(key + '/')) {
-      ings.forEach(n => matched.add(n));
-    }
-  }
-  if (!matched.size) return '';
-  return [...matched]
+function ingRefs(ingestors, ingIndex) {
+  if (!Array.isArray(ingestors) || !ingestors.length) return '';
+  return ingestors
     .map(n => '<a class="source-ref" href="#source-' + ingIndex[n] + '">' + ingIndex[n] + '</a>')
     .join('');
 }
 
-function renderVal(v) {
-  if (Array.isArray(v)) return v.map(i => '<span class="tag">' + esc(String(i)) + '</span>').join(' ');
+function renderVal(v, src, ingIndex) {
+  if (Array.isArray(v)) return v.map(i => {
+    const refs = (src && typeof src === 'object' && !Array.isArray(src))
+      ? ingRefs(src[String(i)], ingIndex) : '';
+    return '<span class="tag">' + esc(String(i)) + refs + '</span>';
+  }).join(' ');
   if (v && typeof v === 'object') {
     let s = '<table>';
-    for (const [k2, v2] of Object.entries(v)) s += '<tr><th>' + esc(k2) + '</th><td>' + renderVal(v2) + '</td></tr>';
+    for (const [k2, v2] of Object.entries(v)) {
+      const sub = (src && typeof src === 'object' && !Array.isArray(src)) ? src[k2] : undefined;
+      const refs = Array.isArray(sub) ? ingRefs(sub, ingIndex) : '';
+      s += '<tr><th>' + esc(k2) + refs + '</th><td>' + renderVal(v2, sub, ingIndex) + '</td></tr>';
+    }
     return s + '</table>';
   }
   return esc(String(v));

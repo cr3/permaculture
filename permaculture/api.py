@@ -108,7 +108,7 @@ def get_plant(
     data = group_characteristics(dict(plant.items()))
     return {
         **translate_data(data, locales),
-        "sources": plant.sources,
+        "sources": translate_data(unflatten(plant.sources), locales),
         "ingestors": plant.ingestors,
     }
 
