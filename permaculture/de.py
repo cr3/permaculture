@@ -78,39 +78,51 @@ class DEConverter(Converter):
         else:
             return []
 
-    def convert_range(self, key, value, unit=1.0):
-        return super().convert_range(key, value.replace(",", "."))
+    def convert_list(self, key, value):
+        return super().convert_list(key, value, sep="\\s*\u2013\\s*")
+
+    def convert_root(self, key, value):
+        return super().convert_letters(key, value.replace("\u2013", ""))
 
     DISPATCH: ClassVar[dict[str, Callable]] = {
         "Accumulateur de Nutriments": Converter.convert_ignore,
-        "Comestible": Converter.convert_list,
+        "Aqua": Converter.convert_bool,
+        "Comestible": convert_list,
         "Couleur de feuillage": Converter.convert_letters,
         "Couleur de floraison": Converter.convert_letters,
         "Couvre-sol": Converter.convert_ignore,
         "Cultivars intéressants": Converter.convert_ignore,
-        "Eau": Converter.convert_letters,
+        "Eau Icons": Converter.convert_letters,
         "Forme": Converter.convert_letters,
         "Fixateur Azote": Converter.convert_ignore,
         "Haie": Converter.convert_ignore,
-        "Hauteur(m)": convert_range,
+        "Hauteur (m)": Converter.convert_range,
         "Inconvénient": Converter.convert_letters,
         "Intérêt automnale hivernal": Converter.convert_ignore,
-        "Largeur(m)": convert_range,
+        "Largeur (m)": Converter.convert_range,
+        "Léger": Converter.convert_bool,
         "Lien Information": Converter.convert_ignore,
-        "Lumière": Converter.convert_letters,
+        "Lourd": Converter.convert_bool,
+        "Lumière Icons": Converter.convert_letters,
         "Medicinal": convert_bool,
+        "Mi-ombre": Converter.convert_bool,
+        "Moyen": Converter.convert_ignore,
         "Multiplication": Converter.convert_letters,
         "Notes": Converter.convert_ignore,
+        "Ombre": Converter.convert_bool,
         "Où peut-on la trouver?": Converter.convert_ignore,
+        "Peu": Converter.convert_bool,
+        "Plus": Converter.convert_bool,
         "Pollinisateurs": Converter.convert_letters,
         "Période de floraison": convert_period,
-        "Période de taille": Converter.convert_list,
-        "Racine": Converter.convert_letters,
+        "Période de taille": convert_list,
+        "Racine": convert_root,
         "Rythme de croissance": Converter.convert_letters,
-        "Texture du sol": Converter.convert_letters,
-        "Utilisation écologique": Converter.convert_list,
+        "Soleil": Converter.convert_bool,
+        "Texture Icons": Converter.convert_letters,
+        "Utilisation écologique": convert_list,
         "Vie sauvage": Converter.convert_letters,
-        "pH (Min-Max)": convert_range,
+        "pH\n(Min - Max)": Converter.convert_range,
     }
 
 
@@ -126,9 +138,11 @@ class DEModel:
     def get_perenial_plants(self):
         data = self.web.perenial_plants_list().export(0)
         csv = reader(StringIO(data))
-        next(csv)  # Skip groups
-        header = [h.strip() for h in next(csv)]
-        next(csv)  # Skip blank row
+        _groups = next(csv)
+        header1 = [i.strip() for i in next(csv)]
+        header2 = [i.strip() for i in next(csv)]
+        header = [b if b else a for a, b in zip(header1, header2, strict=True)]
+        _blank = next(csv)
         for row in csv:
             yield self.converter.convert(dict(zip(header, row, strict=True)))
 

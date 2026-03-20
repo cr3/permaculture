@@ -27,9 +27,6 @@ msgstr "flower color"
 #  Couvre-sol: '*'
 #  Cultivars intéressants: ''
 
-msgid "Eau"
-msgstr "moisture"
-
 msgid "Espèce"
 msgstr "species"
 
@@ -44,7 +41,7 @@ msgstr "genus"
 
 #  Haie: X
 
-msgid "Hauteur(m)"
+msgid "Hauteur (m)"
 msgstr "height"
 
 msgid "Inconvénient"
@@ -52,13 +49,31 @@ msgstr "inconvenience"
 
 #  Intérêt automnale hivernal:
 
-msgid "Largeur(m)"
+msgid "Largeur (m)"
 msgstr "spread"
 
 #  Lien Information: ''
 
-msgid "Lumière"
+msgid "Soleil"
+msgstr "sun/full"
+
+msgid "Mi-ombre"
+msgstr "sun/partial"
+
+msgid "Ombre"
+msgstr "sun/shade"
+
+msgid "Lumière Icons"
 msgstr "sun"
+
+msgid "Peu"
+msgstr "moisture/dry"
+
+msgid "Plus"
+msgstr "moisture/moist"
+
+msgid "Eau Icons"
+msgstr "moisture"
 
 msgid "Medicinal"
 msgstr "medicinal"
@@ -89,7 +104,16 @@ msgstr "root type"
 msgid "Rythme de croissance"
 msgstr "growth rate"
 
-msgid "Texture du sol"
+msgid "Aqua"
+msgstr "soil/aquatic"
+
+msgid "Léger"
+msgstr "soil/light"
+
+msgid "Lourd"
+msgstr "soil/heavy"
+
+msgid "Texture Icons"
 msgstr "soil"
 
 msgid "Utilisation écologique"
@@ -101,7 +125,7 @@ msgstr "wildlife"
 msgid "Zone de rusticité"
 msgstr "hardiness/canada"
 
-msgid "pH (Min-Max)"
+msgid "pH\n(Min - Max)"
 msgstr "ph"
 
 msgctxt "Comestible"
@@ -212,17 +236,17 @@ msgctxt "Couleur de floraison"
 msgid "Bl"
 msgstr "blue"
 
-msgctxt "Eau"
+msgctxt "Eau Icons"
 msgid "▁"
 msgstr "dry"
 
-msgctxt "Eau"
+msgctxt "Eau Icons"
 msgid "▅"
 msgstr "moderate"
 
-msgctxt "Eau"
+msgctxt "Eau Icons"
 msgid "█"
-msgstr "wet"
+msgstr "moist"
 
 msgctxt "Forme"
 msgid "A"
@@ -284,15 +308,15 @@ msgctxt "Intérêt automnale hivernal"
 msgid "H"
 msgstr "winter"
 
-msgctxt "Lumière"
+msgctxt "Lumière Icons"
 msgid "○"
 msgstr "full"
 
-msgctxt "Lumière"
+msgctxt "Lumière Icons"
 msgid "◐"
 msgstr "partial"
 
-msgctxt "Lumière"
+msgctxt "Lumière Icons"
 msgid "●"
 msgstr "shade"
 
@@ -436,19 +460,19 @@ msgctxt "Rythme de croissance"
 msgid "L"
 msgstr "slow"
 
-msgctxt "Texture du sol"
+msgctxt "Texture Icons"
 msgid "░"
 msgstr "light"
 
-msgctxt "Texture du sol"
+msgctxt "Texture Icons"
 msgid "▒"
 msgstr "medium"
 
-msgctxt "Texture du sol"
+msgctxt "Texture Icons"
 msgid "▓"
 msgstr "heavy"
 
-msgctxt "Texture du sol"
+msgctxt "Texture Icons"
 msgid "O"
 msgstr "aquatic"
 

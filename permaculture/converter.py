@@ -25,9 +25,9 @@ class Converter:
         return self.locales.translate(message, context).lower()
 
     def convert_bool(self, key, value):
-        if value in ("Y", "Yes"):
+        if value in ("Y", "Yes", "TRUE"):
             return [(self.translate(key), True)]
-        elif value in ("N", "No"):
+        elif value in ("N", "No", "FALSE"):
             return [(self.translate(key), False)]
         else:
             raise ValueError(f"Unknown boolean: {value!r}")
@@ -68,7 +68,7 @@ class Converter:
         """
         k = self.translate(key)
         values = [self.translate(v, key) for v in re.split(sep, value)]
-        return [(f"{k}/{v}", True) for v in values]
+        return [(f"{k}/{v}", True) for v in values if v is not None]
 
     def convert_range(self, key, value, unit=1.0):
         k = self.translate(key)

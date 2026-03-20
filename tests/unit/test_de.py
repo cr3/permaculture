@@ -69,18 +69,18 @@ def test_de_converter_convert_bool(value, expected):
     "item, expected",
     [
         pytest.param(
-            ("key", "1,0 - 2,0"),
+            ("Racine", "S \u2013 L"),
             [
-                ("key/min", 1.0),
-                ("key/max", 2.0),
+                ("root type/superficial", True),
+                ("root type/lateral", True),
             ],
             id="comma",
         ),
     ],
 )
-def test_de_converter_convert_range(item, expected):
-    """Converting a range should support single and double values."""
-    result = DEConverter().convert_range(*item)
+def test_de_converter_convert_root(item, expected):
+    """Converting a root should strip the en dash."""
+    result = DEConverter().convert_root(*item)
     assert result == expected
 
 
@@ -93,7 +93,7 @@ def test_de_converter_convert_range(item, expected):
             id="nutriments",
         ),
         pytest.param(
-            ("Comestible", "Fl,Fr,Fe,N,G,R,S,JP,T,B"),
+            ("Comestible", "Fl \u2013 Fr \u2013 Fe \u2013 N \u2013 G \u2013 R \u2013 S \u2013 JP \u2013 T \u2013 B"),
             [
                 ("edible uses/flower", True),
                 ("edible uses/fruit", True),
@@ -147,11 +147,11 @@ def test_de_converter_convert_range(item, expected):
             id="cultivars",
         ),
         pytest.param(
-            ("Eau", "▁ ▅ █"),
+            ("Eau Icons", "▁ ▅ █"),
             [
                 ("moisture/dry", True),
                 ("moisture/moderate", True),
-                ("moisture/wet", True),
+                ("moisture/moist", True),
             ],
             id="moisture",
         ),
@@ -161,7 +161,7 @@ def test_de_converter_convert_range(item, expected):
             id="hedge",
         ),
         pytest.param(
-            ("Hauteur(m)", "0,6 \u2013 1,2"),
+            ("Hauteur (m)", "0.6 \u2013 1.2"),
             [
                 ("height/min", 0.6),
                 ("height/max", 1.2),
@@ -189,7 +189,7 @@ def test_de_converter_convert_range(item, expected):
             id="interest",
         ),
         pytest.param(
-            ("Largeur(m)", "1,0"),
+            ("Largeur (m)", "1.0"),
             [
                 ("spread/min", 1.0),
                 ("spread/max", 1.0),
@@ -202,7 +202,7 @@ def test_de_converter_convert_range(item, expected):
             id="information",
         ),
         pytest.param(
-            ("Lumière", "○ ◐ ●"),
+            ("Lumière Icons", "○ ◐ ●"),
             [
                 ("sun/full", True),
                 ("sun/partial", True),
@@ -235,7 +235,7 @@ def test_de_converter_convert_range(item, expected):
             id="bloom period",
         ),
         pytest.param(
-            ("Période de taille", "AD,AF,P,É,A,T,N"),
+            ("Période de taille", "AD \u2013 AF \u2013 P \u2013 É \u2013 A \u2013 T \u2013 N"),
             [
                 ("pruning period/before budburst", True),
                 ("pruning period/after flowering", True),
@@ -281,7 +281,7 @@ def test_de_converter_convert_range(item, expected):
             id="growth rate",
         ),
         pytest.param(
-            ("Texture du sol", "░ ▒ ▓"),
+            ("Texture Icons", "░ ▒ ▓"),
             [
                 ("soil/light", True),
                 ("soil/medium", True),
@@ -290,7 +290,7 @@ def test_de_converter_convert_range(item, expected):
             id="soil",
         ),
         pytest.param(
-            ("Utilisation écologique", "BR,P,Z"),
+            ("Utilisation écologique", "BR \u2013 P \u2013 Z"),
             [
                 ("ecological use/riparian strip", True),
                 ("ecological use/slopes", True),
@@ -307,7 +307,7 @@ def test_de_converter_convert_range(item, expected):
             id="wildlife",
         ),
         pytest.param(
-            ("pH (Min-Max)", "6 - 7"),
+            ("pH\n(Min - Max)", "6 - 7"),
             [
                 ("ph/min", 6.0),
                 ("ph/max", 7.0),
@@ -324,7 +324,7 @@ def test_de_converter_convert_item(item, expected):
 
 def test_de_model_get_perenial_plants():
     """All perenial plants should return a dictionary of characteristics."""
-    data = "TAXONOMIE\nGenre,Espèce \n\na,b\n"
+    data = "TAXONOMIE\nGenre,Espèce \n,\n\na,b\n"
     export = Mock(return_value=data)
     perenial_plants_list = Mock(return_value=Mock(export=export))
     web = Mock(perenial_plants_list=perenial_plants_list)
