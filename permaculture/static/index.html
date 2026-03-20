@@ -282,6 +282,8 @@ function renderVal(v, src, ingIndex) {
     }
     return s + '</table>';
   }
+  if (typeof v === 'number' && !Number.isInteger(v))
+    v = parseFloat(v.toFixed(2))
   return esc(String(v));
 }
 
