@@ -266,7 +266,7 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
 
     def resolve(key, values):
         weights = [p.weight for p in plants if key in p]
-        if isinstance(values[0], float | int):
+        if isinstance(values[0], float | int) and not isinstance(values[0], bool):
             value = sum(starmap(mul, zip(weights, values, strict=True))) / sum(weights)
         else:
             _, value = max(zip(weights, values, strict=True))

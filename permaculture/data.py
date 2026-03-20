@@ -16,10 +16,13 @@ Merging a list of dictionaries by calculating the mean on collision:
     {'a': 1.5}
 """
 
+import logging
 from collections.abc import Mapping
 from itertools import groupby
 from operator import itemgetter
 from statistics import mean
+
+logger = logging.getLogger(__name__)
 
 
 def flatten(data, sep="/"):
@@ -75,11 +78,18 @@ def unflatten(data, sep="/"):
 
 def resolve(key, values):
     """Default function to resolve collisions when merging dictionaries."""
-    if isinstance(values[0], str):
-        values = [v for v in values if v != ""]
-        return values[0] if len(values) == 1 else values
+    if isinstance(values[0], bool):
+        if len(set(values)) > 1:
+            logger.warning("Inconsistent values for %(key)s: %(values)s", {
+                "key": key,
+                "values": values,
+            })
+        return any(values)
     elif isinstance(values[0], float | int):
         return mean(values)
+    elif isinstance(values[0], str):
+        values = [v for v in values if v != ""]
+        return values[0] if len(values) == 1 else values
     else:
         raise TypeError(f"Unsupported values for {key!r}: {values!r}")
 
