@@ -52,10 +52,13 @@
   }
   th { width: 40%; color: #555; font-weight: 500; }
   .tag {
-    display: inline-block; background: #e8f5e9; color: #2e7d32;
-    padding: .15rem .5rem; border-radius: 12px; margin: .1rem;
-    font-size: .85em;
-  }
+     display: inline-block; background: #e8f5e9; color: #2e7d32;
+     padding: .15rem .5rem; border-radius: 12px; margin: .1rem;
+     font-size: .85em;
+   }
+   .tag-false {
+     background: #fdecea; color: #b3261e;
+   }
   .lang-toggle {
     display: inline-flex; border: 1px solid #ccc; border-radius: 6px;
     overflow: hidden; float: right; margin-top: .2rem;
@@ -262,16 +265,32 @@ function renderVal(v, src, ingIndex) {
       ? ingRefs(src[String(i)], ingIndex) : '';
     return '<span class="tag">' + esc(String(i)) + refs + '</span>';
   }).join(' ');
-  if (v && typeof v === 'object') {
-    let s = '<table>';
-    for (const [k2, v2] of Object.entries(v)) {
-      const sub = (src && typeof src === 'object' && !Array.isArray(src)) ? src[k2] : undefined;
-      const refs = Array.isArray(sub) ? ingRefs(sub, ingIndex) : '';
+   if (isBooleanMap(v)) {
+     return Object.entries(v).map(([k2, v2]) => {
+       const sub = (src && typeof src === 'object' && !Array.isArray(src)) ? src[k2] : undefined;
+       const refs = Array.isArray(sub) ? ingRefs(sub, ingIndex) : '';
+       const tagClass = v2 ? 'tag' : 'tag tag-false';
+       return '<span class="' + tagClass + '">' + esc(k2) + refs + '</span>';
+     }).join(' ');
+   }
+   if (v && typeof v === 'object') {
+     let s = '<table>';
+     for (const [k2, v2] of Object.entries(v)) {
+       const sub = (src && typeof src === 'object' && !Array.isArray(src)) ? src[k2] : undefined;
+       const refs = Array.isArray(sub) ? ingRefs(sub, ingIndex) : '';
       s += '<tr><th>' + esc(k2) + refs + '</th><td>' + renderVal(v2, sub, ingIndex) + '</td></tr>';
     }
     return s + '</table>';
   }
   return esc(String(v));
+}
+
+function isBooleanMap(v) {
+  return !!v
+    && typeof v === 'object'
+    && !Array.isArray(v)
+    && Object.values(v).length > 0
+    && Object.values(v).every(v2 => typeof v2 === 'boolean');
 }
 
 function esc(s) {

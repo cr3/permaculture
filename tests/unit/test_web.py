@@ -35,6 +35,8 @@ def database():
                 {
                     "scientific name": "achillea millefolium",
                     "common name/yarrow": True,
+                    "sun/partial": True,
+                    "sun/full": False,
                 },
                 1.0,
                 ingestor="pfaf",
@@ -101,6 +103,14 @@ def test_get_plant_detail_translated_sources(client):
     assert isinstance(data["sources"]["soleil"], dict)
 
 
+def test_get_plant_detail_mixed_boolean_group(client):
+    """Mixed boolean sub-keys should remain a boolean dict for the UI."""
+    r = client.get("/permaculture/plants/achillea millefolium")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["sun"] == {"full": False, "partial": True}
+
+
 def test_get_plant_not_found(client):
     """Looking up a missing plant should return empty object."""
     r = client.get("/permaculture/plants/nonexistent species")
@@ -114,6 +124,8 @@ def test_index_html(client):
     assert r.status_code == 200
     assert "text/html" in r.headers["content-type"]
     assert "Permaculture" in r.text
+    assert "tag-false" in r.text
+    assert "isBooleanMap" in r.text
 
 
 def test_group_characteristics_boolean_lists():
@@ -128,6 +140,13 @@ def test_group_characteristics_mixed():
     data = {"bloom/min": "spring", "bloom/max": "summer"}
     result = group_characteristics(data)
     assert result == {"bloom": {"min": "spring", "max": "summer"}}
+
+
+def test_group_characteristics_mixed_booleans():
+    """Boolean sub-keys with any False value should remain as dicts."""
+    data = {"sun/partial": True, "sun/full": False}
+    result = group_characteristics(data)
+    assert result == {"sun": {"full": False, "partial": True}}
 
 
 def test_group_characteristics_non_dict():
