@@ -40,6 +40,8 @@ class PFAFConverter(Converter):
             return super().convert_float(key, value)
 
     DISPATCH: ClassVar[dict[str, Callable]] = {
+        "Acid": Converter.convert_bool,
+        "Alkaline": Converter.convert_bool,
         "Author": Converter.convert_ignore,
         "Common name": Converter.convert_list,
         "Cultivation details": Converter.convert_ignore,
@@ -48,11 +50,13 @@ class PFAFConverter(Converter):
         "Edible uses": Converter.convert_ignore,
         "Growth rate": Converter.convert_list,
         "Habitat": Converter.convert_ignore,
+        "Heavy clay": Converter.convert_ignore,
         "Height": convert_float,
         "Known hazards": Converter.convert_ignore,
         "Latin name": Converter.convert_token,
         "Medicinal": Converter.convert_ignore,
         "Moisture": Converter.convert_letters,
+        "Neutral": Converter.convert_bool,
         "Pollinators": Converter.convert_list,
         "Propagation": Converter.convert_ignore,
         "Range": Converter.convert_ignore,
@@ -61,6 +65,7 @@ class PFAFConverter(Converter):
         "Uses notes": Converter.convert_ignore,
         "Width": convert_float,
         "Wildlife": Converter.convert_ignore,
+        "Wind": Converter.convert_letters,
         "pH": Converter.convert_letters,
     }
 

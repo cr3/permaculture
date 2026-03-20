@@ -25,9 +25,9 @@ class Converter:
         return self.locales.translate(message, context).lower()
 
     def convert_bool(self, key, value):
-        if value in ("Y", "Yes", "TRUE"):
+        if value in (1, "Y", "Yes", "TRUE"):
             return [(self.translate(key), True)]
-        elif value in ("N", "No", "FALSE"):
+        elif value in (0, "N", "No", "FALSE"):
             return [(self.translate(key), False)]
         else:
             raise ValueError(f"Unknown boolean: {value!r}")

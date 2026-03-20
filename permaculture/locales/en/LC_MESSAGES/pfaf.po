@@ -13,6 +13,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Acid"
+msgstr "ph/acid"
+
+msgid "Alkaline"
+msgstr "ph/alkaline"
+
 msgid "EdibilityRating"
 msgstr "edibility rating"
 
@@ -27,6 +33,9 @@ msgstr "scientific name"
 
 msgid "MedicinalRating"
 msgstr "medicinal rating"
+
+msgid "Neutral"
+msgstr "ph/neutral"
 
 msgid "UK Hardiness"
 msgstr "hardiness/uk"
@@ -108,3 +117,23 @@ msgstr "medium"
 msgctxt "Soil"
 msgid "H"
 msgstr "heavy"
+
+msgctxt "Wind"
+msgid "N"
+msgstr "low"
+
+msgctxt "Wind"
+msgid "L"
+msgstr "low"
+
+msgctxt "Wind"
+msgid "M"
+msgstr "moderate"
+
+msgctxt "Wind"
+msgid "W"
+msgstr "high"
+
+msgctxt "Wind"
+msgid "H"
+msgstr "high"
