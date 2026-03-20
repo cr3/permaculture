@@ -96,9 +96,20 @@ plants. The API is also available directly:
 Interactive API documentation is at ``/permaculture/docs``.
 
 The web interface also includes an MCP server automatically
-mounted at ``/permaculture/mcp`` (SSE transport), so a single
+mounted at ``/permaculture/mcp/`` (SSE transport), so a single
 ``permaculture-web`` process serves the web UI, REST API, and
 MCP server.
+
+ChatGPT App
+-----------
+
+The MCP server can be added to ChatGPT as an App:
+
+1. Settings > Apps > Advanced Settings
+   * Enable ``Developer Mode``
+2. Settings > Apps > Create app
+   * Name: Permaculture
+   * MCP Server URL: ``https://[server hostname]/permaculture/mcp/``
 
 Project Information
 -------------------
