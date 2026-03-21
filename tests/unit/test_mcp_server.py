@@ -143,10 +143,23 @@ def test_search_plants_with_name_and_filters(database):
 def test_search_plants_filters_no_match(database):
     """Filtering with no matches should return empty."""
     result = search_plants_in(
-        database, filters={"sun/shade": True},
+        database, filters={"sun/full": False},
     )
 
     assert result == {"total_count": 0, "results": []}
+
+
+def test_search_plants_unknown_filter_keys(database):
+    """Unknown filter keys should return an error with a hint."""
+    result = search_plants_in(
+        database, filters={"zone_rusticite": 5, "hauteur_m": {"gt": 1}},
+    )
+
+    assert "error" in result
+    assert "zone_rusticite" in result["error"]
+    assert "hauteur_m" in result["error"]
+    assert "hint" in result
+    assert "list_plant_characteristics" in result["hint"]
 
 
 def test_search_plants_limit(database):

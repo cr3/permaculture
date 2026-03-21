@@ -74,6 +74,14 @@ def search_plants_in(
     offset: int = 0,
 ) -> dict:
     """Search for plants by common or scientific name."""
+    if filters:
+        valid_keys = {c["key"] for c in database.list_characteristics()}
+        unknown = sorted(k for k in filters if k not in valid_keys)
+        if unknown:
+            return {
+                "error": f"Unknown filter keys: {', '.join(unknown)}",
+                "hint": "Call list_plant_characteristics to see valid keys.",
+            }
     total_count = database.search_count(name=name, filters=filters)
     results = [
         {
@@ -116,6 +124,11 @@ def search_plants(
     offset: int = 0,
 ) -> dict:
     """Search for plants by name and/or characteristics.
+
+    Before constructing filters from natural-language criteria,
+    first inspect available characteristics and exact field names with
+    list_plant_characteristics, unless the user already supplied valid
+    schema keys.
 
     Returns up to ``limit`` results (default 10, max 100) starting from
     ``offset``.  The response includes ``total_count`` so you can tell
