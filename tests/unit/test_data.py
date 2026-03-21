@@ -5,7 +5,6 @@ import pytest
 from permaculture.data import (
     flatten,
     merge,
-    sort_data,
     unflatten,
 )
 
@@ -139,26 +138,3 @@ def test_merge_error(dicts):
     """Merging data of different types should raise."""
     with pytest.raises(ValueError):
         merge(dicts)
-
-
-def test_sort_data_dict_keys():
-    """Sort data should sort dictionary keys."""
-    data = {"sun": "full", "height": 1.2, "common name": "comfrey"}
-    result = sort_data(data)
-    assert list(result.keys()) == ["common name", "height", "sun"]
-
-
-def test_sort_data_list_values():
-    """Sort data should sort list values."""
-    data = {"sun": ["partial", "full"]}
-    result = sort_data(data)
-    assert result == {"sun": ["full", "partial"]}
-
-
-def test_sort_data_nested():
-    """Sort data should recursively sort nested dicts and lists."""
-    data = {"z": {"b": [2, 1], "a": "x"}, "a": "y"}
-    result = sort_data(data)
-    assert list(result.keys()) == ["a", "z"]
-    assert list(result["z"].keys()) == ["a", "b"]
-    assert result["z"]["b"] == [1, 2]

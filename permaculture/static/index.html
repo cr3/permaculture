@@ -101,6 +101,8 @@ const detail = document.getElementById('detail');
 const langButtons = document.querySelectorAll('.lang-toggle button');
 let debounce;
 let lang = navigator.language.startsWith('fr') ? 'fr' : 'en';
+let cachedSearch = null;
+let cachedDetail = null;
 
 const i18n = {
   en: {
@@ -108,14 +110,119 @@ const i18n = {
     placeholder: 'Search plants\u2026',
     noData: 'No data found.',
     sources: 'Sources',
+    t: {},
+    tc: {},
   },
   fr: {
     title: '\u{1F331} Base de donn\u00E9es de plantes',
     placeholder: 'Rechercher des plantes\u2026',
     noData: 'Aucune donn\u00E9e trouv\u00E9e.',
     sources: 'Sources',
+    t: {
+      'acid': 'acide',
+      'alkaline': 'alcalin',
+      'avg': 'moy.',
+      'bloom period': 'p\u00E9riode de floraison',
+      'cold injury': 'blessure par le froid',
+      'common names': 'noms communs',
+      'disease issues': 'probl\u00E8mes de maladies',
+      'drought': 's\u00E9cheresse',
+      'edibility rating': 'comestibilit\u00E9',
+      'edible uses': 'utilisations comestibles',
+      'family': 'famille',
+      'fire damage': 'dommages par le feu',
+      'flood': 'inondation',
+      'flower color': 'couleur de floraison',
+      'foliage color': 'couleur de feuillage',
+      'form': 'port',
+      'frost tender': 'g\u00E9lif',
+      'fruit period': 'p\u00E9riode de fructification',
+      'fruit type': 'type de fruit',
+      'fungal types': 'types de champignons',
+      'growing season': 'saison de croissance',
+      'growth habits': 'habitudes de croissance',
+      'growth rate': 'taux de croissance',
+      'habit': 'habitude',
+      'hardiness': 'rusticit\u00E9',
+      'heavy clay': 'argile lourde',
+      'height': 'hauteur',
+      'ingestors': 'sources de donn\u00E9es',
+      'insect': 'insecte',
+      'life span': 'dur\u00E9e de vie',
+      'medicinal rating': 'usage m\u00E9dicinal',
+      'moisture': 'humidit\u00E9',
+      'mowing': 'tonte',
+      'native to north america?': "originaire d'Am\u00E9rique du Nord?",
+      'neutral': 'neutre',
+      'nitrogen fixer': "fixateur d'azote",
+      'pest damage': 'dommages par les ravageurs',
+      'ph': 'pH',
+      'plant binomial': 'bin\u00F4me',
+      'plant category': 'cat\u00E9gorie de plante',
+      'plant type': 'type de plante',
+      'pollinators': 'pollinisateurs',
+      'poor soil': 'sol pauvre',
+      'related': 'apparent\u00E9',
+      'root depth': 'profondeur racinaire',
+      'root type': 'type de racine',
+      'saline': 'salin',
+      'salt': 'sel',
+      'scented': 'parfum\u00E9',
+      'scientific name': 'nom scientifique',
+      'seasonal interest': 'int\u00E9r\u00EAt saisonnier',
+      'self-fertile': 'autofertile',
+      'shape': 'forme',
+      'soil': 'sol',
+      'soil compaction': 'compaction du sol',
+      'soil type': 'type de sol',
+      'sources': 'sources',
+      'species': 'esp\u00E8ce',
+      'spread': '\u00E9talement',
+      'stand persistence': 'persistance',
+      'sun': 'soleil',
+      'uk': 'R.-U.',
+      'well-drained': 'bien drain\u00E9',
+      'width': 'largeur',
+      'wind': 'vent',
+      'wind storm damage': 'dommages par le vent',
+      'achene': 'ak\u00E8ne',
+      'apomictic': 'apomictique',
+      'cool-warm': 'frais-chaud',
+      'endomycorrhizal': 'endomycorhizien',
+      'fast': 'rapide',
+      'fall': 'automne',
+      'herbaceous': 'herbac\u00E9',
+      'infrequent': 'rare',
+      'minor': 'mineur',
+      'moderate': 'mod\u00E9r\u00E9',
+      'perennial': 'vivace',
+      'spring': 'printemps',
+      'summer': '\u00E9t\u00E9',
+      'tolerant': 'tol\u00E9rant',
+      'upright': '\u00E9rig\u00E9',
+      'winter': 'hiver',
+      'yellow': 'jaune',
+    },
+    tc: {
+      'life span': { 'long': 'longue' },
+      'moisture': { 'dry': 'sec', 'moist': 'humide' },
+      'native to north america?': { 'no': 'non' },
+      'pollinators': { 'insects': 'insectes', 'self': 'auto' },
+      'root type': { 'tap': 'pivotante' },
+      'soil type': { 'clay': 'argile', 'loamy': 'limoneux', 'sandy': 'sableux', 'silty': 'silteux' },
+      'stand persistence': { 'long': 'longue' },
+      'sun': { 'full': 'plein soleil', 'partial': 'mi-ombre' },
+      'texture': { 'medium': 'moyen' },
+    },
   },
 };
+
+function tr(msg, context) {
+  const loc = i18n[lang] || {};
+  if (context && loc.tc?.[context]?.[msg] !== undefined) return loc.tc[context][msg];
+  if (loc.t?.[msg] !== undefined) return loc.t[msg];
+  return msg;
+}
 
 function setLang(l) {
   lang = l;
@@ -124,9 +231,8 @@ function setLang(l) {
   document.documentElement.lang = l;
   document.querySelector('h1').firstChild.textContent = t.title + ' ';
   q.placeholder = t.placeholder;
-  if (q.value.trim()) search();
-  const name = detail.querySelector('h2');
-  if (name) lookup(name.textContent);
+  if (cachedSearch) renderSearch(cachedSearch);
+  if (cachedDetail) renderDetail(cachedDetail);
 }
 
 langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
@@ -164,14 +270,17 @@ q.addEventListener('keydown', e => {
 async function search() {
   const val = q.value.trim();
   if (val.length < 1) { sugBox.style.display = 'none'; return; }
-  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val) + '&lang=' + lang);
-  const plants = await r.json();
+  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val));
+  cachedSearch = await r.json();
+  renderSearch(cachedSearch);
+}
+
+function renderSearch(plants) {
   sugBox.innerHTML = '';
   for (const p of plants) {
     const li = document.createElement('li');
-    const keys = Object.keys(p);
-    const sciName = p[keys[0]];
-    const commonNames = p[keys[1]];
+    const sciName = p['scientific name'];
+    const commonNames = p['common names'];
     const common = commonNames.length ? ' \u2014 ' + commonNames.join(', ') : '';
     li.innerHTML = '<span class="sci">' + esc(sciName) + '</span>'
       + '<span class="common">' + esc(common) + '</span>';
@@ -187,26 +296,38 @@ async function lookup(name) {
   const url = new URL(window.location);
   url.searchParams.set('plant', name);
   history.pushState(null, '', url);
-  const r = await fetch('/permaculture/plants/' + encodeURIComponent(name) + '?lang=' + lang);
-  const data = await r.json();
+  const r = await fetch('/permaculture/plants/' + encodeURIComponent(name));
+  cachedDetail = await r.json();
+  renderDetail(cachedDetail);
+}
+
+function renderDetail(data) {
   const t = i18n[lang] || i18n.en;
   if (!Object.keys(data).length) { detail.innerHTML = '<p>' + esc(t.noData) + '</p>'; return; }
 
   const sources = data.sources || {};
   const ingestors = data.ingestors || {};
-  delete data.sources;
-  delete data.ingestors;
+  const commonNames = data.common_names || [];
+  const sciName = data.scientific_name || '';
+  const chars = data.characteristics || {};
 
   // Assign each ingestor a stable index (1-based).
   const ingNames = Object.keys(ingestors);
   const ingIndex = {};
   ingNames.forEach((name, i) => ingIndex[name] = i + 1);
 
-  let html = '<h2>' + esc(name) + '</h2><table>';
-  for (const [k, v] of Object.entries(data)) {
+  // Translate keys and sort alphabetically by translated key.
+  const entries = Object.entries(chars)
+    .map(([k, v]) => [k, tr(k), v])
+    .sort((a, b) => a[1].localeCompare(b[1], lang));
+
+  let html = '<h2>' + esc(commonNames.join(', ') || sciName) + '</h2>'
+    + '<p style="font-style:italic;color:#555;margin-bottom:.75rem">' + esc(sciName) + '</p>'
+    + '<table>';
+  for (const [k, tk, v] of entries) {
     const src = sources[k];
     const refs = Array.isArray(src) ? ingRefs(src, ingIndex) : '';
-    html += '<tr><th>' + esc(k) + refs + '</th><td>' + renderVal(v, src, ingIndex) + '</td></tr>';
+    html += '<tr><th>' + esc(tk) + refs + '</th><td>' + renderVal(v, src, ingIndex, k) + '</td></tr>';
   }
   html += '</table>';
 
@@ -230,18 +351,18 @@ function ingRefs(ingestors, ingIndex) {
     .join('');
 }
 
-function renderVal(v, src, ingIndex) {
+function renderVal(v, src, ingIndex, context) {
   if (Array.isArray(v)) return v.map(i => {
     const refs = (src && typeof src === 'object' && !Array.isArray(src))
       ? ingRefs(src[String(i)], ingIndex) : '';
-    return '<span class="tag">' + esc(String(i)) + refs + '</span>';
+    return '<span class="tag">' + esc(tr(String(i), context)) + refs + '</span>';
   }).join(' ');
    if (isBooleanMap(v)) {
      return Object.entries(v).map(([k2, v2]) => {
        const sub = (src && typeof src === 'object' && !Array.isArray(src)) ? src[k2] : undefined;
        const refs = Array.isArray(sub) ? ingRefs(sub, ingIndex) : '';
        const tagClass = v2 ? 'tag' : 'tag tag-false';
-       return '<span class="' + tagClass + '">' + esc(k2) + refs + '</span>';
+       return '<span class="' + tagClass + '">' + esc(tr(k2, context)) + refs + '</span>';
      }).join(' ');
    }
    if (v && typeof v === 'object') {
@@ -249,12 +370,13 @@ function renderVal(v, src, ingIndex) {
      for (const [k2, v2] of Object.entries(v)) {
        const sub = (src && typeof src === 'object' && !Array.isArray(src)) ? src[k2] : undefined;
        const refs = Array.isArray(sub) ? ingRefs(sub, ingIndex) : '';
-      s += '<tr><th>' + esc(k2) + refs + '</th><td>' + renderVal(v2, sub, ingIndex) + '</td></tr>';
+      s += '<tr><th>' + esc(tr(k2, context)) + refs + '</th><td>' + renderVal(v2, sub, ingIndex, k2) + '</td></tr>';
     }
     return s + '</table>';
   }
   if (typeof v === 'number' && !Number.isInteger(v))
     v = parseFloat(v.toFixed(2))
+  if (typeof v === 'string') return esc(tr(v, context));
   return esc(String(v));
 }
 

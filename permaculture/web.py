@@ -9,9 +9,8 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, Query
 from fastapi.responses import HTMLResponse
 
-from permaculture.data import sort_data, unflatten
+from permaculture.data import unflatten
 from permaculture.database import Database
-from permaculture.locales import Locales
 from permaculture.mcp_server import mcp
 
 
@@ -60,16 +59,13 @@ def get_plants(
     database: DatabaseDep,
     q: str = Query(min_length=1, description="Search query"),
     limit: int = Query(default=10, ge=1, le=100),
-    lang: str = Query(default="en", description="Language for translated names"),
 ):
     """Return search results for the given query."""
-    locales = Locales.from_domain("web", language=lang)
-    return [locales.translate_data(
-            {
-                "scientific name": plant.scientific_name,
-                "common name": plant.common_names,
-            },
-        )
+    return [
+        {
+            "scientific name": plant.scientific_name,
+            "common names": plant.common_names,
+        }
         for plant in islice(database.search(name=q), limit)
     ]
 
@@ -78,20 +74,23 @@ def get_plants(
 def get_plant(
     scientific_name: str,
     database: DatabaseDep,
-    lang: str = Query(default="en", description="Language for translated keys"),
 ):
     """Return full characteristics for a scientific name."""
     plants = list(database.lookup([scientific_name]))
     if not plants:
         return {}
 
-    locales = Locales.from_domain("web", language=lang)
     plant = plants[0]
-    data = group_characteristics(dict(plant.items()))
-    translated = sort_data(locales.translate_data(data))
+    chars = {
+        k: v
+        for k, v in plant.items()
+        if k != "scientific name" and not k.startswith("common name/")
+    }
     return {
-        **translated,
-        "sources": locales.translate_data(unflatten(plant.sources)),
+        "scientific_name": plant.scientific_name,
+        "common_names": plant.common_names,
+        "characteristics": group_characteristics(chars),
+        "sources": unflatten(plant.sources),
         "ingestors": plant.ingestors,
     }
 

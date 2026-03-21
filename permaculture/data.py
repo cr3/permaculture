@@ -94,14 +94,6 @@ def resolve(key, values):
         raise TypeError(f"Unsupported values for {key!r}: {values!r}")
 
 
-def sort_data(data):
-    """Recursively sort dictionary keys and list values."""
-    if isinstance(data, dict):
-        return {key: sort_data(value) for key, value in sorted(data.items())}
-    if isinstance(data, list):
-        return sorted(data, key=str)
-    return data
-
 
 def merge(dicts, resolve=resolve):
     """Merge a list of dictionaries by resolving collisions.

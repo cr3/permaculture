@@ -85,22 +85,21 @@ def test_get_plant_detail(client):
     r = client.get("/permaculture/plants/symphytum officinale")
     assert r.status_code == 200
     data = r.json()
-    assert "scientific name" in data
+    assert data["scientific_name"] == "symphytum officinale"
+    assert "comfrey" in data["common_names"]
     assert data["ingestors"] == {
         "pfaf": {"title": "Plants For A Future", "source": "https://pfaf.org/"},
     }
     assert "scientific name" in data["sources"]
+    assert "sun" in data["characteristics"]
 
 
-def test_get_plant_detail_translated_sources(client):
-    """Source keys should be translated to match characteristic keys."""
-    r = client.get(
-        "/permaculture/plants/symphytum officinale",
-        params={"lang": "fr"},
-    )
+def test_get_plant_detail_untranslated_keys(client):
+    """API should return untranslated English keys regardless of request."""
+    r = client.get("/permaculture/plants/symphytum officinale")
     data = r.json()
-    assert "nom scientifique" in data["sources"]
-    assert isinstance(data["sources"]["soleil"], dict)
+    assert "sun" in data["characteristics"]
+    assert "scientific name" in data["sources"]
 
 
 def test_get_plant_detail_mixed_boolean_group(client):
@@ -108,7 +107,7 @@ def test_get_plant_detail_mixed_boolean_group(client):
     r = client.get("/permaculture/plants/achillea millefolium")
     assert r.status_code == 200
     data = r.json()
-    assert data["sun"] == {"full": False, "partial": True}
+    assert data["characteristics"]["sun"] == {"full": False, "partial": True}
 
 
 def test_get_plant_not_found(client):
