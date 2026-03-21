@@ -63,7 +63,7 @@ def get_plants(
     lang: str = Query(default="en", description="Language for translated names"),
 ):
     """Return search results for the given query."""
-    locales = Locales.from_domain("api", language=lang)
+    locales = Locales.from_domain("web", language=lang)
     return [locales.translate_data(
             {
                 "scientific name": plant.scientific_name,
@@ -85,7 +85,7 @@ def get_plant(
     if not plants:
         return {}
 
-    locales = Locales.from_domain("api", language=lang)
+    locales = Locales.from_domain("web", language=lang)
     plant = plants[0]
     data = group_characteristics(dict(plant.items()))
     translated = sort_data(locales.translate_data(data))

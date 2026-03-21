@@ -25,29 +25,29 @@ def test_locales_translate(message, context, expected):
 
 def test_locales_translate_data_non_dict():
     """Non-dict input should be returned as-is."""
-    locales = Locales.from_domain("api", language="fr")
+    locales = Locales.from_domain("de", language="en")
     assert locales.translate_data([1, 2, 3]) == [1, 2, 3]
 
 
 def test_locales_translate_data_flat():
     """Translate data should translate top-level keys."""
-    locales = Locales.from_domain("api", language="fr")
-    data = {"scientific name": "test", "height": 1.2}
+    locales = Locales.from_domain("de", language="en")
+    data = {"Largeur (m)": 1.2}
     result = locales.translate_data(data)
-    assert result == {"nom scientifique": "test", "hauteur": 1.2}
+    assert result == {"spread": 1.2}
 
 
 def test_locales_translate_data_nested():
     """Translate data should recurse into nested dicts."""
-    locales = Locales.from_domain("api", language="fr")
-    data = {"height": {"max": 1.2}}
+    locales = Locales.from_domain("de", language="en")
+    data = {"Hauteur (m)": {"max": 1.2}}
     result = locales.translate_data(data)
-    assert result == {"hauteur": {"max": 1.2}}
+    assert result == {"height": {"max": 1.2}}
 
 
 def test_locales_translate_data_passthrough():
     """Untranslated keys should pass through unchanged."""
-    locales = Locales.from_domain("api", language="fr")
+    locales = Locales.from_domain("de", language="en")
     data = {"unknown key": 42}
     result = locales.translate_data(data)
     assert result == {"unknown key": 42}
@@ -55,15 +55,15 @@ def test_locales_translate_data_passthrough():
 
 def test_locales_translate_data_string_values():
     """Translate data should translate string values using context."""
-    locales = Locales.from_domain("api", language="fr")
-    data = {"growth rate": "fast"}
+    locales = Locales.from_domain("de", language="en")
+    data = {"Comestible": "Fl"}
     result = locales.translate_data(data)
-    assert result == {"taux de croissance": "rapide"}
+    assert result == {"edible uses": "flower"}
 
 
 def test_locales_translate_data_list_values():
     """Translate data should translate list items using context."""
-    locales = Locales.from_domain("api", language="fr")
-    data = {"sun": ["full", "partial"]}
+    locales = Locales.from_domain("de", language="en")
+    data = {"Comestible": ["Fl", "Fr"]}
     result = locales.translate_data(data)
-    assert result == {"soleil": ["plein soleil", "mi-ombre"]}
+    assert result == {"edible uses": ["flower", "fruit"]}
