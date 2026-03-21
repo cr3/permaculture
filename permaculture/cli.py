@@ -239,7 +239,7 @@ def command_search(args, database):
     """Search for the scientific name by common name."""
     return [
         {plant.scientific_name: plant.common_names}
-        for plant in database.search(args.name, args.score)
+        for plant in database.search(name=args.name, score=args.score)
     ]
 
 

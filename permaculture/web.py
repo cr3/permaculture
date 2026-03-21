@@ -71,7 +71,7 @@ def get_plants(
                 "common name": plant.common_names,
             },
         )
-        for plant in islice(database.search(q, score=score), limit)
+        for plant in islice(database.search(name=q, score=score), limit)
     ]
 
 

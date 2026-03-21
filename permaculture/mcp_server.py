@@ -60,9 +60,25 @@ def _plant_dict(plant):
     }
 
 
-def search_plants_in(database, name: str, score: float = 0.7) -> list[dict]:
+def list_characteristics_in(database) -> list[dict]:
+    """List all searchable plant characteristics."""
+    return database.list_characteristics()
+
+
+def search_plants_in(
+    database,
+    name: str | None = None,
+    score: float = 0.7,
+    *,
+    filters: dict | None = None,
+) -> list[dict]:
     """Search for plants by common or scientific name."""
-    return [_plant_dict(plant) for plant in database.search(name, score)]
+    return [
+        _plant_dict(plant)
+        for plant in database.search(
+            name=name, score=score, filters=filters,
+        )
+    ]
 
 
 def lookup_plants_in(database, names: list[str], score: float = 1.0) -> list[dict]:
@@ -71,15 +87,36 @@ def lookup_plants_in(database, names: list[str], score: float = 1.0) -> list[dic
 
 
 @mcp.tool()
-def search_plants(name: str, score: float = 0.7) -> list[dict]:
-    """Search for plants by common or scientific name.
+def list_plant_characteristics() -> list[dict]:
+    """List all searchable plant characteristics with types and counts.
+
+    Returns keys that can be used as filters in search_plants.
+    Each entry includes the key name, value type (number or text),
+    and count of plants with that characteristic.
+    Numeric keys also include min and max values.
+    """
+    database = Database.from_env()
+    return list_characteristics_in(database)
+
+
+@mcp.tool()
+def search_plants(
+    name: str | None = None,
+    filters: dict | None = None,
+    score: float = 0.7,
+) -> list[dict]:
+    """Search for plants by name and/or characteristics.
 
     Args:
         name: Common or scientific name to search for.
+        filters: Filter by characteristics. Use {"key": value} for
+            exact matches, or {"key": {"gt": v, "lte": v}} for
+            numeric ranges.
+            Call list_plant_characteristics to discover available keys.
         score: Minimum match score from 0.0 to 1.0 (default 0.7).
     """
     database = Database.from_env()
-    return search_plants_in(database, name, score)
+    return search_plants_in(database, name, score, filters=filters)
 
 
 @mcp.tool()

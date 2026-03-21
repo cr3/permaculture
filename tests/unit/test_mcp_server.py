@@ -1,11 +1,13 @@
 """Unit tests for the MCP server module."""
 
 import pytest
+from hamcrest import assert_that, contains_exactly, has_entry, has_items
 
 from permaculture.database import Database
 from permaculture.mcp_server import (
     get_allowed_hosts,
     get_allowed_origins,
+    list_characteristics_in,
     lookup_plants_in,
     search_plants_in,
 )
@@ -55,6 +57,8 @@ def database():
                 {
                     "scientific name": "symphytum officinale",
                     "common name/comfrey": True,
+                    "sun/full": True,
+                    "height": 1.2,
                 },
                 1.0,
                 ingestor="pfaf",
@@ -65,6 +69,8 @@ def database():
                 {
                     "scientific name": "achillea millefolium",
                     "common name/yarrow": True,
+                    "sun/full": True,
+                    "height": 0.6,
                 },
                 1.0,
                 ingestor="pfaf",
@@ -108,3 +114,42 @@ def test_lookup_plants_empty(database):
     result = lookup_plants_in(database, [])
 
     assert result == []
+
+
+def test_search_plants_with_filters(database):
+    """Searching with filters should return matching plants."""
+    result = search_plants_in(
+        database, filters={"height": {"gt": 1.0}},
+    )
+
+    assert_that(result, contains_exactly(
+        has_entry("scientific_name", "symphytum officinale"),
+    ))
+
+
+def test_search_plants_with_name_and_filters(database):
+    """Combining name and filters should intersect results."""
+    result = search_plants_in(
+        database, "comfrey", 0.5, filters={"sun/full": True},
+    )
+
+    assert_that(result, contains_exactly(
+        has_entry("scientific_name", "symphytum officinale"),
+    ))
+
+
+def test_search_plants_filters_no_match(database):
+    """Filtering with no matches should return empty."""
+    result = search_plants_in(
+        database, filters={"sun/shade": True},
+    )
+
+    assert result == []
+
+
+def test_list_plant_characteristics(database):
+    """Listing characteristics should return available keys."""
+    result = list_characteristics_in(database)
+    keys = {c["key"] for c in result}
+
+    assert_that(keys, has_items("height", "sun/full"))

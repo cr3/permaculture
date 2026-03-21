@@ -1,6 +1,7 @@
 """Unit tests for the database module."""
 
 import pytest
+from hamcrest import assert_that, contains_exactly, has_entries, has_entry
 
 from permaculture.database import (
     Database,
@@ -94,7 +95,7 @@ def test_database_search(database):
         ],
     )
 
-    result = list(database.search("comfrey", 0.5))
+    result = list(database.search(name="comfrey", score=0.5))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
@@ -115,7 +116,7 @@ def test_database_search_by_scientific_name(database):
         ],
     )
 
-    result = list(database.search("symphytum", 0.5))
+    result = list(database.search(name="symphytum", score=0.5))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
@@ -297,7 +298,7 @@ def test_database_search_no_match(database):
             ),
         ],
     )
-    result = list(database.search("nonexistent", 0.5))
+    result = list(database.search(name="nonexistent", score=0.5))
     assert result == []
 
 
@@ -338,8 +339,27 @@ def test_database_delete_ingestor(database):
     assert len(result) == 1
     assert result[0]["scientific name"] == "y"
 
-    assert database.search("comfrey", 0.5) is not None
-    assert list(database.search("comfrey", 0.5)) == []
+    assert database.search(name="comfrey", score=0.5) is not None
+    assert list(database.search(name="comfrey", score=0.5)) == []
+
+
+def test_database_delete_ingestor_cleans_attributes(database):
+    """Deleting an ingestor should also remove its plant attributes."""
+    database.write_batch(
+        [
+            IngestorPlant(
+                {"scientific name": "x", "sun/full": True},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+        ],
+    )
+    database.delete_ingestor("a")
+
+    result = list(database.search(filters={"sun/full": True}))
+    assert result == []
 
 
 def test_database_write_batch_idempotent(database):
@@ -366,3 +386,158 @@ def test_database_write_batch_replaces_data(database):
     result = list(database.iterate())
     assert len(result) == 1
     assert result[0]["height"] == 2.0
+
+
+def test_database_filter_by_bool(database):
+    """Filtering by a boolean characteristic should return matching plants."""
+    database.write_batch(
+        [
+            IngestorPlant(
+                {"scientific name": "symphytum officinale", "sun/full": True},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+            IngestorPlant(
+                {"scientific name": "asarum canadense", "sun/shade": True},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+        ],
+    )
+
+    result = list(database.search(filters={"sun/full": True}))
+    assert_that(result, contains_exactly(
+        has_entry("scientific name", "symphytum officinale"),
+    ))
+
+
+def test_database_filter_by_numeric_range(database):
+    """Filtering by a numeric range should return matching plants."""
+    database.write_batch(
+        [
+            IngestorPlant(
+                {"scientific name": "symphytum officinale", "height": 1.2},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+            IngestorPlant(
+                {"scientific name": "asarum canadense", "height": 0.2},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+        ],
+    )
+
+    result = list(database.search(filters={"height": {"gt": 0.5}}))
+    assert_that(result, contains_exactly(
+        has_entry("scientific name", "symphytum officinale"),
+    ))
+
+
+def test_database_filter_combined_with_name(database):
+    """Combining name search with filters should intersect results."""
+    database.write_batch(
+        [
+            IngestorPlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                    "sun/full": True,
+                },
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+            IngestorPlant(
+                {
+                    "scientific name": "achillea millefolium",
+                    "common name/yarrow": True,
+                    "sun/full": True,
+                },
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+        ],
+    )
+
+    result = list(
+        database.search(
+            name="comfrey", score=0.5, filters={"sun/full": True},
+        )
+    )
+    assert_that(result, contains_exactly(
+        has_entry("scientific name", "symphytum officinale"),
+    ))
+
+
+def test_database_filter_no_match(database):
+    """Filtering with no matches should return empty."""
+    database.write_batch(
+        [
+            IngestorPlant(
+                {"scientific name": "symphytum officinale", "sun/full": True},
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+        ],
+    )
+
+    result = list(database.search(filters={"sun/shade": True}))
+    assert result == []
+
+
+def test_database_filter_empty(database):
+    """Filtering with no name or filters should return empty."""
+    result = list(database.search())
+    assert result == []
+
+
+def test_database_list_characteristics(database):
+    """Listing characteristics should return keys with types and counts."""
+    database.write_batch(
+        [
+            IngestorPlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "sun/full": True,
+                    "height": 1.2,
+                },
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+            IngestorPlant(
+                {
+                    "scientific name": "achillea millefolium",
+                    "sun/full": True,
+                    "height": 0.6,
+                },
+                1.0,
+                ingestor="a",
+                title="A",
+                source="s",
+            ),
+        ],
+    )
+
+    chars = database.list_characteristics()
+    by_key = {c["key"]: c for c in chars}
+
+    assert_that(by_key, has_entries(
+        height=has_entries(type="float", count=2, min=0.6, max=1.2),
+        **{"sun/full": has_entries(type="bool", count=2)},
+    ))

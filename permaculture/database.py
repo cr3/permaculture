@@ -85,6 +85,34 @@ class Database:
                 "CREATE VIRTUAL TABLE IF NOT EXISTS names_fts"
                 " USING fts5(name, plant_id UNINDEXED, tokenize='trigram')"
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS plant_attributes (
+                    plant_id    INTEGER NOT NULL REFERENCES plants(id),
+                    key         TEXT NOT NULL,
+                    value_text  TEXT,
+                    value_bool  INTEGER,
+                    value_int   INTEGER,
+                    value_float REAL
+                )
+            """
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_attr_key_text"
+                " ON plant_attributes(key, value_text)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_attr_key_bool"
+                " ON plant_attributes(key, value_bool)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_attr_key_int"
+                " ON plant_attributes(key, value_int)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_attr_key_float"
+                " ON plant_attributes(key, value_float)"
+            )
 
     def delete_ingestor(self, name) -> None:
         """Remove all data for an ingestor."""
@@ -96,6 +124,11 @@ class Database:
             )
             conn.execute(
                 "DELETE FROM common_names WHERE plant_id IN"
+                " (SELECT id FROM plants WHERE ingestor = ?)",
+                (name,),
+            )
+            conn.execute(
+                "DELETE FROM plant_attributes WHERE plant_id IN"
                 " (SELECT id FROM plants WHERE ingestor = ?)",
                 (name,),
             )
@@ -119,6 +152,12 @@ class Database:
                 )
                 conn.execute(
                     "DELETE FROM common_names WHERE plant_id IN"
+                    " (SELECT id FROM plants"
+                    "  WHERE ingestor = ? AND scientific_name = ?)",
+                    (record.ingestor, record.scientific_name),
+                )
+                conn.execute(
+                    "DELETE FROM plant_attributes WHERE plant_id IN"
                     " (SELECT id FROM plants"
                     "  WHERE ingestor = ? AND scientific_name = ?)",
                     (record.ingestor, record.scientific_name),
@@ -155,6 +194,23 @@ class Database:
                 conn.executemany(
                     "INSERT INTO names_fts (name, plant_id) VALUES (?, ?)",
                     fts_rows,
+                )
+                attr_rows = []
+                attr_type_slot = {
+                    bool: lambda v: (None, int(v), None, None),
+                    int: lambda v: (None, None, v, None),
+                    float: lambda v: (None, None, None, v),
+                    str: lambda v: (v, None, None, None),
+                }
+                for key, value in record.data.items():
+                    to_slot = attr_type_slot.get(type(value))
+                    if to_slot is not None:
+                        attr_rows.append((pid, key, *to_slot(value)))
+                conn.executemany(
+                    "INSERT INTO plant_attributes"
+                    " (plant_id, key, value_text, value_bool, value_int, value_float)"
+                    " VALUES (?, ?, ?, ?, ?, ?)",
+                    attr_rows,
                 )
 
     def ingestors(self, include=None) -> list[str]:
@@ -213,33 +269,125 @@ class Database:
                 for ing, title, source, data, weight in rows
             )
 
-    def search(self, name: str, score: float) -> Iterator[DatabasePlant]:
-        """Search for plants by name using FTS5 trigram matching."""
+    def search(
+        self,
+        *,
+        name: str | None = None,
+        score: float = 0.7,
+        filters: dict | None = None,
+    ) -> Iterator[DatabasePlant]:
+        """Search for plants by name and/or characteristics.
+
+        :param name: Optional fuzzy name search.
+        :param score: Minimum match score for name search.
+        :param filters: Key-value pairs to filter by.
+            Use ``{"key": value}`` for exact matches, or
+            ``{"key": {"gt": v, "lte": v}}`` for numeric ranges.
+        """
+        if not name and not filters:
+            return
+
+        filter_clauses, filter_params = _filter_conditions(filters or {})
+
+        with self.conn as conn:
+            if name:
+                query = (
+                    "SELECT DISTINCT p.ingestor, p.title, p.source,"
+                    " p.data, p.weight"
+                    " FROM names_fts fts"
+                    " JOIN plants p ON fts.plant_id = p.id"
+                    " WHERE fts.name MATCH ?"
+                )
+                params = [f'"{name}"']
+                for clause in filter_clauses:
+                    query += f" AND {clause}"
+                params.extend(filter_params)
+
+                rows = conn.execute(query, params)
+                yield from _merge_all(
+                    plant
+                    for ing, title, source, data, weight in rows
+                    if self._extract(
+                        name,
+                        (
+                            plant := IngestorPlant(
+                                json.loads(data),
+                                weight,
+                                ingestor=ing,
+                                title=title,
+                                source=source,
+                            )
+                        ).names,
+                    )
+                    >= score
+                )
+            else:
+                query = (
+                    "SELECT DISTINCT p.ingestor, p.title, p.source,"
+                    " p.data, p.weight"
+                    " FROM plants p"
+                )
+                if filter_clauses:
+                    query += " WHERE " + " AND ".join(filter_clauses)
+
+                rows = conn.execute(query, filter_params)
+                yield from _merge_all(
+                    IngestorPlant(
+                        json.loads(data),
+                        weight,
+                        ingestor=ing,
+                        title=title,
+                        source=source,
+                    )
+                    for ing, title, source, data, weight in rows
+                )
+
+    def list_characteristics(self) -> list[dict]:
+        """Return distinct characteristic keys with types and counts."""
         with self.conn as conn:
             rows = conn.execute(
-                "SELECT DISTINCT p.ingestor, p.title, p.source, p.data, p.weight"
-                " FROM names_fts fts"
-                " JOIN plants p ON fts.plant_id = p.id"
-                " WHERE fts.name MATCH ?",
-                (f'"{name}"',),
-            )
-            yield from _merge_all(
-                plant
-                for ing, ing_title, source, data, weight in rows
-                if self._extract(
-                    name,
-                    (
-                        plant := IngestorPlant(
-                            json.loads(data),
-                            weight,
-                            ingestor=ing,
-                            title=ing_title,
-                            source=source,
-                        )
-                    ).names,
+                "SELECT key, COUNT(*),"
+                " SUM(CASE WHEN value_bool IS NOT NULL THEN 1 ELSE 0 END),"
+                " SUM(CASE WHEN value_int IS NOT NULL THEN 1 ELSE 0 END),"
+                " MIN(value_int),"
+                " MAX(value_int),"
+                " SUM(CASE WHEN value_float IS NOT NULL THEN 1 ELSE 0 END),"
+                " MIN(value_float),"
+                " MAX(value_float)"
+                " FROM plant_attributes"
+                " GROUP BY key ORDER BY key"
+            ).fetchall()
+        result = []
+        for (
+            key, count, bool_count,
+            int_count, int_min, int_max,
+            float_count, float_min, float_max,
+        ) in rows:
+            if bool_count > 0:
+                result.append(
+                    {"key": key, "type": "bool", "count": count}
                 )
-                >= score
-            )
+            elif int_count > 0:
+                result.append({
+                    "key": key,
+                    "type": "int",
+                    "count": count,
+                    "min": int_min,
+                    "max": int_max,
+                })
+            elif float_count > 0:
+                result.append({
+                    "key": key,
+                    "type": "float",
+                    "count": count,
+                    "min": float_min,
+                    "max": float_max,
+                })
+            else:
+                result.append(
+                    {"key": key, "type": "text", "count": count}
+                )
+        return result
 
 
 def _merge_all(
@@ -281,3 +429,60 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
         ingestors=ingestors,
         sources=sources,
     )
+
+
+_FILTER_OPS = {"gt": ">", "gte": ">=", "lt": "<", "lte": "<="}
+
+
+def _filter_conditions(filters):
+    """Build SQL WHERE clauses from a filters dict.
+
+    Returns a tuple of (conditions, params) where conditions are SQL
+    fragments using ``p.id`` and params are the bind values.
+    """
+    conditions = []
+    params = []
+    for key, value in filters.items():
+        if isinstance(value, bool):
+            conditions.append(
+                "p.id IN (SELECT plant_id FROM plant_attributes"
+                " WHERE key = ? AND value_bool = ?)"
+            )
+            params.extend([key, int(value)])
+        elif isinstance(value, dict):
+            sub = (
+                "p.id IN (SELECT plant_id FROM plant_attributes"
+                " WHERE key = ?"
+            )
+            sub_params = [key]
+            for op, v in value.items():
+                if op not in _FILTER_OPS:
+                    raise ValueError(
+                        f"Unknown filter operator: {op!r}"
+                    )
+                col = "value_int" if isinstance(v, int) else "value_float"
+                sub += f" AND COALESCE({col}, value_float, value_int)"
+                sub += f" {_FILTER_OPS[op]} ?"
+                sub_params.append(v)
+            sub += ")"
+            conditions.append(sub)
+            params.extend(sub_params)
+        elif isinstance(value, int):
+            conditions.append(
+                "p.id IN (SELECT plant_id FROM plant_attributes"
+                " WHERE key = ? AND value_int = ?)"
+            )
+            params.extend([key, value])
+        elif isinstance(value, float):
+            conditions.append(
+                "p.id IN (SELECT plant_id FROM plant_attributes"
+                " WHERE key = ? AND value_float = ?)"
+            )
+            params.extend([key, value])
+        else:
+            conditions.append(
+                "p.id IN (SELECT plant_id FROM plant_attributes"
+                " WHERE key = ? AND value_text = ?)"
+            )
+            params.extend([key, str(value)])
+    return conditions, params
