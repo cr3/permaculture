@@ -86,16 +86,16 @@ def test_search_plants(database):
     """Searching by common name should return matching plants."""
     result = search_plants_in(database, "comfrey")
 
-    assert len(result) == 1
-    assert result[0]["scientific_name"] == "symphytum officinale"
-    assert "comfrey" in result[0]["common_names"]
+    assert result["total_count"] == 1
+    assert result["results"][0]["scientific_name"] == "symphytum officinale"
+    assert "comfrey" in result["results"][0]["common_names"]
 
 
 def test_search_plants_no_match(database):
     """Searching for a non-existent name should return empty."""
     result = search_plants_in(database, "nonexistent")
 
-    assert result == []
+    assert result == {"total_count": 0, "results": []}
 
 
 def test_lookup_plants(database):
@@ -122,7 +122,8 @@ def test_search_plants_with_filters(database):
         database, filters={"height": {"gt": 1.0}},
     )
 
-    assert_that(result, contains_exactly(
+    assert result["total_count"] == 1
+    assert_that(result["results"], contains_exactly(
         has_entry("scientific_name", "symphytum officinale"),
     ))
 
@@ -133,7 +134,8 @@ def test_search_plants_with_name_and_filters(database):
         database, "comfrey", filters={"sun/full": True},
     )
 
-    assert_that(result, contains_exactly(
+    assert result["total_count"] == 1
+    assert_that(result["results"], contains_exactly(
         has_entry("scientific_name", "symphytum officinale"),
     ))
 
@@ -144,7 +146,70 @@ def test_search_plants_filters_no_match(database):
         database, filters={"sun/shade": True},
     )
 
-    assert result == []
+    assert result == {"total_count": 0, "results": []}
+
+
+def test_search_plants_limit(database):
+    """Limiting results should return at most limit items."""
+    result = search_plants_in(
+        database, filters={"sun/full": True}, limit=1,
+    )
+
+    assert result["total_count"] == 2
+    assert len(result["results"]) == 1
+
+
+def test_search_plants_offset(database):
+    """Offset should skip the first results."""
+    result = search_plants_in(
+        database, filters={"sun/full": True}, offset=1,
+    )
+
+    assert result["total_count"] == 2
+    assert len(result["results"]) == 1
+
+
+def test_search_plants_multi_ingestor():
+    """A plant from two ingestors should appear once in search results."""
+    db = Database.from_url(":memory:")
+    db.initialize()
+    db.write_batch(
+        [
+            IngestorPlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                    "height": 1.0,
+                },
+                1.0,
+                ingestor="pfaf",
+                title="PFAF",
+                source="https://pfaf.org/",
+            ),
+        ],
+    )
+    db.write_batch(
+        [
+            IngestorPlant(
+                {
+                    "scientific name": "symphytum officinale",
+                    "common name/comfrey": True,
+                    "height": 1.4,
+                },
+                1.0,
+                ingestor="usda",
+                title="USDA",
+                source="https://usda.gov/",
+            ),
+        ],
+    )
+
+    result = search_plants_in(db, "comfrey")
+
+    assert result["total_count"] == 1
+    assert_that(result["results"], contains_exactly(
+        has_entry("scientific_name", "symphytum officinale"),
+    ))
 
 
 def test_list_plant_characteristics(database):

@@ -270,6 +270,8 @@ class Database:
         *,
         name: str | None = None,
         filters: dict | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> Iterator[DatabasePlant]:
         """Search for plants by name and/or characteristics.
 
@@ -278,58 +280,56 @@ class Database:
         :param filters: Key-value pairs to filter by.
             Use ``{"key": value}`` for exact matches, or
             ``{"key": {"gt": v, "lte": v}}`` for numeric ranges.
+        :param limit: Maximum number of plants to return.
+        :param offset: Number of plants to skip.
         """
         if not name and not filters:
             return
 
-        filter_clauses, filter_params = _filter_conditions(filters or {})
+        names_query, params = _search_query(name, filters)
+        if limit is not None:
+            names_query += " LIMIT ? OFFSET ?"
+            params.extend([limit, offset])
+
+        query = (
+            "SELECT p.ingestor, p.title, p.source, p.data, p.weight"  # noqa: S608
+            f" FROM plants p JOIN ({names_query}) AS page"
+            " ON p.scientific_name = page.scientific_name"
+            " ORDER BY page.best_rank"
+        )
 
         with self.conn as conn:
-            if name:
-                query = (
-                    "SELECT p.ingestor, p.title, p.source,"
-                    " p.data, p.weight"
-                    " FROM names_fts fts"
-                    " JOIN plants p ON fts.plant_id = p.id"
-                    " WHERE fts.name MATCH ?"
+            rows = conn.execute(query, params)
+            yield from _merge_all(
+                IngestorPlant(
+                    json.loads(data),
+                    weight,
+                    ingestor=ing,
+                    title=title,
+                    source=source,
                 )
-                params = [f'"{name}"']
-                for clause in filter_clauses:
-                    query += f" AND {clause}"
-                params.extend(filter_params)
-                query += " GROUP BY p.id ORDER BY MIN(fts.rank)"
+                for ing, title, source, data, weight in rows
+            )
 
-                rows = conn.execute(query, params)
-                yield from _merge_all(
-                    IngestorPlant(
-                        json.loads(data),
-                        weight,
-                        ingestor=ing,
-                        title=title,
-                        source=source,
-                    )
-                    for ing, title, source, data, weight in rows
-                )
-            else:
-                query = (
-                    "SELECT DISTINCT p.ingestor, p.title, p.source,"
-                    " p.data, p.weight"
-                    " FROM plants p"
-                )
-                if filter_clauses:
-                    query += " WHERE " + " AND ".join(filter_clauses)
+    def search_count(
+        self,
+        *,
+        name: str | None = None,
+        filters: dict | None = None,
+    ) -> int:
+        """Count distinct scientific names matching a search.
 
-                rows = conn.execute(query, filter_params)
-                yield from _merge_all(
-                    IngestorPlant(
-                        json.loads(data),
-                        weight,
-                        ingestor=ing,
-                        title=title,
-                        source=source,
-                    )
-                    for ing, title, source, data, weight in rows
-                )
+        Uses the same filtering logic as :meth:`search` but returns
+        only the count, without materializing the results.
+        """
+        if not name and not filters:
+            return 0
+
+        names_query, params = _search_query(name, filters)
+        with self.conn as conn:
+            return conn.execute(
+                f"SELECT COUNT(*) FROM ({names_query})", params,  # noqa: S608
+            ).fetchone()[0]
 
     def list_characteristics(self) -> list[dict]:
         """Return distinct characteristic keys with types and counts."""
@@ -420,15 +420,40 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
     )
 
 
+def _search_query(name, filters):
+    """Build a query selecting plants that match."""
+    filter_clauses, filter_params = _filter_conditions(filters or {})
+
+    if name:
+        query = (
+            "SELECT p.scientific_name, MIN(fts.rank) AS best_rank"
+            " FROM names_fts fts"
+            " JOIN plants p ON fts.plant_id = p.id"
+            " WHERE fts.name MATCH ?"
+        )
+        params = [f'"{name}"']
+        for clause in filter_clauses:
+            query += f" AND {clause}"
+        params.extend(filter_params)
+        query += " GROUP BY p.scientific_name ORDER BY best_rank"
+    else:
+        query = (
+            "SELECT DISTINCT p.scientific_name, 0 AS best_rank"
+            " FROM plants p"
+        )
+        params = list(filter_params)
+        if filter_clauses:
+            query += " WHERE " + " AND ".join(filter_clauses)
+
+    return query, params
+
+
+
 _FILTER_OPS = {"gt": ">", "gte": ">=", "lt": "<", "lte": "<="}
 
 
 def _filter_conditions(filters):
-    """Build SQL WHERE clauses from a filters dict.
-
-    Returns a tuple of (conditions, params) where conditions are SQL
-    fragments using ``p.id`` and params are the bind values.
-    """
+    """Build SQL WHERE clauses from a filters dict."""
     conditions = []
     params = []
     for key, value in filters.items():

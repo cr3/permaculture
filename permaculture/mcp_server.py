@@ -70,14 +70,24 @@ def search_plants_in(
     name: str | None = None,
     *,
     filters: dict | None = None,
-) -> list[dict]:
+    limit: int = 10,
+    offset: int = 0,
+) -> dict:
     """Search for plants by common or scientific name."""
-    return [
-        _plant_dict(plant)
+    total_count = database.search_count(name=name, filters=filters)
+    results = [
+        {
+            "scientific_name": plant.scientific_name,
+            "common_names": plant.common_names,
+        }
         for plant in database.search(
-            name=name, filters=filters,
+            name=name, filters=filters, limit=limit, offset=offset,
         )
     ]
+    return {
+        "total_count": total_count,
+        "results": results,
+    }
 
 
 def lookup_plants_in(database, names: list[str]) -> list[dict]:
@@ -102,8 +112,14 @@ def list_plant_characteristics() -> list[dict]:
 def search_plants(
     name: str | None = None,
     filters: dict | None = None,
-) -> list[dict]:
+    limit: int = 10,
+    offset: int = 0,
+) -> dict:
     """Search for plants by name and/or characteristics.
+
+    Returns up to ``limit`` results (default 10, max 100) starting from
+    ``offset``.  The response includes ``total_count`` so you can tell
+    whether more results are available.
 
     Args:
         name: Common or scientific name to search for.
@@ -111,9 +127,15 @@ def search_plants(
             exact matches, or {"key": {"gt": v, "lte": v}} for
             numeric ranges.
             Call list_plant_characteristics to discover available keys.
+        limit: Maximum number of results to return (default 10, max 100).
+        offset: Number of results to skip (default 0).
     """
     database = Database.from_env()
-    return search_plants_in(database, name, filters=filters)
+    limit = max(1, min(limit, 100))
+    offset = max(0, offset)
+    return search_plants_in(
+        database, name, filters=filters, limit=limit, offset=offset,
+    )
 
 
 @mcp.tool()
