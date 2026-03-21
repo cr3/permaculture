@@ -279,8 +279,8 @@ function renderSearch(plants) {
   sugBox.innerHTML = '';
   for (const p of plants) {
     const li = document.createElement('li');
-    const sciName = p['scientific name'];
-    const commonNames = p['common names'];
+    const sciName = p.scientific_name;
+    const commonNames = p.common_names;
     const common = commonNames.length ? ' \u2014 ' + commonNames.join(', ') : '';
     li.innerHTML = '<span class="sci">' + esc(sciName) + '</span>'
       + '<span class="common">' + esc(common) + '</span>';
@@ -307,7 +307,6 @@ function renderDetail(data) {
 
   const sources = data.sources || {};
   const ingestors = data.ingestors || {};
-  const commonNames = data.common_names || [];
   const sciName = data.scientific_name || '';
   const chars = data.characteristics || {};
 
@@ -321,8 +320,7 @@ function renderDetail(data) {
     .map(([k, v]) => [k, tr(k), v])
     .sort((a, b) => a[1].localeCompare(b[1], lang));
 
-  let html = '<h2>' + esc(commonNames.join(', ') || sciName) + '</h2>'
-    + '<p style="font-style:italic;color:#555;margin-bottom:.75rem">' + esc(sciName) + '</p>'
+  let html = '<h2>' + esc(sciName) + '</h2>'
     + '<table>';
   for (const [k, tk, v] of entries) {
     const src = sources[k];

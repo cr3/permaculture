@@ -138,7 +138,7 @@ def test_database_iterate_tracks_source(database):
 
     result = list(database.iterate())
     assert result[0].ingestors == {"pfaf": {"title": "Plants For A Future", "source": "https://pfaf.org/"}}
-    assert result[0].sources == {"scientific name": ["pfaf"]}
+    assert result[0].sources == {}
 
 
 @pytest.mark.parametrize(
@@ -150,28 +150,28 @@ def test_database_iterate_tracks_source(database):
             id="empty",
         ),
         pytest.param(
-            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1")],
+            [IngestorPlant({"scientific name": "a", "x": "b"}, 1.0, ingestor="s1", title="S1", source="u1")],
             [
                 DatabasePlant(
-                    {"scientific name": "a"},
+                    {"scientific name": "a", "x": "b"},
                     1.0,
                     ingestors={"s1": {"title": "S1", "source": "u1"}},
-                    sources={"scientific name": ["s1"]},
+                    sources={"x": ["s1"]},
                 ),
             ],
             id="single",
         ),
         pytest.param(
             [
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1"),
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", title="S2", source="u2"),
+                IngestorPlant({"scientific name": "a", "x": "b"}, 1.0, ingestor="s1", title="S1", source="u1"),
+                IngestorPlant({"scientific name": "a", "x": "b"}, 1.0, ingestor="s2", title="S2", source="u2"),
             ],
             [
                 DatabasePlant(
-                    {"scientific name": "a"},
+                    {"scientific name": "a", "x": "b"},
                     1.0,
                     ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
-                    sources={"scientific name": ["s1", "s2"]},
+                    sources={"x": ["s1", "s2"]},
                 ),
             ],
             id="group by scientific name",
@@ -193,25 +193,25 @@ def test_database_merge_all(plants, expected):
             id="empty",
         ),
         pytest.param(
-            [IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1")],
+            [IngestorPlant({"scientific name": "a", "x": "b"}, 1.0, ingestor="s1", title="S1", source="u1")],
             DatabasePlant(
-                {"scientific name": "a"},
+                {"scientific name": "a", "x": "b"},
                 1.0,
                 ingestors={"s1": {"title": "S1", "source": "u1"}},
-                sources={"scientific name": ["s1"]},
+                sources={"x": ["s1"]},
             ),
             id="single",
         ),
         pytest.param(
             [
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s1", title="S1", source="u1"),
-                IngestorPlant({"scientific name": "a"}, 1.0, ingestor="s2", title="S2", source="u2"),
+                IngestorPlant({"scientific name": "a", "x": "b"}, 1.0, ingestor="s1", title="S1", source="u1"),
+                IngestorPlant({"scientific name": "a", "x": "b"}, 1.0, ingestor="s2", title="S2", source="u2"),
             ],
             DatabasePlant(
-                {"scientific name": "a"},
+                {"scientific name": "a", "x": "b"},
                 1.0,
                 ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
-                sources={"scientific name": ["s1", "s2"]},
+                sources={"x": ["s1", "s2"]},
             ),
             id="group by scientific name",
         ),
@@ -224,7 +224,7 @@ def test_database_merge_all(plants, expected):
                 {"scientific name": "a", "x": 2.0},
                 1.5,
                 ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
-                sources={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
+                sources={"x": ["s1", "s2"]},
             ),
             id="merge numbers",
         ),
@@ -237,7 +237,7 @@ def test_database_merge_all(plants, expected):
                 {"scientific name": "a", "x": "b"},
                 1.5,
                 ingestors={"s1": {"title": "S1", "source": "u1"}, "s2": {"title": "S2", "source": "u2"}},
-                sources={"scientific name": ["s1", "s2"], "x": ["s1", "s2"]},
+                sources={"x": ["s1", "s2"]},
             ),
             id="merge strings",
         ),

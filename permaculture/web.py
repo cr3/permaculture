@@ -63,8 +63,8 @@ def get_plants(
     """Return search results for the given query."""
     return [
         {
-            "scientific name": plant.scientific_name,
-            "common names": plant.common_names,
+            "scientific_name": plant.scientific_name,
+            "common_names": plant.common_names,
         }
         for plant in islice(database.search(name=q), limit)
     ]
@@ -84,11 +84,10 @@ def get_plant(
     chars = {
         k: v
         for k, v in plant.items()
-        if k != "scientific name" and not k.startswith("common name/")
+        if k != "scientific name"
     }
     return {
         "scientific_name": plant.scientific_name,
-        "common_names": plant.common_names,
         "characteristics": group_characteristics(chars),
         "sources": unflatten(plant.sources),
         "ingestors": plant.ingestors,

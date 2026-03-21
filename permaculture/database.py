@@ -395,7 +395,8 @@ def _merge(plants: Iterator[IngestorPlant]) -> DatabasePlant:
 
     sources = {}
     for key in {k for p in plants for k in p}:
-        sources[key] = [p.ingestor for p in plants if key in p]
+        if key != "scientific name":
+            sources[key] = [p.ingestor for p in plants if key in p]
 
     ingestors = {
         p.ingestor: {"title": p.title, "source": p.source} for p in plants if p.ingestor

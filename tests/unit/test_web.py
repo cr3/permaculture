@@ -62,8 +62,8 @@ def test_get_plants_search(client):
     assert r.status_code == 200
     data = r.json()
     assert len(data) == 1
-    assert data[0]["scientific name"] == "symphytum officinale"
-    assert "comfrey" in data[0]["common names"]
+    assert data[0]["scientific_name"] == "symphytum officinale"
+    assert "comfrey" in data[0]["common_names"]
 
 
 def test_get_plants_no_match(client):
@@ -86,11 +86,11 @@ def test_get_plant_detail(client):
     assert r.status_code == 200
     data = r.json()
     assert data["scientific_name"] == "symphytum officinale"
-    assert "comfrey" in data["common_names"]
     assert data["ingestors"] == {
         "pfaf": {"title": "Plants For A Future", "source": "https://pfaf.org/"},
     }
-    assert "scientific name" in data["sources"]
+    assert "scientific name" not in data["sources"]
+    assert "common name" in data["characteristics"]
     assert "sun" in data["characteristics"]
 
 
@@ -99,7 +99,7 @@ def test_get_plant_detail_untranslated_keys(client):
     r = client.get("/permaculture/plants/symphytum officinale")
     data = r.json()
     assert "sun" in data["characteristics"]
-    assert "scientific name" in data["sources"]
+    assert "common name" in data["sources"]
 
 
 def test_get_plant_detail_mixed_boolean_group(client):
