@@ -4,14 +4,38 @@ import argparse
 from contextlib import asynccontextmanager
 from importlib.resources import files
 from itertools import islice
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+from pydantic import BaseModel
 
 from permaculture.data import unflatten
 from permaculture.database import Database
 from permaculture.mcp_server import mcp
+
+
+class PlantSummary(BaseModel):
+    """A plant search result with name information."""
+
+    scientific_name: str
+    common_names: list[str]
+
+
+class IngestorInfo(BaseModel):
+    """Metadata about a data source."""
+
+    title: str
+    source: str
+
+
+class PlantDetail(BaseModel):
+    """Full plant characteristics returned by lookup."""
+
+    scientific_name: str
+    characteristics: dict[str, Any]
+    sources: dict[str, Any]
+    ingestors: dict[str, IngestorInfo]
 
 
 def group_characteristics(data):
@@ -59,13 +83,13 @@ def get_plants(
     database: DatabaseDep,
     q: str = Query(min_length=1, description="Search query"),
     limit: int = Query(default=10, ge=1, le=100),
-):
+) -> list[PlantSummary]:
     """Return search results for the given query."""
     return [
-        {
-            "scientific_name": plant.scientific_name,
-            "common_names": plant.common_names,
-        }
+        PlantSummary(
+            scientific_name=plant.scientific_name,
+            common_names=plant.common_names,
+        )
         for plant in islice(database.search(name=q), limit)
     ]
 
@@ -74,7 +98,7 @@ def get_plants(
 def get_plant(
     scientific_name: str,
     database: DatabaseDep,
-):
+) -> PlantDetail | dict:
     """Return full characteristics for a scientific name."""
     plants = list(database.lookup([scientific_name]))
     if not plants:
@@ -86,12 +110,18 @@ def get_plant(
         for k, v in plant.items()
         if k != "scientific name"
     }
-    return {
-        "scientific_name": plant.scientific_name,
-        "characteristics": group_characteristics(chars),
-        "sources": unflatten(plant.sources),
-        "ingestors": plant.ingestors,
-    }
+    return PlantDetail(
+        scientific_name=plant.scientific_name,
+        characteristics=group_characteristics(chars),
+        sources=unflatten(plant.sources),
+        ingestors=plant.ingestors,
+    )
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    """Redirect to the web interface."""
+    return RedirectResponse("/permaculture/")
 
 
 @app.get("/permaculture/", response_class=HTMLResponse)
