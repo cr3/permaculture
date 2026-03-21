@@ -65,4 +65,6 @@ def connect(url: URL | str) -> sqlite3.Connection:
             path = path.removeprefix("file:")
         Path(path).parent.mkdir(parents=True, exist_ok=True)
 
-    return sqlite3.connect(uri, check_same_thread=False, **kwargs)
+    conn = sqlite3.connect(uri, check_same_thread=False, **kwargs)
+    conn.execute("PRAGMA journal_mode=WAL")
+    return conn
