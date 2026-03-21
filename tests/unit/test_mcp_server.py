@@ -130,7 +130,7 @@ def test_search_plants_with_filters(database):
 def test_search_plants_with_name_and_filters(database):
     """Combining name and filters should intersect results."""
     result = search_plants_in(
-        database, "comfrey", 0.5, filters={"sun/full": True},
+        database, "comfrey", filters={"sun/full": True},
     )
 
     assert_that(result, contains_exactly(

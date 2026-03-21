@@ -20,12 +20,6 @@
     width: 100%; padding: .6rem .8rem; font-size: 1rem;
     border: 1px solid #ccc; border-radius: 6px;
   }
-  .controls {
-    display: flex; align-items: center; gap: .6rem; margin-top: .5rem;
-  }
-  .controls label { font-size: .85rem; color: #555; }
-  .controls input[type=range] { width: 100px; }
-  .controls .score-val { font-size: .85rem; min-width: 2.2em; }
   .suggestions {
     position: absolute; top: 100%; left: 0; right: 0;
     background: #fff; border: 1px solid #ddd; border-top: none;
@@ -70,9 +64,6 @@
   .lang-toggle button.active {
     background: #2e7d32; color: #fff;
   }
-  .help-text {
-    font-size: .8rem; color: #888; margin-top: .25rem;
-  }
   .source-ref {
     font-size: .7em; vertical-align: super; color: #2e7d32;
     margin-left: .15em; text-decoration: none;
@@ -101,21 +92,12 @@
          autocomplete="off">
   <ul class="suggestions" id="suggestions"></ul>
 </div>
-<div class="controls">
-  <label for="score">Score</label>
-  <input type="range" id="score" min="0" max="1" step="0.1" value="0.6">
-  <span class="score-val" id="score-val">0.6</span>
-</div>
-<div class="help-text" id="score-help"></div>
 <div id="detail"></div>
 
 <script>
 const q = document.getElementById('q');
 const sugBox = document.getElementById('suggestions');
 const detail = document.getElementById('detail');
-const scoreInput = document.getElementById('score');
-const scoreVal = document.getElementById('score-val');
-const scoreHelp = document.getElementById('score-help');
 const langButtons = document.querySelectorAll('.lang-toggle button');
 let debounce;
 let lang = navigator.language.startsWith('fr') ? 'fr' : 'en';
@@ -124,16 +106,12 @@ const i18n = {
   en: {
     title: '\u{1F331} Permaculture Plant Database',
     placeholder: 'Search plants\u2026',
-    score: 'Score',
-    scoreHelp: 'Minimum fuzzy\u2011match score: 0\u00A0=\u00A0all results, 1\u00A0=\u00A0exact matches only.',
     noData: 'No data found.',
     sources: 'Sources',
   },
   fr: {
     title: '\u{1F331} Base de donn\u00E9es de plantes',
     placeholder: 'Rechercher des plantes\u2026',
-    score: 'Score',
-    scoreHelp: 'Score minimal de correspondance\u00A0: 0\u00A0=\u00A0tous les r\u00E9sultats, 1\u00A0=\u00A0correspondances exactes.',
     noData: 'Aucune donn\u00E9e trouv\u00E9e.',
     sources: 'Sources',
   },
@@ -146,8 +124,6 @@ function setLang(l) {
   document.documentElement.lang = l;
   document.querySelector('h1').firstChild.textContent = t.title + ' ';
   q.placeholder = t.placeholder;
-  document.querySelector('label[for=score]').textContent = t.score;
-  scoreHelp.textContent = t.scoreHelp;
   if (q.value.trim()) search();
   const name = detail.querySelector('h2');
   if (name) lookup(name.textContent);
@@ -163,11 +139,6 @@ window.addEventListener('popstate', () => {
   const name = new URL(window.location).searchParams.get('plant');
   if (name) lookup(name);
   else { q.value = ''; detail.innerHTML = ''; }
-});
-
-scoreInput.addEventListener('input', () => {
-  scoreVal.textContent = scoreInput.value;
-  if (q.value.trim()) { clearTimeout(debounce); debounce = setTimeout(search, 200); }
 });
 
 q.addEventListener('input', () => {
@@ -193,7 +164,7 @@ q.addEventListener('keydown', e => {
 async function search() {
   const val = q.value.trim();
   if (val.length < 1) { sugBox.style.display = 'none'; return; }
-  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val) + '&lang=' + lang + '&score=' + scoreInput.value);
+  const r = await fetch('/permaculture/plants?q=' + encodeURIComponent(val) + '&lang=' + lang);
   const plants = await r.json();
   sugBox.innerHTML = '';
   for (const p of plants) {

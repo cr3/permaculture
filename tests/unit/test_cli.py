@@ -186,7 +186,6 @@ def test_make_args_parser_lookup_defaults(unique):
     args, _ = args_parser.parse_known_args(["lookup", name])
     assert args.names == [name]
     assert args.file is False
-    assert args.score == 1.0
 
 
 def test_make_args_parser_lookup_multiple_names(unique):
@@ -201,7 +200,7 @@ def test_make_args_parser_search_defaults(unique):
     """Making an args parser should have sensible search defaults."""
     args_parser = make_args_parser()
     args, _ = args_parser.parse_known_args(["search", unique("text")])
-    assert args.score == 0.7
+    assert args.name
 
 
 def test_make_config_parser_serializer():

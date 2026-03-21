@@ -13,7 +13,6 @@ from attrs import define, field
 from yarl import URL
 
 from permaculture.data import merge
-from permaculture.nlp import Extractor, normalize, score
 from permaculture.plant import DatabasePlant, IngestorPlant
 from permaculture.sqlite import connect as sqliteconnect
 
@@ -44,9 +43,6 @@ class Database:
             " WHERE type = 'table' AND name = 'plants'"
         ).fetchone()
         return row[0] > 0
-
-    def _extract(self, query, choices):
-        return Extractor(query, normalize, score).extract_one(choices)[0]
 
     def initialize(self) -> None:
         """Create tables and indexes."""
@@ -246,7 +242,7 @@ class Database:
                     source=source,
                 )
 
-    def lookup(self, names: list[str], score: float) -> Iterator[DatabasePlant]:
+    def lookup(self, names: list[str]) -> Iterator[DatabasePlant]:
         """Lookup characteristics by scientific names, merging across ingestors."""
         if not names:
             return
@@ -273,13 +269,12 @@ class Database:
         self,
         *,
         name: str | None = None,
-        score: float = 0.7,
         filters: dict | None = None,
     ) -> Iterator[DatabasePlant]:
         """Search for plants by name and/or characteristics.
 
-        :param name: Optional fuzzy name search.
-        :param score: Minimum match score for name search.
+        :param name: Optional fuzzy name search.  Results are ranked
+            by FTS5 BM25 relevance (best matches first).
         :param filters: Key-value pairs to filter by.
             Use ``{"key": value}`` for exact matches, or
             ``{"key": {"gt": v, "lte": v}}`` for numeric ranges.
@@ -292,7 +287,7 @@ class Database:
         with self.conn as conn:
             if name:
                 query = (
-                    "SELECT DISTINCT p.ingestor, p.title, p.source,"
+                    "SELECT p.ingestor, p.title, p.source,"
                     " p.data, p.weight"
                     " FROM names_fts fts"
                     " JOIN plants p ON fts.plant_id = p.id"
@@ -302,24 +297,18 @@ class Database:
                 for clause in filter_clauses:
                     query += f" AND {clause}"
                 params.extend(filter_params)
+                query += " GROUP BY p.id ORDER BY MIN(fts.rank)"
 
                 rows = conn.execute(query, params)
                 yield from _merge_all(
-                    plant
-                    for ing, title, source, data, weight in rows
-                    if self._extract(
-                        name,
-                        (
-                            plant := IngestorPlant(
-                                json.loads(data),
-                                weight,
-                                ingestor=ing,
-                                title=title,
-                                source=source,
-                            )
-                        ).names,
+                    IngestorPlant(
+                        json.loads(data),
+                        weight,
+                        ingestor=ing,
+                        title=title,
+                        source=source,
                     )
-                    >= score
+                    for ing, title, source, data, weight in rows
                 )
             else:
                 query = (

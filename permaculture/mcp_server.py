@@ -68,7 +68,6 @@ def list_characteristics_in(database) -> list[dict]:
 def search_plants_in(
     database,
     name: str | None = None,
-    score: float = 0.7,
     *,
     filters: dict | None = None,
 ) -> list[dict]:
@@ -76,14 +75,14 @@ def search_plants_in(
     return [
         _plant_dict(plant)
         for plant in database.search(
-            name=name, score=score, filters=filters,
+            name=name, filters=filters,
         )
     ]
 
 
-def lookup_plants_in(database, names: list[str], score: float = 1.0) -> list[dict]:
+def lookup_plants_in(database, names: list[str]) -> list[dict]:
     """Look up plant characteristics by exact scientific name."""
-    return [_plant_dict(plant) for plant in database.lookup(names, score)]
+    return [_plant_dict(plant) for plant in database.lookup(names)]
 
 
 @mcp.tool()
@@ -103,7 +102,6 @@ def list_plant_characteristics() -> list[dict]:
 def search_plants(
     name: str | None = None,
     filters: dict | None = None,
-    score: float = 0.7,
 ) -> list[dict]:
     """Search for plants by name and/or characteristics.
 
@@ -113,21 +111,19 @@ def search_plants(
             exact matches, or {"key": {"gt": v, "lte": v}} for
             numeric ranges.
             Call list_plant_characteristics to discover available keys.
-        score: Minimum match score from 0.0 to 1.0 (default 0.7).
     """
     database = Database.from_env()
-    return search_plants_in(database, name, score, filters=filters)
+    return search_plants_in(database, name, filters=filters)
 
 
 @mcp.tool()
 def lookup_plants(
-    names: list[str], score: float = 1.0
+    names: list[str],
 ) -> list[dict]:
     """Look up plant characteristics by exact scientific name.
 
     Args:
         names: Scientific names to look up.
-        score: Minimum match score from 0.0 to 1.0 (default 1.0).
     """
     database = Database.from_env()
-    return lookup_plants_in(database, names, score)
+    return lookup_plants_in(database, names)

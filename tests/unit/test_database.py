@@ -74,7 +74,7 @@ def test_database_lookup(database):
         ],
     )
 
-    result = list(database.lookup(["symphytum officinale"], 1.0))
+    result = list(database.lookup(["symphytum officinale"]))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
@@ -95,7 +95,7 @@ def test_database_search(database):
         ],
     )
 
-    result = list(database.search(name="comfrey", score=0.5))
+    result = list(database.search(name="comfrey"))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
@@ -116,7 +116,7 @@ def test_database_search_by_scientific_name(database):
         ],
     )
 
-    result = list(database.search(name="symphytum", score=0.5))
+    result = list(database.search(name="symphytum"))
     assert len(result) == 1
     assert result[0]["scientific name"] == "symphytum officinale"
 
@@ -298,13 +298,13 @@ def test_database_search_no_match(database):
             ),
         ],
     )
-    result = list(database.search(name="nonexistent", score=0.5))
+    result = list(database.search(name="nonexistent"))
     assert result == []
 
 
 def test_database_lookup_empty(database):
     """Lookup with empty names should return empty."""
-    result = list(database.lookup([], 1.0))
+    result = list(database.lookup([]))
     assert result == []
 
 
@@ -339,8 +339,8 @@ def test_database_delete_ingestor(database):
     assert len(result) == 1
     assert result[0]["scientific name"] == "y"
 
-    assert database.search(name="comfrey", score=0.5) is not None
-    assert list(database.search(name="comfrey", score=0.5)) == []
+    assert database.search(name="comfrey") is not None
+    assert list(database.search(name="comfrey")) == []
 
 
 def test_database_delete_ingestor_cleans_attributes(database):
@@ -473,7 +473,7 @@ def test_database_filter_combined_with_name(database):
 
     result = list(
         database.search(
-            name="comfrey", score=0.5, filters={"sun/full": True},
+            name="comfrey", filters={"sun/full": True},
         )
     )
     assert_that(result, contains_exactly(

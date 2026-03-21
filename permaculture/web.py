@@ -61,7 +61,6 @@ def get_plants(
     q: str = Query(min_length=1, description="Search query"),
     limit: int = Query(default=10, ge=1, le=100),
     lang: str = Query(default="en", description="Language for translated names"),
-    score: float = Query(default=0.6, ge=0, le=1, description="Minimum match score"),
 ):
     """Return search results for the given query."""
     locales = Locales.from_domain("api", language=lang)
@@ -71,7 +70,7 @@ def get_plants(
                 "common name": plant.common_names,
             },
         )
-        for plant in islice(database.search(name=q, score=score), limit)
+        for plant in islice(database.search(name=q), limit)
     ]
 
 
@@ -82,7 +81,7 @@ def get_plant(
     lang: str = Query(default="en", description="Language for translated keys"),
 ):
     """Return full characteristics for a scientific name."""
-    plants = list(database.lookup([scientific_name], score=1.0))
+    plants = list(database.lookup([scientific_name]))
     if not plants:
         return {}
 

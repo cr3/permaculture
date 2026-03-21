@@ -19,7 +19,6 @@ from permaculture.logger import (
     LoggerLevelAction,
     setup_logger,
 )
-from permaculture.nlp import score_type
 from permaculture.runner import Runner
 from permaculture.serializer import SerializerAction
 from permaculture.storage import DEFAULT_STORAGE, StorageAction
@@ -103,12 +102,6 @@ def make_args_parser():
         action="append",
         help="only include these characteristics",
     )
-    lookup.add_argument(
-        "--score",
-        default=1.0,
-        type=score_type,
-        help="cutoff score (default %(default)s for exact match)",
-    )
     search = command.add_parser(
         "search",
         help="search for the scentific name by common name",
@@ -116,12 +109,6 @@ def make_args_parser():
     search.add_argument(
         "name",
         help="common name to search",
-    )
-    search.add_argument(
-        "--score",
-        default=0.7,
-        type=score_type,
-        help="cutoff score (default %(default)s for partial match)",
     )
     return args_parser
 
@@ -231,7 +218,7 @@ def command_lookup(args, config, database):
         names = args.names
     return [
         {k: v for k, v in f(plant).items() if include.match(k) and not exclude.match(k)}
-        for plant in database.lookup(names, args.score)
+        for plant in database.lookup(names)
     ]
 
 
@@ -239,7 +226,7 @@ def command_search(args, database):
     """Search for the scientific name by common name."""
     return [
         {plant.scientific_name: plant.common_names}
-        for plant in database.search(name=args.name, score=args.score)
+        for plant in database.search(name=args.name)
     ]
 
 
