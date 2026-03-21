@@ -199,9 +199,10 @@ class Database:
                     str: lambda v: (v, None, None, None),
                 }
                 for key, value in record.data.items():
-                    to_slot = attr_type_slot.get(type(value))
-                    if to_slot is not None:
-                        attr_rows.append((pid, key, *to_slot(value)))
+                    if key != "scientific name" and not key.startswith("common name"):
+                        to_slot = attr_type_slot.get(type(value))
+                        if to_slot is not None:
+                            attr_rows.append((pid, key, *to_slot(value)))
                 conn.executemany(
                     "INSERT INTO plant_attributes"
                     " (plant_id, key, value_text, value_bool, value_int, value_float)"
