@@ -451,7 +451,17 @@ def _search_query(name, filters):
 
 
 
-_FILTER_OPS = {"gt": ">", "gte": ">=", "lt": "<", "lte": "<="}
+_FILTER_OPS = {"eq": "=", "gt": ">", "gte": ">=", "lt": "<", "lte": "<="}
+
+
+def _value_col(v):
+    if isinstance(v, bool):
+        return "value_bool"
+    if isinstance(v, int):
+        return "value_int"
+    if isinstance(v, float):
+        return "value_float"
+    return "value_text"
 
 
 def _filter_conditions(filters):
@@ -476,10 +486,15 @@ def _filter_conditions(filters):
                     raise ValueError(
                         f"Unknown filter operator: {op!r}"
                     )
-                col = "value_int" if isinstance(v, int) else "value_float"
-                sub += f" AND COALESCE({col}, value_float, value_int)"
-                sub += f" {_FILTER_OPS[op]} ?"
-                sub_params.append(v)
+                if op == "eq":
+                    col = _value_col(v)
+                    sub += f" AND {col} = ?"
+                    sub_params.append(int(v) if isinstance(v, bool) else v)
+                else:
+                    col = "value_int" if isinstance(v, int) else "value_float"
+                    sub += f" AND COALESCE({col}, value_float, value_int)"
+                    sub += f" {_FILTER_OPS[op]} ?"
+                    sub_params.append(v)
             sub += ")"
             conditions.append(sub)
             params.extend(sub_params)

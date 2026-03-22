@@ -149,6 +149,25 @@ def test_search_plants_filters_no_match(database):
     assert result == {"total_count": 0, "results": []}
 
 
+def test_search_plants_eq_operator_float(database):
+    """eq operator in dict syntax should match exact float values."""
+    result = search_plants_in(
+        database, filters={"height": {"eq": 1.2}},
+    )
+
+    assert result["total_count"] == 1
+    assert result["results"][0]["scientific_name"] == "symphytum officinale"
+
+
+def test_search_plants_eq_operator_bool(database):
+    """eq operator in dict syntax should match bool values."""
+    result = search_plants_in(
+        database, filters={"sun/full": {"eq": True}},
+    )
+
+    assert result["total_count"] == 2
+
+
 def test_search_plants_unknown_filter_keys(database):
     """Unknown filter keys should return an error with a hint."""
     result = search_plants_in(
@@ -226,8 +245,26 @@ def test_search_plants_multi_ingestor():
 
 
 def test_list_plant_characteristics(database):
-    """Listing characteristics should return available keys."""
+    """Listing characteristics should return a structured schema."""
     result = list_characteristics_in(database)
-    keys = {c["key"] for c in result}
 
+    assert result["entity"] == "plant"
+    keys = {f["key"] for f in result["fields"]}
     assert_that(keys, has_items("height", "sun/full"))
+
+
+def test_list_plant_characteristics_field_shape(database):
+    """Each field entry should include key, type, operators, and count."""
+    result = list_characteristics_in(database)
+    fields_by_key = {f["key"]: f for f in result["fields"]}
+
+    height = fields_by_key["height"]
+    assert height["type"] == "float"
+    assert_that(height["operators"], has_items("eq", "gt", "lte"))
+    assert "min" in height and "max" in height
+    assert "Hauteur (m)" in height["aliases"]  # from en/de.po
+
+    sun = fields_by_key["sun/full"]
+    assert sun["type"] == "bool"
+    assert sun["operators"] == ["eq"]
+    assert "Soleil" in sun["aliases"]  # from en/de.po

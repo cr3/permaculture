@@ -6,6 +6,7 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 
 from permaculture.database import Database
+from permaculture.locales import all_aliases
 
 
 def get_allowed_hosts(env=os.environ):
@@ -50,19 +51,37 @@ mcp = FastMCP(
 )
 
 
-def _plant_dict(plant):
+_OPERATORS_BY_TYPE = {
+    "text": ["eq"],
+    "bool": ["eq"],
+    "int": ["eq", "lt", "lte", "gt", "gte"],
+    "float": ["eq", "lt", "lte", "gt", "gte"],
+}
+
+
+def list_characteristics_in(database) -> dict:
+    """Build a structured schema of all searchable plant characteristics."""
+    aliases = all_aliases()
+    fields = []
+    for char in database.list_characteristics():
+        typ = char["type"]
+        field = {
+            "key": char["key"],
+            "type": typ,
+            "operators": _OPERATORS_BY_TYPE[typ],
+            "count": char["count"],
+        }
+        if typ in ("int", "float"):
+            field["min"] = char["min"]
+            field["max"] = char["max"]
+        if char["key"] in aliases:
+            field["aliases"] = aliases[char["key"]]
+        fields.append(field)
+
     return {
-        "scientific_name": plant.scientific_name,
-        "common_names": plant.common_names,
-        "data": dict(plant),
-        "ingestors": plant.ingestors,
-        "sources": plant.sources,
+        "entity": "plant",
+        "fields": fields,
     }
-
-
-def list_characteristics_in(database) -> list[dict]:
-    """List all searchable plant characteristics."""
-    return database.list_characteristics()
 
 
 def search_plants_in(
@@ -100,17 +119,28 @@ def search_plants_in(
 
 def lookup_plants_in(database, names: list[str]) -> list[dict]:
     """Look up plant characteristics by exact scientific name."""
-    return [_plant_dict(plant) for plant in database.lookup(names)]
+    return [
+        {
+            "scientific_name": plant.scientific_name,
+            "common_names": plant.common_names,
+            "data": dict(plant),
+            "ingestors": plant.ingestors,
+            "sources": plant.sources,
+        }
+        for plant in database.lookup(names)
+    ]
 
 
 @mcp.tool()
-def list_plant_characteristics() -> list[dict]:
-    """List all searchable plant characteristics with types and counts.
+def list_plant_characteristics() -> dict:
+    """Return the plant schema: filterable fields, types, and supported operators.
 
-    Returns keys that can be used as filters in search_plants.
-    Each entry includes the key name, value type (number or text),
-    and count of plants with that characteristic.
-    Numeric keys also include min and max values.
+    Use this before calling search_plants to discover valid filter keys and
+    the operators each field supports.  The response includes:
+    - ``version``: schema version date
+    - ``filter_syntax``: supported logical and comparison operators
+    - ``fields``: one entry per filterable characteristic with key, type,
+      operators, count, and (for text fields) example values
     """
     database = Database.from_env()
     return list_characteristics_in(database)
