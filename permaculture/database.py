@@ -377,6 +377,23 @@ class Database:
                 result.append(
                     {"key": key, "type": "text", "count": count}
                 )
+        text_entries = [e for e in result if e["type"] == "text"]
+        if text_entries:
+            text_keys = [e["key"] for e in text_entries]
+            placeholders = ",".join("?" * len(text_keys))
+            sample_rows = conn.execute(
+                f"SELECT key, value_text FROM plant_attributes"  # noqa: S608
+                f" WHERE key IN ({placeholders}) AND value_text IS NOT NULL"
+                f" GROUP BY key, value_text ORDER BY key, COUNT(*) DESC",
+                text_keys,
+            ).fetchall()
+            examples: dict[str, list] = {}
+            for k, val in sample_rows:
+                bucket = examples.setdefault(k, [])
+                if len(bucket) < 5:
+                    bucket.append(val)
+            for entry in text_entries:
+                entry["examples"] = examples.get(entry["key"], [])
         return result
 
 

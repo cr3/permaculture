@@ -76,6 +76,8 @@ def list_characteristics_in(database) -> dict:
             field["max"] = char["max"]
         if char["key"] in aliases:
             field["aliases"] = aliases[char["key"]]
+        if "examples" in char:
+            field["examples"] = char["examples"]
         fields.append(field)
 
     return {
