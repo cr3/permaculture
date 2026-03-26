@@ -62,7 +62,7 @@ class Locales:
         }
 
 
-def all_aliases(locales_dir: Path = LOCALES_DIR) -> dict[str, list[str]]:
+def all_aliases(locales_dir: Path = LOCALES_DIR, language: str = "*") -> dict[str, list[str]]:
     """Return a mapping from DB keys to their source name aliases.
 
     Scans all ingestor .mo files in the ``en`` locale and inverts
@@ -70,10 +70,10 @@ def all_aliases(locales_dir: Path = LOCALES_DIR) -> dict[str, list[str]]:
     ``"Hauteur (m)"`` and ``"Height"`` are both aliases for ``"height"``.
     """
     result: dict[str, set] = {}
-    en_dir = locales_dir / "en" / "LC_MESSAGES"
-    for mo_path in en_dir.glob("*.mo"):
+    for mo_path in locales_dir.glob(f"{language}/LC_MESSAGES/*.mo"):
         domain = mo_path.stem
-        locales = Locales.from_domain(domain, locales_dir)
+        language = mo_path.parent.parent.name
+        locales = Locales.from_domain(domain, locales_dir, language=language)
         for msgid, msgstr in locales.field_translations():
             if msgstr != msgid:
                 result.setdefault(msgstr, set()).add(msgid)

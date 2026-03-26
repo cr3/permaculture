@@ -164,7 +164,7 @@ def parse_product(html):
 class SDPConverter(Converter):
     """Converter for La Société des Plantes fields."""
 
-    locales: Locales = field(factory=partial(Locales.from_domain, "sdp"))
+    locales: Locales = field(factory=partial(Locales.from_domain, "sdp", language="fr"))
 
     DISPATCH: ClassVar[dict[str, Callable]] = {
         "common name": Converter.convert_ignore,

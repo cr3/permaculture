@@ -56,7 +56,7 @@ class DEWeb:
 
 @define(frozen=True)
 class DEConverter(Converter):
-    locales: Locales = field(factory=partial(Locales.from_domain, "de"))
+    locales: Locales = field(factory=partial(Locales.from_domain, "de", language="fr"))
 
     def translate(self, message, context=None):
         """Translate `*` to None."""
