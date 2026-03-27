@@ -23,7 +23,7 @@ msgid "EdibilityRating"
 msgstr "edibility rating"
 
 msgid "FrostTender"
-msgstr "frost tender"
+msgstr "cold injury"
 
 msgid "Height"
 msgstr "height/avg"
@@ -40,11 +40,14 @@ msgstr "ph/neutral"
 msgid "UK Hardiness"
 msgstr "hardiness/uk"
 
+msgid "Saline"
+msgstr "salt"
+
 msgid "Shade"
 msgstr "sun"
 
 msgid "Width"
-msgstr "width/avg"
+msgstr "spread/avg"
 
 msgctxt "Deciduous/Evergreen"
 msgid "D"
@@ -53,6 +56,14 @@ msgstr "deciduous"
 msgctxt "Deciduous/Evergreen"
 msgid "E"
 msgstr "evergreen"
+
+msgctxt "FrostTender"
+msgid "N"
+msgstr "infrequent"
+
+msgctxt "FrostTender"
+msgid "Y"
+msgstr "frequent"
 
 msgctxt "Growth rate"
 msgid "S"
@@ -93,6 +104,14 @@ msgstr "neutral"
 msgctxt "pH"
 msgid "B"
 msgstr "alkaline"
+
+msgctxt "Saline"
+msgid "0"
+msgstr "sensitive"
+
+msgctxt "Saline"
+msgid "1"
+msgstr "tolerant"
 
 msgctxt "Shade"
 msgid "F"

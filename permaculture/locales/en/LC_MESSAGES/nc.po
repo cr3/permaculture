@@ -22,6 +22,12 @@ msgstr "fruit period"
 msgid "Minimum Root Depth"
 msgstr "root depth/min"
 
+msgid "Plant Type"
+msgstr "cycle"
+
+msgid "Plant Category"
+msgstr "habit"
+
 msgid "Related Plant"
 msgstr "related"
 

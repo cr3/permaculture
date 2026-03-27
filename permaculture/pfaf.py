@@ -39,6 +39,9 @@ class PFAFConverter(Converter):
         else:
             return super().convert_float(key, value)
 
+    def convert_letters(self, key, value):
+        return super().convert_letters(key, str(value))
+
     DISPATCH: ClassVar[dict[str, Callable]] = {
         "Acid": Converter.convert_bool,
         "Alkaline": Converter.convert_bool,
@@ -48,6 +51,7 @@ class PFAFConverter(Converter):
         "Deciduous/Evergreen": Converter.convert_letters,
         "Drought": Converter.convert_ignore,
         "Edible uses": Converter.convert_ignore,
+        "FrostTender": Converter.convert_letters,
         "Growth rate": Converter.convert_list,
         "Habitat": Converter.convert_ignore,
         "Heavy clay": Converter.convert_ignore,
@@ -60,6 +64,7 @@ class PFAFConverter(Converter):
         "Pollinators": Converter.convert_list,
         "Propagation": Converter.convert_ignore,
         "Range": Converter.convert_ignore,
+        "Saline": convert_letters,
         "Shade": Converter.convert_letters,
         "Soil": Converter.convert_letters,
         "Uses notes": Converter.convert_ignore,

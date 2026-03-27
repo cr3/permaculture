@@ -34,7 +34,7 @@ msgid "Fixateur Azote"
 msgstr "nitrogen fixer"
 
 msgid "Forme"
-msgstr "shape"
+msgstr "habit"
 
 msgid "Genre"
 msgstr "genus"
