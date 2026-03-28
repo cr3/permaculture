@@ -170,6 +170,7 @@ class NCConverter(Converter):
         "Minimum Root Depth": partial(Converter.convert_float, unit=inches),
         "Notes": Converter.convert_ignore,
         "Plant Binomial": Converter.convert_ignore,
+        "Plant Category": Converter.convert_list,
         "Root Type": Converter.convert_list,
         "Soil Moisture": Converter.convert_list,
         "Soil Type": Converter.convert_list,
