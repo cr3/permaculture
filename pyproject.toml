@@ -48,7 +48,7 @@ check = [
 ]
 
 docs = [
-  "sphinx>=9.1.0,<9.2.0",
+  "sphinx>=9.2.0,<9.3.0",
   "sphinxcontrib-log-cabinet>=1.0.1,<2.0.0",
   "sphinx-rtd-theme>=3.1.0,<3.2.0",
 ]
